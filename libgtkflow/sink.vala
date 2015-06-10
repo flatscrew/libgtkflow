@@ -24,7 +24,7 @@ namespace GtkFlow {
      * A Sink is a special Type of Dock that receives data from
      * A source in order to let it either 
      */
-    public class Sink : Dock {
+    public class Sink : GFlow.SimpleSink {
         /**
          * The Source that this Sink draws its data from
          */
@@ -40,10 +40,10 @@ namespace GtkFlow {
             base(initial);
         }
 
-        public virtual void set_source(Source s) throws NodeError{
+        public virtual void set_source(Source s) throws GFlow.NodeError{
             this.unset_source();
             if (this.val.type() != s.val.type()) {
-                throw new NodeError.INCOMPATIBLE_SOURCETYPE(
+                throw new GFlow.NodeError.INCOMPATIBLE_SOURCETYPE(
                     "Can't connect. Source has type %s while Sink has type %s".printf(
                         s.val.type().name(), this.val.type().name()
                     )
@@ -69,36 +69,17 @@ namespace GtkFlow {
          * If yes, it returns that value. If not, returns the default value of
          * This Sink
          */
-        public GLib.Value get_value() throws NodeError {
+        public GLib.Value get_value() throws GFlow.NodeError {
             if (this.source != null && this.valid) {
                 return this.val;
             } else {
-                throw new NodeError.NO_SOURCE("This sink has no source to drain data from");
+                throw new GFlow.NodeError.NO_SOURCE("This sink has no source to drain data from");
             }
         }
 
-        /**
-         * Returns true if this Sink is connected to the given Source
-         */
-        public bool connected_to(Source s) {
-            return this.source == s;
-        }
-
-        /**
-         * Returns true if this sink is connected to a source
-         */
-        public override bool is_connected() {
-            return this.source != null;
-        }
-
-        public override void invalidate () {
-            this.valid = false;
-            this.changed(this.initial);
-        }
-
-        public void change_value(GLib.Value v) throws NodeError {
+        public void change_value(GLib.Value v) throws GFlow.NodeError {
             if (this.val.type() != v.type())
-                throw new NodeError.INCOMPATIBLE_VALUE(
+                throw new GFlow.NodeError.INCOMPATIBLE_VALUE(
                     "Cannot feed a %s value into this %s Sink".printf(
                         v.type().name(),this.val.type().name())
                 );
@@ -144,11 +125,6 @@ namespace GtkFlow {
             cr.move_to(offset_x+Dock.HEIGHT+Dock.SPACING_X, offset_y);
             Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
-
-            /*
-            Important stateflags
-            sc.set_state(Gtk.StateFlags.ACTIVE | Gtk.StateFlags.CHECKED | Gtk.StateFlags.PRELIGHT);
-            */
         }
     }
 }
