@@ -23,71 +23,12 @@
  * Flowgraphs for Gtk
  */
 namespace GtkFlow {
-    public errordomain NodeError {
-        /**
-         * Throw when the user tries to connect a sink to a source that
-         * Delivers a different type
-         */
-        INCOMPATIBLE_SOURCETYPE,
-        /**
-         * Throw when the user tries to connect a source to a sink that
-         * Delivers a different type
-         */
-        INCOMPATIBLE_SINKTYPE,
-        /**
-         * Throw when a user tries to assign a value with a wrong type
-         * to a sink
-         */
-        INCOMPATIBLE_VALUE,
-        /**
-         * Throw then the user tries to get a value from a sink that
-         * is currently not connected to any source
-         */
-        NO_SOURCE,
-        /**
-         * Throw when there is no Dock available on this position
-         */
-        NO_DOCK_ON_POSITION,
-        /**
-         * Throw when the user tries to add a dock to a node
-         * That already contains a dock
-         */
-        ALREADY_HAS_DOCK,
-        /**
-         * Throw when the dock that the user tries to add already
-         * belongs to another node
-         */
-        DOCK_ALREADY_BOUND_TO_NODE,
-        /**
-         * Throw when the user tries to remove a dock from a node
-         * that hasn't yet been added to the node
-         */
-        NO_SUCH_DOCK
-    }
-
-    public interface INode : GLib.Object {
-        public abstract void disconnect_all();
-        public abstract void draw_node(Cairo.Context cr);
-        public abstract Dock? get_dock_on_position(Gdk.Point p);
-        public abstract uint get_min_height();
-        public abstract uint get_min_width();
-        public abstract void get_node_allocation(out Gtk.Allocation a);
-        public abstract bool is_on_closebutton(Gdk.Point p);
-        public abstract bool is_on_resize_handle(Gdk.Point p);
-        public abstract bool is_recursive(Node from, bool initial=false);
-        public abstract void set_node_allocation(Gtk.Allocation a);
-        public abstract void set_node_view(NodeView? n);
-        public abstract void set_position(int x, int y);
-        public abstract unowned List<Source> get_sources();
-        public abstract Gdk.Point get_dock_position(Dock d) throws NodeError;
-    }
-
     /**
      * Represents an element that can generate, process or receive data
      * This is done by adding Sources and Sinks to it. The inner logic of
      * The node can be represented towards the user as arbitrary Gtk widget.
      */
-    public class Node : Gtk.Bin, INode {
+    public class Node : Gtk.Bin, GFlow.SimpleNode {
         // Determines the space between the title and the first dock (y-axis)
         // as well as the space between the title and the close-button if any (x-axis)
         private const int TITLE_SPACING = 15;
@@ -151,70 +92,6 @@ namespace GtkFlow {
             base.remove(w);
         }
 
-        public void add_source(Source s) throws NodeError {
-            if (s.get_node() != null)
-                throw new NodeError.DOCK_ALREADY_BOUND_TO_NODE("This Source is already bound");
-            if (this.sources.index(s) != -1)
-                throw new NodeError.ALREADY_HAS_DOCK("This node already has this source");
-            sources.append(s);
-            s.set_node(this);
-            s.update_layout();
-            this.recalculate_size();
-            s.size_changed.connect(this.recalculate_size);
-        }
-
-        public void add_sink(Sink s) throws NodeError {
-            if (s.get_node() != null)
-                throw new NodeError.DOCK_ALREADY_BOUND_TO_NODE("This Sink is already bound" );
-            if (this.sinks.index(s) != -1)
-                throw new NodeError.ALREADY_HAS_DOCK("This node already has this sink");
-            sinks.append(s);
-            s.set_node(this);
-            s.update_layout();
-            this.recalculate_size();
-            s.size_changed.connect(this.recalculate_size);
-        }
-
-        public void remove_source(Source s) throws NodeError {
-            if (this.sources.index(s) == -1)
-                throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
-            sources.remove(s);
-            s.set_node(null);
-            this.recalculate_size();
-            s.size_changed.disconnect(this.recalculate_size);
-        }
-
-        public void remove_sink(Sink s) throws NodeError {
-            if (this.sinks.index(s) == -1)
-                throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
-            sinks.remove(s);
-            s.set_node(null);
-            this.recalculate_size();
-            s.size_changed.disconnect(this.recalculate_size);
-        }
-
-        public bool has_sink(Sink s) {
-            return this.sinks.index(s) != -1;
-        }
-
-        public bool has_source(Source s) {
-            return this.sources.index(s) != -1;
-        }
-
-        public bool has_dock(Dock d) {
-            if (d is Source)
-                return this.has_source(d as Source);
-            else
-                return this.has_sink(d as Sink);
-        }
-
-        /**
-         * Returns the sources of this node
-         */
-        public unowned List<Source> get_sources() {
-            return this.sources;
-        }
-
         public new void set_border_width(uint border_width) {
             if (border_width < RESIZE_HANDLE_SIZE) {
                 warning("Cannot set border width smaller than %d", RESIZE_HANDLE_SIZE);
@@ -230,22 +107,6 @@ namespace GtkFlow {
         }
 
         /**
-         * This method checks whether a connection from the given from-Node
-         * to this Node would lead to a recursion
-         */
-        public bool is_recursive(Node from, bool initial=true) {
-            if (!initial && this == from)
-                return true;
-            foreach (Source source in this.get_sources()) {
-                foreach (Sink sink in source.get_sinks()) {
-                    if (sink.get_node().is_recursive(from, false))
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        /**
          * Returns the position of the given dock.
          * This is obviously bullshit. Docks should be able to know
          * their own position
@@ -253,7 +114,7 @@ namespace GtkFlow {
         /*
          * TODO: find better solution
          */
-        public Gdk.Point get_dock_position(Dock d) throws NodeError {
+        public Gdk.Point get_dock_position(Dock d) throws GFlow.NodeError {
             int i = 0;
             Gdk.Point p = {0,0};
 
@@ -283,7 +144,7 @@ namespace GtkFlow {
                 }
                 i++;
             }
-            throw new NodeError.NO_SUCH_DOCK("There is no such dock in this node");
+            throw new GFlow.NodeError.NO_SUCH_DOCK("There is no such dock in this node");
         }
 
         /**

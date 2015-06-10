@@ -54,8 +54,10 @@ AM_VALAFLAGS += \
 	--vapidir=. \
 	--pkg glib-2.0 \
 	--pkg gtk+-3.0 \
+	--pkg gflow-0.2 \
 	--includedir libgtkflow \
 	--vapi gtkflow-0.2.vapi \
+	--vapidir libgflow \
 	-H gtkflow.h \
 	-C \
 	$(NULL)

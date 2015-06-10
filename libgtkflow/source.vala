@@ -24,16 +24,16 @@ namespace GtkFlow {
      * The Source is a special Type of Dock that provides data.
      * A Source can provide a multitude of Sinks with data.
      */
-    public class Source : Dock {
+    public class Source : GFlow.SimpleSource {
         private List<Sink> sinks = new List<Sink>();
 
         public Source(GLib.Value initial) {
             base(initial);
         }
 
-        public void set_value(GLib.Value v) throws NodeError {
+        public void set_value(GLib.Value v) throws GFlow.NodeError {
             if (this.val.type() != v.type())
-                throw new NodeError.INCOMPATIBLE_VALUE(
+                throw new GFlow.NodeError.INCOMPATIBLE_VALUE(
                     "Cannot set a %s value to this %s Source".printf(
                         v.type().name(),this.val.type().name())
                 );
@@ -48,9 +48,9 @@ namespace GtkFlow {
             }
         }
 
-        public virtual void add_sink(Sink s) throws NodeError {
+        public virtual void add_sink(Sink s) throws GFlow.NodeError {
             if (this.val.type() != s.val.type()) {
-                throw new NodeError.INCOMPATIBLE_SINKTYPE(
+                throw new GFlow.NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Sink has type %s while Source has type %s".printf(
                         s.val.type().name(), this.val.type().name()
                     )
@@ -65,10 +65,6 @@ namespace GtkFlow {
             }
         }
 
-        public new void set_valid() {
-            this.valid = true;
-        }
-
         public virtual void remove_sink(Sink s){
             if (this.sinks.index(s) != -1)
                 this.sinks.remove(s);
@@ -80,20 +76,6 @@ namespace GtkFlow {
         public virtual void remove_sinks() {
             foreach (Sink s in this.sinks)
                 this.remove_sink(s);
-        }
-
-        /**
-         * Returns true if this Source is connected to the given Sink
-         */
-        public bool connected_to(Sink s) {
-            return this.sinks.index(s) != -1;
-        }
-
-        /**
-         * Returns true if this Source is connected to one or more Sinks
-         */
-        public override bool is_connected() {
-            return this.sinks.length() > 0;
         }
 
         /**
