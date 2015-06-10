@@ -47,12 +47,12 @@ namespace GtkFlow {
         private int resize_start_y = 0;
 
         // Remember the last dock the mouse hovered over, so we can unhighlight it
-        private Dock? hovered_dock = null;
+        private GFlow.Dock? hovered_dock = null;
 
         // The dock that we are targeting for dragging a new connector
-        private Dock? drag_dock = null;
+        private GFlow.Dock? drag_dock = null;
         // The dock that we are targeting to drop a connector on
-        private Dock? drop_dock = null;
+        private GFlow.Dock? drop_dock = null;
         // The connector that is being used to draw a non-established connection
         private Gtk.Allocation? temp_connector = null;
 
@@ -150,7 +150,7 @@ namespace GtkFlow {
             if (!this.editable)
                 return false;
             GFlow.Node? n = this.get_node_on_position(e.x, e.y);
-            Dock? targeted_dock = null;
+            GFlow.Dock? targeted_dock = null;
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
                 if (n.is_on_closebutton(pos))
@@ -293,7 +293,7 @@ namespace GtkFlow {
             // currently pointing on a dock. if this is true, we
             // Want to draw a new connector instead of dragging the node
             GFlow.Node? n = this.get_node_on_position(e.x, e.y);
-            Dock? targeted_dock = null;
+            GFlow.Dock? targeted_dock = null;
             if (n != null) {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
                 if (!n.is_on_closebutton(pos))
@@ -391,7 +391,7 @@ namespace GtkFlow {
         /**
          * Determines wheter one dock can be dropped on another
          */
-        private bool is_suitable_target (Dock from, Dock to) {
+        private bool is_suitable_target (GFlow.Dock from, GFlow.Dock to) {
             // Check whether the docks have the same type
             if (!from.has_same_type(to))
                 return false;
@@ -424,7 +424,7 @@ namespace GtkFlow {
          * Sets the dock that is currently being hovered over to drop
          * a connector on
          */
-        private void set_drop_dock(Dock? d) {
+        private void set_drop_dock(GFlow.Dock? d) {
             if (this.drop_dock != null)
                 this.drop_dock.pressed = false;
             this.drop_dock = d;
@@ -436,7 +436,7 @@ namespace GtkFlow {
         /**
          * Sets the dock that is currently being hovered over
          */
-        private void set_hovered_dock(Dock? d) {
+        private void set_hovered_dock(GFlow.Dock? d) {
             if (this.hovered_dock != null)
                 this.hovered_dock.highlight = false;
             this.hovered_dock = d;

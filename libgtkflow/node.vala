@@ -108,13 +108,13 @@ namespace GtkFlow {
 
         /**
          * Returns the position of the given dock.
-         * This is obviously bullshit. Docks should be able to know
+         * This is obviously bullshit. GFlow.Docks should be able to know
          * their own position
          */
         /*
          * TODO: find better solution
          */
-        public Gdk.Point get_dock_position(Dock d) throws GFlow.NodeError {
+        public Gdk.Point get_dock_position(GFlow.Dock d) throws GFlow.NodeError {
             int i = 0;
             Gdk.Point p = {0,0};
 
@@ -125,21 +125,21 @@ namespace GtkFlow {
 
             uint title_offset = this.get_title_line_height();
 
-            foreach (Dock s in this.sinks) {
+            foreach (GFlow.Dock s in this.sinks) {
                 if (s == d) {
-                    p.x += (int)(this.node_allocation.x + this.border_width + Dock.HEIGHT/2);
+                    p.x += (int)(this.node_allocation.x + this.border_width + GFlow.Dock.HEIGHT/2);
                     p.y += (int)(this.node_allocation.y + this.border_width + title_offset
-                              + Dock.HEIGHT/2 + i * s.get_min_height());
+                              + GFlow.Dock.HEIGHT/2 + i * s.get_min_height());
                     return p;
                 }
                 i++;
             }
-            foreach (Dock s in this.sources) {
+            foreach (GFlow.Dock s in this.sources) {
                 if (s == d) {
                     p.x += (int)(this.node_allocation.x - this.border_width
-                              + this.node_allocation.width - Dock.HEIGHT/2);
+                              + this.node_allocation.width - GFlow.Dock.HEIGHT/2);
                     p.y += (int)(this.node_allocation.y + this.border_width + title_offset
-                              + Dock.HEIGHT/2 + i * s.get_min_height());
+                              + GFlow.Dock.HEIGHT/2 + i * s.get_min_height());
                     return p;
                 }
                 i++;
@@ -169,10 +169,10 @@ namespace GtkFlow {
         public uint get_min_height() {
             uint mw = this.border_width*2;
             mw += this.get_title_line_height();
-            foreach (Dock d in this.sinks) {
+            foreach (GFlow.Dock d in this.sinks) {
                 mw += d.get_min_height();
             }
-            foreach (Dock d in this.sources) {
+            foreach (GFlow.Dock d in this.sources) {
                 mw += d.get_min_height();
             }
             Gtk.Widget child = this.get_child();
@@ -195,12 +195,12 @@ namespace GtkFlow {
                 this.layout.get_pixel_size(out width, out height);
                 mw = width + TITLE_SPACING + DELETE_BTN_SIZE;
             }
-            foreach (Dock d in this.sinks) {
+            foreach (GFlow.Dock d in this.sinks) {
                 t = d.get_min_width();
                 if (t > mw)
                     mw = t;
             }
-            foreach (Dock d in this.sources) {
+            foreach (GFlow.Dock d in this.sources) {
                 t = d.get_min_width();
                 if (t > mw)
                     mw = t;
@@ -228,7 +228,7 @@ namespace GtkFlow {
         /**
          * Determines whether the mousepointer is hovering over a dock on this node
          */
-        public Dock? get_dock_on_position(Gdk.Point p) {
+        public GFlow.Dock? get_dock_on_position(Gdk.Point p) {
             int x = p.x;
             int y = p.y;
 
@@ -240,22 +240,22 @@ namespace GtkFlow {
             int dock_x, dock_y;
             uint title_offset;
             title_offset = this.get_title_line_height();
-            foreach (Dock s in this.sinks) {
+            foreach (GFlow.Dock s in this.sinks) {
                 dock_x = this.node_allocation.x + (int)this.border_width - (int)scroll_x;
                 dock_y = this.node_allocation.y + (int)this.border_width + (int)title_offset
                          + i * s.get_min_height() - (int)scroll_y;
-                if (x > dock_x && x < dock_x + Dock.HEIGHT
-                        && y > dock_y && y < dock_y + Dock.HEIGHT )
+                if (x > dock_x && x < dock_x + GFlow.Dock.HEIGHT
+                        && y > dock_y && y < dock_y + GFlow.Dock.HEIGHT )
                     return s;
                 i++;
             }
-            foreach (Dock s in this.sources) {
+            foreach (GFlow.Dock s in this.sources) {
                 dock_x = this.node_allocation.x + this.node_allocation.width
-                         - (int)this.border_width - Dock.HEIGHT - (int)scroll_x;
+                         - (int)this.border_width - GFlow.Dock.HEIGHT - (int)scroll_x;
                 dock_y = this.node_allocation.y + (int)this.border_width + (int)title_offset
                          + i * s.get_min_height() - (int)scroll_y;
-                if (x > dock_x && x < dock_x + Dock.HEIGHT
-                        && y > dock_y && y < dock_y + Dock.HEIGHT )
+                if (x > dock_x && x < dock_x + GFlow.Dock.HEIGHT
+                        && y > dock_y && y < dock_y + GFlow.Dock.HEIGHT )
                     return s;
                 i++;
             }

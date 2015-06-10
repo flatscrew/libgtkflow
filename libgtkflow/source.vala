@@ -21,7 +21,7 @@
 
 namespace GtkFlow {
     /**
-     * The Source is a special Type of Dock that provides data.
+     * The Source is a special Type of GFlow.Dock that provides data.
      * A Source can provide a multitude of Sinks with data.
      */
     public class Source : GFlow.SimpleSource {
@@ -112,7 +112,7 @@ namespace GtkFlow {
             if (this.pressed)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
             sc.add_class(Gtk.STYLE_CLASS_RADIO);
-            sc.render_option(cr, offset_x+width-Dock.HEIGHT,offset_y,Dock.HEIGHT,Dock.HEIGHT);
+            sc.render_option(cr, offset_x+width-GFlow.Dock.HEIGHT,offset_y,GFlow.Dock.HEIGHT,GFlow.Dock.HEIGHT);
             sc.restore();
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);

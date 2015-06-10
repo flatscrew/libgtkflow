@@ -13,7 +13,6 @@ lib_LTLIBRARIES = libgtkflow-0.2.la
 # Vala source code
 sources = \
 	namespace-info.vala \
-	dock.vala \
 	node.vala \
 	nodeview.vala \
 	sink.vala \

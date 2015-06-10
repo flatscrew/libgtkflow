@@ -21,7 +21,7 @@
 
 namespace GtkFlow {
     /**
-     * A Sink is a special Type of Dock that receives data from
+     * A Sink is a special Type of GFlow.Dock that receives data from
      * A source in order to let it either 
      */
     public class Sink : GFlow.SimpleSink {
@@ -116,13 +116,13 @@ namespace GtkFlow {
             if (this.pressed)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
             sc.add_class(Gtk.STYLE_CLASS_RADIO);
-            sc.render_option(cr, offset_x,offset_y,Dock.HEIGHT,Dock.HEIGHT);
+            sc.render_option(cr, offset_x,offset_y,GFlow.Dock.HEIGHT,GFlow.Dock.HEIGHT);
             sc.restore();
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);
             Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
-            cr.move_to(offset_x+Dock.HEIGHT+Dock.SPACING_X, offset_y);
+            cr.move_to(offset_x+GFlow.Dock.HEIGHT+GFlow.Dock.SPACING_X, offset_y);
             Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
