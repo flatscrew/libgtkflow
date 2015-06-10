@@ -165,7 +165,7 @@ namespace GtkFlow {
                         Node srcnode = s.get_node();
                         try {
                             startpos = srcnode.get_dock_position(s);
-                        } catch (NodeError e) {
+                        } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
@@ -174,7 +174,7 @@ namespace GtkFlow {
                     } else {
                         try {
                             startpos = n.get_dock_position(this.drag_dock);
-                        } catch (NodeError e) {
+                        } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
@@ -246,7 +246,7 @@ namespace GtkFlow {
                             src.remove_sink(this.drag_dock as Sink);
                         }
                     }
-                } catch (NodeError e) {
+                } catch (GFlow.NodeError e) {
                     warning(e.message);
                 }
             }
@@ -461,7 +461,7 @@ namespace GtkFlow {
                     Gdk.Point source_pos = {0,0};
                     try {
                         source_pos = n.get_dock_position(source);
-                    } catch (NodeError e) {
+                    } catch (GFlow.NodeError e) {
                         warning("No dock on position. Ommiting connector");
                         continue;
                     }
@@ -473,7 +473,7 @@ namespace GtkFlow {
                         Gdk.Point sink_pos = {0,0};
                         try {
                             sink_pos = sink_node.get_dock_position(sink);
-                        } catch (NodeError e) {
+                        } catch (GFlow.NodeError e) {
                             warning("No dock on position. Ommiting connector");
                             continue;
                         }
