@@ -17,6 +17,7 @@ sources = \
 	gflow-node.vala \
 	gflow-simple-sink.vala \
 	gflow-simple-source.vala \
+	gflow-simple-node.vala \
 	gflow-sink.vala \
 	gflow-source.vala
 
