@@ -50,6 +50,40 @@ public class GFlowTest.SourceTest
       src.val = 0.10;
       assert (src.val.get_int () == 10);
     });
+    Test.add_func ("/gflow/source/connect", 
+    () => {
+      var src = new GFlow.SimpleSource (0);
+      var s = new GFlow.SimpleSink (true);
+      var s1 = new GFlow.SimpleSink (1);
+      var s2 = new GFlow.SimpleSink (10);
+      assert (src.initial != null);
+      assert (src.val != null);
+      assert (src.val.holds (typeof (int)));
+      assert (((int) src.val) == 0);
+      assert (!src.is_connected ());
+      bool fail = true;
+      try { src.connect (s); } catch { fail = false; }
+      if (fail) assert_not_reached ();
+      try {
+        assert (!s1.is_connected ());
+        fail = true;
+        s1.connected.connect (()=>{
+          fail = false;
+        });
+        src.connect (s1);
+        if (fail)  assert_not_reached ();
+        fail = true;
+        s2.connected.connect (()=>{
+          fail = false;
+        });
+        src.connect (s2);
+        if (fail)  assert_not_reached ();
+        src.val = 20;
+        assert (((int) src.val) == 20);
+        assert (((int) s1.val) == 20);
+        assert (((int) s2.val) == 20);
+      } catch { assert_not_reached (); }
+    });
     Test.add_func ("/gflow/source/derived", 
     () => {
       var src = new GFlowTest.Source ();

@@ -108,6 +108,7 @@ namespace GFlow {
           if (dock.is_connected_to (this)) return;
           if (dock is Sink) {
             add_sink ((Sink) dock);
+            dock.connect (this);
             connected (dock);
           }
         }

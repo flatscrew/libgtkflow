@@ -91,11 +91,12 @@ namespace GFlow {
           if (dock.is_connected_to (this)) return;
           if (dock is Source) {
             if (source != null) ((Dock) source).disconnect (this);
-            dock.connect (this);
             _source = (Source) dock;
+            dock.connect (this);
             _source.changed.connect (() =>{
               val = _source.val;
             });
+            connected (dock);
           }
         }
         // FIXME This oeverrides Dock.changed signals and set a value but this should not be the case
