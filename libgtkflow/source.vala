@@ -24,7 +24,7 @@ namespace GtkFlow {
      * The Source is a special Type of GFlow.Dock that provides data.
      * A Source can provide a multitude of Sinks with data.
      */
-    public class Source : GFlow.SimpleSource {
+    public class Source {
         private List<Sink> sinks = new List<Sink>();
 
         public Source(GLib.Value initial) {

@@ -24,7 +24,7 @@ namespace GtkFlow {
      * A Sink is a special Type of GFlow.Dock that receives data from
      * A source in order to let it either 
      */
-    public class Sink : GFlow.SimpleSink {
+    public class Sink {
         /**
          * The Source that this Sink draws its data from
          */

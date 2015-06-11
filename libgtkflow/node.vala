@@ -24,24 +24,235 @@
  */
 namespace GtkFlow {
     public interface DockRenderer {
-        
+        public abstract void draw_dock(GFlow.Dock d, Cairo.Context cr, 
+                                         int offset_x, int offset_y, int width);
+        public abstract int get_min_height(GFlow.Dock d);
+        public abstract int get_min_width(GFlow.Dock d);
     }
 
-    public interface NodeRenderer {
+    public abstract class NodeRenderer {
+        public int title_spacing {get; set; default=15;}
+        public int delete_btn_size {get; set; default=16;}
+        public int resize_handle_size {get; set; default=10;}
+
         public abstract void draw_node (Cairo.Context cr);
         public abstract GFlow.Dock? get_dock_on_position(Gdk.Point p);
-        public abstract Gdk.Point get_dock_position(GFlow.Dock d);
+        public abstract Gdk.Point get_dock_position(GFlow.Dock d) throws GFlow.NodeError;
+        public abstract bool is_on_closebutton(Gdk.Point p);
+        public abstract bool is_on_resize_handle(Gdk.Point p);
+        public abstract uint get_min_width();
+        public abstract uint get_min_height();
+    }
+
+    private class DefaultDockRenderer : DockRenderer {
+        public int dockpoint_height {get;set;default=16;}
+        
+        private Pango.Layout layout = null;
+
+        public DefaultDockRenderer(Node n) {
+            this.layout = this.node.create_pango_layout("");
+            //FIXME: to listen to the signals we will need
+            //       create a DockRenderer for each dock.
+            //       would be nice to get signals for this
+            //          i'd like to have sink_added, source_added,
+            //       sink_removed, source_removed as signal on node
+            //       as parameter they should supply the dock in question
+            this.node.gnode.notify["name"].connect(()=>this.update_name_layout());
+        }
+
+        /**
+         * Get the minimum width for this dock
+         */
+        public virtual int get_min_height() {
+            int width, height;
+            this.layout.get_pixel_size(out width, out height);
+            return (int)(Math.fmax(height, Dock.HEIGHT))+Dock.SPACING_Y;
+        }
+
+        /**
+         * Get the minimum height for this dock
+         */
+        public virtual int get_min_width() {
+            int width, height;
+            this.layout.get_pixel_size(out width, out height);
+            return (int)(width + Dock.HEIGHT + Dock.SPACING_X);
+        }
+
+        public void draw_dock(GFlow.Dock d, Cairo.Context cr,
+                              int offset_x, int offset_y, int width) {
+            if (d is GFlow.Sink)
+                draw_sink(d,cr,offset_x,offset_y,width);
+            if (d is GFlow.Source)
+                draw_source(d,cr,offset_x,offset_y,width);
+        }
+
+        /**
+         * Draw the given source onto a cairo context
+         */
+        public void draw_source(Source s, Cairo.Context cr, 
+                                int offset_x, int offset_y, int width) {
+            Gtk.StyleContext sc = this.get_style_context();
+            sc.save();
+            if (s.is_connected())
+                sc.set_state(Gtk.StateFlags.CHECKED);
+            if (s.highlight)
+                sc.set_state(sc.get_state() | Gtk.StateFlags.PRELIGHT);
+            if (s.active)
+                sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
+            sc.add_class(Gtk.STYLE_CLASS_RADIO);
+            sc.render_option(cr, offset_x+width-GFlow.Dock.HEIGHT,offset_y,GFlow.Dock.HEIGHT,GFlow.Dock.HEIGHT);
+            sc.restore();
+            sc.save();
+            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
+            cr.move_to(offset_x + width - this.get_min_width(), offset_y);
+            Pango.cairo_show_layout(cr, this.layout);
+            sc.restore();
+        }
+
+        /**
+         * Draw the given sink onto a cairo context
+         */
+        public void draw_sink(Sink s, Cairo.Context cr, int offset_x, int offset_y, int width) {
+            Gtk.StyleContext sc = this.get_style_context();
+            sc.save();
+            if (s.is_connected())
+                sc.set_state(Gtk.StateFlags.CHECKED);
+            if (s.highlight)
+                sc.set_state(sc.get_state() | Gtk.StateFlags.PRELIGHT);
+            if (s.active)
+                sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
+            sc.add_class(Gtk.STYLE_CLASS_RADIO);
+            sc.render_option(cr, offset_x,offset_y,GFlow.Dock.HEIGHT,GFlow.Dock.HEIGHT);
+            sc.restore();
+            sc.save();
+            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
+            cr.move_to(offset_x+GFlow.Dock.HEIGHT+GFlow.Dock.SPACING_X, offset_y);
+            Pango.cairo_show_layout(cr, this.layout);
+            sc.restore();
+        }
     }
 
     private class DefaultNodeRenderer : NodeRenderer {
-        private const int TITLE_SPACING = 15;
-        private const int DELETE_BTN_SIZE = 16;
-        private const int RESIZE_HANDLE_SIZE = 10;
+        private Pango.Layout layout;
 
         private weak Node node = null;
 
         public DefaultNodeRenderer(Node n) {
             this.node = n;
+            this.node.gnode.notify["name"].connect(()=>this.update_name_layout());
+        }
+
+        public void update_name_layout() {
+            this.layout = this.node.create_pango_layout("");
+            this.layout.set_markup("<b>%s</b>".printf(this.node.gnode.name),-1);
+            this.node.recalculate_size();
+            this.node.node_view.queue_draw();
+        }
+
+
+        private uint get_title_line_height() {
+            int width, height;
+            if (this.node.gnode.name == "") {
+                 width = height = 0;
+            } else {
+                this.layout.get_pixel_size(out width, out height);
+            }
+            return (uint)Math.fmax(height, delete_btn_size) + title_spacing;
+        }
+
+        /**
+         * Returns the minimum height this node has to have
+         */
+        public override uint get_min_height() {
+            uint mw = this.node.border_width*2;
+            mw += this.get_title_line_height();
+            foreach (GFlow.Dock d in this.node.gnode.get_sinks()) {
+                mw += this.dock_renderer.get_min_height(d);
+            }
+            foreach (GFlow.Dock d in this.node.gnode.get_sources()) {
+                mw += this.dock_renderer.get_min_height(d);
+            }
+            Gtk.Widget child = this.node.get_child();
+            if (child != null) {
+                int child_height, _;
+                child.get_preferred_height(out child_height, out _);
+                mw += child_height;
+            }
+            return mw;
+        }
+
+        /**
+         * Returns the minimum width this node has to have
+         */
+        public override uint get_min_width() {
+            uint mw = 0;
+            int t = 0;
+            if (this.node.name != "") {
+                int width, height;
+                this.layout.get_pixel_size(out width, out height);
+                mw = width + title_spacing + delete_btn_size;
+            }
+            foreach (GFlow.Dock d in this.node.gnode.get_sinks()) {
+                t = d.get_min_width();
+                if (t > mw)
+                    mw = t;
+            }
+            foreach (GFlow.Dock d in this.node.gnode.get_sources()) {
+                t = d.get_min_width();
+                if (t > mw)
+                    mw = t;
+            }
+            Gtk.Widget child = this.node.get_child();
+            if (child != null) {
+                int child_width, _;
+                child.get_preferred_width(out child_width, out _);
+                if (child_width > mw)
+                    mw = child_width;
+            }
+            return mw + this.node.border_width*2;
+        }
+
+        /**
+         * Returns true if the point is on the close-button of the node
+         */
+        public override bool is_on_closebutton(Gdk.Point p) {
+            int x = p.x;
+            int y = p.y;
+
+            double scroll_x = this.node.node_view != null ? this.node.node_view.hadjustment.value : 0;
+            double scroll_y = this.node.node_view != null ? this.node.node_view.vadjustment.value : 0;
+
+            Gtk.Allocation alloc;
+            this.node.get_node_allocation(out alloc);
+            int x_left = alloc.x + alloc.width - delete_btn_size
+                                 - (int)this.node.border_width - (int)scroll_x;
+            int x_right = x_left + delete_btn_size;
+            int y_top = alloc.y + (int)this.node.border_width - (int)scroll_y;
+            int y_bot = y_top + delete_btn_size;
+            return x > x_left && x < x_right && y > y_top && y < y_bot;
+        }
+
+        /**
+         * Returns true if the point is in the resize-drag area
+         */
+        public override bool is_on_resize_handle(Gdk.Point p) {
+            int x = p.x;
+            int y = p.y;
+
+            double scroll_x = this.node.node_view != null ? this.node.node_view.hadjustment.value : 0;
+            double scroll_y = this.node.node_view != null ? this.node.node_view.vadjustment.value : 0;
+
+            Gtk.Allocation alloc;
+            this.node.get_node_allocation(out alloc);
+            int x_right = alloc.x + alloc.width - (int)scroll_x;
+            int x_left = x_right - resize_handle_size;
+            int y_bot = alloc.y + alloc.height - (int)scroll_y;
+            int y_top = y_bot - resize_handle_size;
+            return x > x_left && x < x_right && y > y_top && y < y_bot;
         }
 
         /**
@@ -49,7 +260,7 @@ namespace GtkFlow {
          * This is obviously bullshit. GFlow.Docks should be able to know
          * their own position
          */
-        public Gdk.Point get_dock_position(GFlow.Dock d) throws GFlow.NodeError {
+        public override Gdk.Point get_dock_position(GFlow.Dock d) throws GFlow.NodeError {
             int i = 0;
             Gdk.Point p = {0,0};
 
@@ -58,22 +269,24 @@ namespace GtkFlow {
                 p.y -= (int)this.node.node_view.vadjustment.get_value();
             }
 
-            uint title_offset = this.node.get_title_line_height();
+            uint title_offset = this.get_title_line_height();
+            Gtk.Allocation node_allocation;
+            this.node.get_node_allocation(out node_allocation);
 
-            foreach (GFlow.Dock s in this.node.sinks) {
+            foreach (GFlow.Dock s in this.node.gnode.get_sinks()) {
                 if (s == d) {
-                    p.x += (int)(this.node.node_allocation.x + this.node.border_width + GFlow.Dock.HEIGHT/2);
-                    p.y += (int)(this.node.node_allocation.y + this.node.border_width + title_offset
+                    p.x += (int)(node_allocation.x + this.node.border_width + GFlow.Dock.HEIGHT/2);
+                    p.y += (int)(node_allocation.y + this.node.border_width + title_offset
                               + GFlow.Dock.HEIGHT/2 + i * s.get_min_height());
                     return p;
                 }
                 i++;
             }
-            foreach (GFlow.Dock s in this.node.sources) {
+            foreach (GFlow.Dock s in this.node.gnode.get_sources()) {
                 if (s == d) {
-                    p.x += (int)(this.node.node_allocation.x - this.node.border_width
-                              + this.node.node_allocation.width - GFlow.Dock.HEIGHT/2);
-                    p.y += (int)(this.node.node_allocation.y + this.node.border_width + title_offset
+                    p.x += (int)(node_allocation.x - this.node.border_width
+                              + node_allocation.width - GFlow.Dock.HEIGHT/2);
+                    p.y += (int)(node_allocation.y + this.node.border_width + title_offset
                               + GFlow.Dock.HEIGHT/2 + i * s.get_min_height());
                     return p;
                 }
@@ -85,7 +298,7 @@ namespace GtkFlow {
         /**
          * Determines whether the mousepointer is hovering over a dock on this node
          */
-        public GFlow.Dock? get_dock_on_position(Gdk.Point p) {
+        public override GFlow.Dock? get_dock_on_position(Gdk.Point p) {
             int x = p.x;
             int y = p.y;
 
@@ -94,23 +307,27 @@ namespace GtkFlow {
 
             int i = 0;
 
-            int dock_x, dock_y;
+            Gtk.Allocation node_allocation;
+            this.node.get_node_allocation(out node_allocation);
+            int dock_x, dock_y, mh;
             uint title_offset;
-            title_offset = this.node.get_title_line_height();
-            foreach (GFlow.Dock s in this.node.sinks) {
-                dock_x = this.node.node_allocation.x + (int)this.node.border_width - (int)scroll_x;
-                dock_y = this.node.node_allocation.y + (int)this.node.border_width + (int)title_offset
-                         + i * s.get_min_height() - (int)scroll_y;
+            title_offset = this.get_title_line_height();
+            foreach (GFlow.Dock s in this.node.gnode.get_sinks()) {
+                mh = this.node.dock_renderer.get_min_height(s);
+                dock_x = node_allocation.x + (int)this.node.border_width - (int)scroll_x;
+                dock_y = node_allocation.y + (int)this.node.border_width + (int)title_offset
+                         + i * mh - (int)scroll_y;
                 if (x > dock_x && x < dock_x + GFlow.Dock.HEIGHT
                         && y > dock_y && y < dock_y + GFlow.Dock.HEIGHT )
                     return s;
                 i++;
             }
-            foreach (GFlow.Dock s in this.node.sources) {
-                dock_x = this.node.node_allocation.x + this.node.node_allocation.width
+            foreach (GFlow.Dock s in this.node.gnode.get_sources()) {
+                mh = this.node.dock_renderer.get_min_height(s);
+                dock_x = node_allocation.x + node_allocation.width
                          - (int)this.node.border_width - GFlow.Dock.HEIGHT - (int)scroll_x;
-                dock_y = this.node.node_allocation.y + (int)this.node.border_width + (int)title_offset
-                         + i * s.get_min_height() - (int)scroll_y;
+                dock_y = node_allocation.y + (int)this.node.border_width + (int)title_offset
+                         + i * mh - (int)scroll_y;
                 if (x > dock_x && x < dock_x + GFlow.Dock.HEIGHT
                         && y > dock_y && y < dock_y + GFlow.Dock.HEIGHT )
                     return s;
@@ -122,7 +339,7 @@ namespace GtkFlow {
         /**
          * Draw this node on the given cairo context
          */
-        public void draw_node(Cairo.Context cr) {
+        public override void draw_node(Cairo.Context cr) {
             Gtk.Allocation alloc;
             this.node.get_node_allocation(out alloc);
 
@@ -140,7 +357,7 @@ namespace GtkFlow {
 
             int y_offset = 0;
 
-            if (this.node.title != "") {
+            if (this.node.gnode.name != "") {
                 sc.save();
                 cr.save();
                 sc.add_class(Gtk.STYLE_CLASS_BUTTON);
@@ -148,7 +365,7 @@ namespace GtkFlow {
                 cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
                 cr.move_to(alloc.x + this.node.border_width,
                            alloc.y + (int) this.node.border_width + y_offset);
-                Pango.cairo_show_layout(cr, this.node.layout);
+                Pango.cairo_show_layout(cr, this.layout);
                 cr.restore();
                 sc.restore();
             }
@@ -156,11 +373,11 @@ namespace GtkFlow {
                 Gtk.IconTheme it = Gtk.IconTheme.get_default();
                 try {
                     cr.save();
-                    Gdk.Pixbuf icon_pix = it.load_icon("edit-delete", DELETE_BTN_SIZE, 0);
+                    Gdk.Pixbuf icon_pix = it.load_icon("edit-delete", delete_btn_size, 0);
                     Gdk.cairo_set_source_pixbuf(
                         cr, icon_pix,
-                        alloc.x+alloc.width-DELETE_BTN_SIZE-border_width,
-                        alloc.y+border_width
+                        alloc.x+alloc.width-delete_btn_size-this.node.border_width,
+                        alloc.y+this.node.border_width
                     );
                     cr.paint();
                 } catch (GLib.Error e) {
@@ -169,26 +386,26 @@ namespace GtkFlow {
                     cr.restore();
                 }
             }
-            y_offset += (int)this.node.get_title_line_height();
+            y_offset += (int)this.get_title_line_height();
 
-            foreach (Sink s in this.node.sinks) {
-                s.draw_sink(cr, alloc.x + (int)this.node.border_width,
+            foreach (GFlow.Sink s in this.node.gnode.get_sinks()) {
+                this.node.dock_renderer.draw_dock(s, cr, alloc.x + (int)this.node.border_width,
                                 alloc.y+y_offset + (int) this.node.border_width);
-                y_offset += s.get_min_height();
+                y_offset += this.node.dock_renderer.get_min_height(s);
             }
-            foreach (Source s in this.node.sources) {
-                s.draw_source(cr, alloc.x-(int)this.node.border_width,
+            foreach (GFlow.Source s in this.node.gnode.get_sources()) {
+                this.node.dock_renderer.draw_dock(s, cr, alloc.x-(int)this.node.border_width,
                                   alloc.y+y_offset + (int) this.node.border_width, alloc.width);
-                y_offset += s.get_min_height();
+                y_offset += this.node.dock_renderer.get_min_height(s);
             }
 
             Gtk.Widget child = this.node.get_child();
             if (child != null) {
                 Gtk.Allocation child_alloc = {0,0,0,0};
-                child_alloc.x = alloc.x + (int)border_width;
-                child_alloc.y = alloc.y + (int)border_width + y_offset;
-                child_alloc.width = alloc.width - 2 * (int)border_width;
-                child_alloc.height = alloc.height - 2 * (int)border_width - y_offset;
+                child_alloc.x = alloc.x + (int)this.node.border_width;
+                child_alloc.y = alloc.y + (int)this.node.border_width + y_offset;
+                child_alloc.width = alloc.width - 2 * (int)this.node.border_width;
+                child_alloc.height = alloc.height - 2 * (int)this.node.border_width - y_offset;
                 child.size_allocate(child_alloc);
 
                 this.node.propagate_draw(child, cr);
@@ -199,10 +416,10 @@ namespace GtkFlow {
             cr.set_source_rgba(0.5,0.5,0.5,0.5);
             cr.move_to(alloc.x + alloc.width,
                        alloc.y + alloc.height);
-            cr.line_to(alloc.x + alloc.width - RESIZE_HANDLE_SIZE,
+            cr.line_to(alloc.x + alloc.width - resize_handle_size,
                        alloc.y + alloc.height);
             cr.line_to(alloc.x + alloc.width,
-                       alloc.y + alloc.height - RESIZE_HANDLE_SIZE);
+                       alloc.y + alloc.height - resize_handle_size);
             cr.fill();
             cr.stroke();
             cr.restore();
@@ -221,24 +438,21 @@ namespace GtkFlow {
 
         public GFlow.Node gnode {public get; private set; default = null;}
 
-        private NodeView? node_view = null;
+        public NodeView? node_view {get; set; default=null;}
 
         public NodeRenderer? node_renderer {get; set; default=null;}
         public DockRenderer? dock_renderer {get; set; default=null;}
 
         private Gtk.Allocation node_allocation;
 
-        private string title = "";
-        private Pango.Layout layout;
-
         public bool show_types {get; set; default=false;}
 
         public Node (GFlow.Node n) {
             this.gnode = n;
             this.node_allocation = {0,0,0,0};
-            this.set_border_width(RESIZE_HANDLE_SIZE);
+            this.node_renderer = new DefaultNodeRenderer(this);
+            this.set_border_width(this.node_renderer.resize_handle_size);
             this.recalculate_size();
-            this.node_renderer = new DefaultNodeRenderer();
         }
 
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
@@ -250,23 +464,15 @@ namespace GtkFlow {
             this.node_renderer = r;
         }
 
-        public void set_dock_renderer(NodeRenderer r) {
+        public void set_dock_renderer(DockRenderer r) {
             this.dock_renderer = r;
         }
 
-        public void set_title(string title) {
-            this.title = title;
-            this.layout = this.create_pango_layout("");
-            this.layout.set_markup("<b>%s</b>".printf(this.title),-1);
-            this.recalculate_size();
-            this.node_view.queue_draw();
-        }
-
         public void set_node_allocation(Gtk.Allocation alloc) {
-            if (alloc.width < (int)this.get_min_width())
-                alloc.width = (int)this.get_min_width();
-            if (alloc.height < (int)this.get_min_height())
-                alloc.height = (int)this.get_min_height();
+            if (alloc.width < (int)this.node_renderer.get_min_width())
+                alloc.width = (int)this.node_renderer.get_min_width();
+            if (alloc.height < (int)this.node_renderer.get_min_height())
+                alloc.height = (int)this.node_renderer.get_min_height();
             this.node_allocation = alloc;
         }
 
@@ -295,8 +501,9 @@ namespace GtkFlow {
         }
 
         public new void set_border_width(uint border_width) {
-            if (border_width < RESIZE_HANDLE_SIZE) {
-                warning("Cannot set border width smaller than %d", RESIZE_HANDLE_SIZE);
+            int nr = this.node_renderer.resize_handle_size;
+            if (border_width < nr) {
+                warning("Cannot set border width smaller than %d", nr);
                 return;
             }
             base.set_border_width(border_width);
@@ -315,8 +522,8 @@ namespace GtkFlow {
         public void recalculate_size() {
             Gtk.Allocation alloc;
             this.get_node_allocation(out alloc);
-            uint mw = this.get_min_width();
-            uint mh = this.get_min_height();
+            uint mw = this.node_renderer.get_min_width();
+            uint mh = this.node_renderer.get_min_height();
             if (mw > alloc.width)
                 alloc.width = (int)mw;
             if (mh > alloc.height)
@@ -325,124 +532,11 @@ namespace GtkFlow {
         }
 
         /**
-         * Returns the minimum height this node has to have
-         */
-        public uint get_min_height() {
-            uint mw = this.border_width*2;
-            mw += this.get_title_line_height();
-            foreach (GFlow.Dock d in this.sinks) {
-                mw += d.get_min_height();
-            }
-            foreach (GFlow.Dock d in this.sources) {
-                mw += d.get_min_height();
-            }
-            Gtk.Widget child = this.get_child();
-            if (child != null) {
-                int child_height, _;
-                child.get_preferred_height(out child_height, out _);
-                mw += child_height;
-            }
-            return mw;
-        }
-
-        /**
-         * Returns the minimum width this node has to have
-         */
-        public uint get_min_width() {
-            uint mw = 0;
-            int t = 0;
-            if (this.title != "") {
-                int width, height;
-                this.layout.get_pixel_size(out width, out height);
-                mw = width + TITLE_SPACING + DELETE_BTN_SIZE;
-            }
-            foreach (GFlow.Dock d in this.sinks) {
-                t = d.get_min_width();
-                if (t > mw)
-                    mw = t;
-            }
-            foreach (GFlow.Dock d in this.sources) {
-                t = d.get_min_width();
-                if (t > mw)
-                    mw = t;
-            }
-            Gtk.Widget child = this.get_child();
-            if (child != null) {
-                int child_width, _;
-                child.get_preferred_width(out child_width, out _);
-                if (child_width > mw)
-                    mw = child_width;
-            }
-            return mw + this.border_width*2;
-        }
-
-        private uint get_title_line_height() {
-            int width, height;
-            if (this.title == "") {
-                 width = height = 0;
-            } else {
-                this.layout.get_pixel_size(out width, out height);
-            }
-            return (uint)Math.fmax(height, DELETE_BTN_SIZE) + Node.TITLE_SPACING;
-        }
-
-        /**
-         * Returns true if the point is on the close-button of the node
-         */
-        public bool is_on_closebutton(Gdk.Point p) {
-            int x = p.x;
-            int y = p.y;
-
-            double scroll_x = this.node_view != null ? this.node_view.hadjustment.value : 0;
-            double scroll_y = this.node_view != null ? this.node_view.vadjustment.value : 0;
-
-            Gtk.Allocation alloc;
-            this.get_node_allocation(out alloc);
-            int x_left = alloc.x + alloc.width - DELETE_BTN_SIZE
-                                 - (int)border_width - (int)scroll_x;
-            int x_right = x_left + DELETE_BTN_SIZE;
-            int y_top = alloc.y + (int)border_width - (int)scroll_y;
-            int y_bot = y_top + DELETE_BTN_SIZE;
-            return x > x_left && x < x_right && y > y_top && y < y_bot;
-        }
-
-        /**
-         * Returns true if the point is in the resize-drag area
-         */
-        public bool is_on_resize_handle(Gdk.Point p) {
-            int x = p.x;
-            int y = p.y;
-
-            double scroll_x = this.node_view != null ? this.node_view.hadjustment.value : 0;
-            double scroll_y = this.node_view != null ? this.node_view.vadjustment.value : 0;
-
-            Gtk.Allocation alloc;
-            this.get_node_allocation(out alloc);
-            int x_right = alloc.x + alloc.width - (int)scroll_x;
-            int x_left = x_right - RESIZE_HANDLE_SIZE;
-            int y_bot = alloc.y + alloc.height - (int)scroll_y;
-            int y_top = y_bot - RESIZE_HANDLE_SIZE;
-            return x > x_left && x < x_right && y > y_top && y < y_bot;
-        }
-
-        /**
-         * Disconnect all connections from and to this node
-         */
-        public void disconnect_all() {
-            foreach (Source s in this.sources) {
-                s.remove_sinks();
-            }
-            foreach (Sink s in this.sinks) {
-                s.unset_source();
-            }
-        }
-
-        /**
          * Causes this node's NodeRenderer to draw
          * the node
          */
         public void draw_node(Cairo.Context cr) {
-            this.renderer.draw_node(cr);
+            this.node_renderer.draw_node(cr);
         }
 
     }

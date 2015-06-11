@@ -166,7 +166,7 @@ namespace GtkFlow {
             GFlow.Dock? targeted_dock = null;
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
-                if (n.is_on_closebutton(pos))
+                if (n.node_renderer.is_on_closebutton(pos))
                     this.close_button_pressed = true;
                 targeted_dock = n.node_renderer.get_dock_on_position(pos);
                 if (targeted_dock != null) {
@@ -174,7 +174,7 @@ namespace GtkFlow {
                     this.drag_dock.active = true;
                     Gdk.Point startpos;
                     if (this.drag_dock is Sink && this.drag_dock.is_connected()){
-                        Source s = (this.drag_dock as Sink).source;
+                        GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         try {
                             startpos = srcnode.node_renderer.get_dock_position(s);
@@ -200,7 +200,7 @@ namespace GtkFlow {
             // Set a new drag node.
             if (n != null) {
                 Gtk.Allocation alloc;
-                if (n.is_on_resize_handle(pos) && this.resize_node == null) {
+                if (n.node_renderer.is_on_resize_handle(pos) && this.resize_node == null) {
                     this.resize_node = n;
                     this.resize_node.get_node_allocation(out alloc);
                     this.resize_start_x = alloc.width;
@@ -227,8 +227,8 @@ namespace GtkFlow {
                 Node? n = this.get_node_on_position(e.x, e.y);
                 if (n != null) {
                     Gdk.Point pos = {(int)e.x,(int)e.y};
-                    if (n.is_on_closebutton(pos)) {
-                        n.disconnect_all();
+                    if (n.node_renderer.is_on_closebutton(pos)) {
+                        n.gnode.disconnect_all();
                         assert (n is Gtk.Widget);
                         (n as Gtk.Widget).destroy();
                         this.queue_draw();
@@ -309,10 +309,10 @@ namespace GtkFlow {
             GFlow.Dock? targeted_dock = null;
             if (n != null) {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
-                if (!n.is_on_closebutton(pos))
+                if (!n.node_renderer.is_on_closebutton(pos))
                     this.close_button_pressed = false;
                 // Update cursor if we are on the resize area
-                if (n.is_on_resize_handle(pos))
+                if (n.node_renderer.is_on_resize_handle(pos))
                     this.get_window().set_cursor(this.get_resize_cursor());
                 else if (this.resize_node == null)
                     this.get_window().set_cursor(null);
