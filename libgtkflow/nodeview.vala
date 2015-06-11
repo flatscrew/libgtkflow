@@ -173,7 +173,7 @@ namespace GtkFlow {
                     this.drag_dock = targeted_dock;
                     this.drag_dock.active = true;
                     Gdk.Point startpos;
-                    if (this.drag_dock is Sink && this.drag_dock.is_connected()){
+                    if (this.drag_dock is GFlow.Sink && this.drag_dock.is_connected()){
                         GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         try {
@@ -240,23 +240,23 @@ namespace GtkFlow {
             // Try to build a new connection
             if (this.drag_dock != null) {
                 try {
-                    if (this.drag_dock is Source && this.drop_dock is Sink) {
-                        (this.drag_dock as Source).add_sink(this.drop_dock as Sink);
+                    if (this.drag_dock is GFlow.Source && this.drop_dock is GFlow.Sink) {
+                        (this.drag_dock as GFlow.Source).add_sink(this.drop_dock as GFlow.Sink);
                     }
-                    else if (this.drag_dock is Sink && this.drop_dock is Source) {
-                        (this.drop_dock as Source).add_sink(this.drag_dock as Sink);
+                    else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Source) {
+                        (this.drop_dock as GFlow.Source).add_sink(this.drag_dock as GFlow.Sink);
                     }
-                    else if (this.drag_dock is Sink && this.drop_dock is Sink) {
-                        Source? src = (this.drag_dock as Sink).source;
+                    else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Sink) {
+                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.remove_sink(this.drag_dock as Sink);
-                            src.add_sink(this.drop_dock as Sink);
+                            src.remove_sink(this.drag_dock as GFlow.Sink);
+                            src.add_sink(this.drop_dock as GFlow.Sink);
                         }
                     }
-                    else if (this.drag_dock is Sink && this.drop_dock == null) {
-                        Source? src = (this.drag_dock as Sink).source;
+                    else if (this.drag_dock is GFlow.Sink && this.drop_dock == null) {
+                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.remove_sink(this.drag_dock as Sink);
+                            src.remove_sink(this.drag_dock as GFlow.Sink);
                         }
                     }
                 } catch (GFlow.NodeError e) {
@@ -416,17 +416,17 @@ namespace GtkFlow {
             // to target is either a source which does not belong to the own node
             // or if the to target is another sink (this is valid as we can
             // move a connection from one sink to another
-            if (from is Sink
-                    && ((to is Sink
+            if (from is GFlow.Sink
+                    && ((to is GFlow.Sink
                     && to != from)
-                    || (to is Source
+                    || (to is GFlow.Source
                     && !to.node.has_dock(from)))) {
                 return true;
             }
             // Check if the from-target is a source. if yes, make sure the
             // to-target is a sink and it does not belong to the own node
-            else if (from is Source
-                    && to is Sink
+            else if (from is GFlow.Source
+                    && to is GFlow.Sink
                     && !to.node.has_dock(from)) {
                 return true;
             }

@@ -14,9 +14,7 @@ lib_LTLIBRARIES = libgtkflow-0.2.la
 sources = \
 	namespace-info.vala \
 	node.vala \
-	nodeview.vala \
-	sink.vala \
-	source.vala
+	nodeview.vala
 
 
 ### General Compilation flags

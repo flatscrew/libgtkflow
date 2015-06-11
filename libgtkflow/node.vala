@@ -89,7 +89,7 @@ namespace GtkFlow {
         /**
          * Draw the given source onto a cairo context
          */
-        public void draw_source(Source s, Cairo.Context cr, 
+        public void draw_source(GFlow.Source s, Cairo.Context cr,
                                 int offset_x, int offset_y, int width) {
             Gtk.StyleContext sc = this.get_style_context();
             sc.save();
@@ -114,7 +114,7 @@ namespace GtkFlow {
         /**
          * Draw the given sink onto a cairo context
          */
-        public void draw_sink(Sink s, Cairo.Context cr, int offset_x, int offset_y, int width) {
+        public void draw_sink(GFlow.Sink s, Cairo.Context cr, int offset_x, int offset_y, int width) {
             Gtk.StyleContext sc = this.get_style_context();
             sc.save();
             if (s.is_connected())
