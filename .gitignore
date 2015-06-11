@@ -42,6 +42,7 @@ libgflow/gflow-0.2.vapi
 libgflow/gflow.h
 libgflow/namespace-info.vala
 test/.deps/
+test/.libs/
 test/tests-config.vala
 
 # Python cache folders
