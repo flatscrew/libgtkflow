@@ -23,7 +23,11 @@
  * Flowgraphs for Gtk
  */
 namespace GtkFlow {
-    public interface DockRenderer {
+    public abstract class DockRenderer {
+        public int dockpoint_height {get;set;default=16;}
+        public int spacing_x {get; set; default=5;}
+        public int spacing_y {get; set; default=3;}
+
         public abstract void draw_dock(Cairo.Context cr, 
                                          int offset_x, int offset_y, int width);
         public abstract int get_min_height();
@@ -45,10 +49,6 @@ namespace GtkFlow {
     }
 
     private class DefaultDockRenderer : DockRenderer {
-        public int dockpoint_height {get;set;default=16;}
-        public int spacing_x {get; set; default=5;}
-        public int spacing_y {get; set; default=3;}
-        
         private Pango.Layout layout = null;
         private GFlow.Dock d = null;
         private Node node = null;
@@ -83,7 +83,7 @@ namespace GtkFlow {
         /**
          * Get the minimum width for this dock
          */
-        public virtual int get_min_height() {
+        public override int get_min_height() {
             int width, height;
             this.layout.get_pixel_size(out width, out height);
             return (int)(Math.fmax(height, dockpoint_height))+spacing_y;
@@ -92,14 +92,13 @@ namespace GtkFlow {
         /**
          * Get the minimum height for this dock
          */
-        public virtual int get_min_width() {
+        public override int get_min_width() {
             int width, height;
             this.layout.get_pixel_size(out width, out height);
             return (int)(width + dockpoint_height + spacing_y);
         }
 
-        public void draw_dock(Cairo.Context cr,
-                              int offset_x, int offset_y, int width) {
+        public override void draw_dock(Cairo.Context cr, int offset_x, int offset_y, int width) {
             if (d is GFlow.Sink)
                 draw_sink(cr,offset_x,offset_y,width);
             if (d is GFlow.Source)
@@ -190,11 +189,14 @@ namespace GtkFlow {
         public override uint get_min_height() {
             uint mw = this.node.border_width*2;
             mw += this.get_title_line_height();
+            DockRenderer dock_renderer;
             foreach (GFlow.Dock d in this.node.gnode.get_sinks()) {
-                mw += this.dock_renderer.get_min_height(d);
+                dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
+                mw += dock_renderer.get_min_height();
             }
             foreach (GFlow.Dock d in this.node.gnode.get_sources()) {
-                mw += this.dock_renderer.get_min_height(d);
+                dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
+                mw += dock_renderer.get_min_height();
             }
             Gtk.Widget child = this.node.get_child();
             if (child != null) {
@@ -216,13 +218,17 @@ namespace GtkFlow {
                 this.layout.get_pixel_size(out width, out height);
                 mw = width + title_spacing + delete_btn_size;
             }
+
+            DockRenderer dock_renderer;
             foreach (GFlow.Dock d in this.node.gnode.get_sinks()) {
-                t = d.get_min_width();
+                dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
+                t = dock_renderer.get_min_width();
                 if (t > mw)
                     mw = t;
             }
             foreach (GFlow.Dock d in this.node.gnode.get_sources()) {
-                t = d.get_min_width();
+                dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
+                t = dock_renderer.get_min_width();
                 if (t > mw)
                     mw = t;
             }
@@ -293,21 +299,27 @@ namespace GtkFlow {
             Gtk.Allocation node_allocation;
             this.node.get_node_allocation(out node_allocation);
 
+            DockRenderer dock_renderer;
             foreach (GFlow.Dock s in this.node.gnode.get_sinks()) {
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
                 if (s == d) {
-                    p.x += (int)(node_allocation.x + this.node.border_width + dockpoint_height/2);
+                    p.x += (int)(node_allocation.x + this.node.border_width
+                                 + dock_renderer.dockpoint_height/2);
                     p.y += (int)(node_allocation.y + this.node.border_width + title_offset
-                              + dockpoint_height/2 + i * s.get_min_height());
+                              + dock_renderer.dockpoint_height/2 + i
+                              * dock_renderer.get_min_height());
                     return p;
                 }
                 i++;
             }
             foreach (GFlow.Dock s in this.node.gnode.get_sources()) {
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
                 if (s == d) {
                     p.x += (int)(node_allocation.x - this.node.border_width
-                              + node_allocation.width - dockpoint_height/2);
+                              + node_allocation.width - dock_renderer.dockpoint_height/2);
                     p.y += (int)(node_allocation.y + this.node.border_width + title_offset
-                              + dockpoint_height/2 + i * s.get_min_height());
+                              + dock_renderer.dockpoint_height/2 + i
+                              * dock_renderer.get_min_height());
                     return p;
                 }
                 i++;
@@ -332,24 +344,28 @@ namespace GtkFlow {
             int dock_x, dock_y, mh;
             uint title_offset;
             title_offset = this.get_title_line_height();
+            DockRenderer dock_renderer;
             foreach (GFlow.Dock s in this.node.gnode.get_sinks()) {
-                mh = this.node.dock_renderer.get_min_height(s);
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
+                mh = dock_renderer.get_min_height();
                 dock_x = node_allocation.x + (int)this.node.border_width - (int)scroll_x;
                 dock_y = node_allocation.y + (int)this.node.border_width + (int)title_offset
                          + i * mh - (int)scroll_y;
-                if (x > dock_x && x < dock_x + dockpoint_height
-                        && y > dock_y && y < dock_y + dockpoint_height )
+                if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                        && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                     return s;
                 i++;
             }
             foreach (GFlow.Dock s in this.node.gnode.get_sources()) {
-                mh = this.node.dock_renderer.get_min_height(s);
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
+                mh = dock_renderer.get_min_height();
                 dock_x = node_allocation.x + node_allocation.width
-                         - (int)this.node.border_width - dockpoint_height - (int)scroll_x;
+                         - (int)this.node.border_width - (int)scroll_x
+                         - dock_renderer.dockpoint_height;
                 dock_y = node_allocation.y + (int)this.node.border_width + (int)title_offset
                          + i * mh - (int)scroll_y;
-                if (x > dock_x && x < dock_x + dockpoint_height
-                        && y > dock_y && y < dock_y + dockpoint_height )
+                if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                        && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                     return s;
                 i++;
             }
@@ -408,15 +424,18 @@ namespace GtkFlow {
             }
             y_offset += (int)this.get_title_line_height();
 
+            DockRenderer dock_renderer;
             foreach (GFlow.Sink s in this.node.gnode.get_sinks()) {
-                this.node.dock_renderer.draw_dock(cr, alloc.x + (int)this.node.border_width,
-                                alloc.y+y_offset + (int) this.node.border_width);
-                y_offset += this.node.dock_renderer.get_min_height(s);
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
+                dock_renderer.draw_dock(cr, alloc.x + (int)this.node.border_width,
+                                alloc.y+y_offset + (int) this.node.border_width, alloc.width);
+                y_offset += dock_renderer.get_min_height();
             }
             foreach (GFlow.Source s in this.node.gnode.get_sources()) {
-                this.node.dock_renderer.draw_dock(cr, alloc.x-(int)this.node.border_width,
+                dock_renderer = this.node.get_dock_renderer_mapping(s).renderer;
+                dock_renderer.draw_dock(cr, alloc.x-(int)this.node.border_width,
                                   alloc.y+y_offset + (int) this.node.border_width, alloc.width);
-                y_offset += this.node.dock_renderer.get_min_height(s);
+                y_offset += dock_renderer.get_min_height();
             }
 
             Gtk.Widget child = this.node.get_child();
@@ -447,6 +466,11 @@ namespace GtkFlow {
         }
     }
 
+    private struct DockRendererMapping {
+        public GFlow.Dock dock;
+        public DockRenderer renderer;
+    }
+
     /**
      * Represents an element that can generate, process or receive data
      * This is done by adding Sources and Sinks to it. The inner logic of
@@ -461,7 +485,8 @@ namespace GtkFlow {
         public NodeView? node_view {get; set; default=null;}
 
         public NodeRenderer? node_renderer {get; set; default=null;}
-        public DockRenderer? dock_renderer {get; set; default=null;}
+
+        private List<DockRendererMapping?> dock_renderers = new List<DockRendererMapping?>();
 
         private Gtk.Allocation node_allocation;
 
@@ -469,10 +494,35 @@ namespace GtkFlow {
 
         public Node (GFlow.Node n) {
             this.gnode = n;
+            this.gnode.source_added.connect((s)=>{this.register_dock(s);});
+            this.gnode.sink_added.connect((s)=>{this.register_dock(s);});
+            this.gnode.source_removed.connect((s)=>{this.unregister_dock(s);});
+            this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
             this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
             this.set_border_width(this.node_renderer.resize_handle_size);
             this.recalculate_size();
+        }
+
+        private void register_dock(GFlow.Dock d) {
+            DockRendererMapping m = {d, new DefaultDockRenderer(this, d)};
+            this.dock_renderers.append(m);
+        }
+
+        public DockRendererMapping? get_dock_renderer_mapping(GFlow.Dock d) {
+            foreach (DockRendererMapping m in this.dock_renderers) {
+                if (m.dock == d)
+                    return m;
+            }
+            return null;
+        }
+
+        private void unregister_dock(GFlow.Dock d) {
+            DockRendererMapping? m = this.get_dock_renderer_mapping(d);
+            if (m != null) {
+                this.dock_renderers.remove(m);
+                //m.free();
+            }
         }
 
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
@@ -482,10 +532,6 @@ namespace GtkFlow {
 
         public void set_node_renderer(NodeRenderer r) {
             this.node_renderer = r;
-        }
-
-        public void set_dock_renderer(DockRenderer r) {
-            this.dock_renderer = r;
         }
 
         public void set_node_allocation(Gtk.Allocation alloc) {
