@@ -27,6 +27,10 @@ namespace GFlow {
      * data with the same VariantType can be interconnected.
      */
     public interface Dock : Object {
+        /**
+         * The name that will be rendered for this dock
+         */
+        public abstract string? name { get; set; }
 
         /**
          * The string rendered as typehint for this dock.
@@ -35,7 +39,7 @@ namespace GFlow {
          * dock and display it, but it produces nicer results to set
          * them manually. // FIXME On setting this you should draw the label in GtkFlow
          */
-        public abstract string? name { get; set; }
+        public abstract string? typename { get; set; }
 
         /**
          * Determines whether this dock is highlighted

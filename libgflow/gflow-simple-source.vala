@@ -30,6 +30,7 @@ namespace GFlow {
         protected bool _valid = false;
 
         public string? name { get; set; }
+        public string? typename { get; set; }
         public bool highlight { get; set; }
         public bool active {get; set; default=false;}
         public weak Node? node { get; set; }
