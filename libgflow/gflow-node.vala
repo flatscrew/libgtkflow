@@ -69,8 +69,11 @@ namespace GFlow {
      * This is done by adding Sources and Sinks to it. The inner logic of // FIXME;
      */
     public interface Node : GLib.Object {
-        public signal void sinks_changed ();
-        public signal void sources_changed ();
+        public signal void sink_added (Sink s);
+        public signal void source_added (Source s);
+        public signal void sink_removed (Sink s);
+        public signal void source_removed (Source s);
+
         public abstract string name { get; set; }
         public abstract void disconnect_all ();
         public abstract bool is_recursive (Node from, bool initial=false);

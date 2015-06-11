@@ -42,7 +42,7 @@ namespace GFlow {
             sources.append(s);
             s.set_node(this);
             s.update_layout();
-            sources_changed ();
+            source_added (s);
         }
         /**
          * FIXME:*
@@ -54,7 +54,7 @@ namespace GFlow {
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this sink");
             sinks.append(s);
             s.set_node(this); // FIXME: send a signal to update_layout and recalculate_size
-            sinks_changed ();
+            sink_added (s);
         }
 
         public void remove_source(Source s) throws NodeError {
@@ -62,7 +62,7 @@ namespace GFlow {
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
             sources.remove(s);
             s.set_node(null); // FIXME: send a signal to update_layout and recalculate_size
-            sources_changed ();
+            source_removed (s);
         }
 
         public void remove_sink(Sink s) throws NodeError {
@@ -70,7 +70,7 @@ namespace GFlow {
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
             sinks.remove(s);
             s.set_node(null); // FIXME: send a signal to update_layout and recalculate_size
-            sinks_changed ();
+            sink_removed (s);
         }
 
         public bool has_sink(Sink s) {
