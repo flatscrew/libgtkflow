@@ -96,6 +96,13 @@ namespace GFlow {
         }
 
         /**
+         * Returns the sinks of this node
+         */
+        public unowned List<Sink> get_sinks() {
+            return this.sinks;
+        }
+
+        /**
          * This method checks whether a connection from the given from-Node
          * to this Node would lead to a recursion
          */

@@ -77,6 +77,7 @@ namespace GFlow {
         public abstract Dock? get_dock (string name);
         public abstract bool has_dock(Dock d);
         public abstract unowned List<Source> get_sources ();
+        public abstract unowned List<Sink> get_sinks ();
         public abstract void add_source (Source source);
         public abstract void remove_source (Source source);
         public abstract bool has_source (Source s);
