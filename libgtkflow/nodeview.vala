@@ -25,11 +25,11 @@ namespace GtkFlow {
      * It also lets the user edit said connections.
      */
     public class NodeView : Gtk.Container, Gtk.Scrollable {
-        private List<GFlow.Node> nodes = new List<GFlow.Node>();
+        private List<Node> nodes = new List<Node>();
    
         // The node that is currently being dragged around
         private const int DRAG_THRESHOLD = 3;
-        private GFlow.Node? drag_node = null;
+        private Node? drag_node = null;
         private bool drag_threshold_fulfilled = false;
         // Coordinates where the drag started
         private double drag_start_x = 0;
@@ -42,7 +42,7 @@ namespace GtkFlow {
         // Remember if a closebutton was pressed
         private bool close_button_pressed = false;
         // Remember if we are resizing a node
-        private GFlow.Node? resize_node = null;
+        private Node? resize_node = null;
         private int resize_start_x = 0;
         private int resize_start_y = 0;
 
@@ -96,47 +96,60 @@ namespace GtkFlow {
             this.set_size_request(100,100);
         }
 
-        public override void add(Gtk.Widget w) {
-            if (!(w is GFlow.Node)) {
-                warning("Tried to add a non-node to NodeView");
-                return;
-            }
-            this.add_node(w as GFlow.Node);
-            w.set_parent(this);
-        }
-
-        public override void remove(Gtk.Widget w) {
-            if (!(w is GFlow.Node)) {
-                warning("Tried to remove a non-node to NodeView");
-                return;
-            }
-            this.remove_node(w as GFlow.Node);
-            w.unparent();
-        }
-
-        private void add_node(GFlow.Node n) {
+        private void add_common(Node n) {
             if (this.nodes.index(n) == -1) {
                 this.nodes.insert(n,0);
                 n.set_node_view(this);
                 this.add(n as Gtk.Widget);
             }
             this.queue_draw();
+            n.set_parent(this);
+        }
+
+        public void add_node(GFlow.Node gn) {
+            Node n = new Node(gn);
+            this.add_common(n);
+        }
+
+        public void add_with_child(GFlow.Node gn, Gtk.Widget child) {
+            Node n = new Node.with_child(gn, child);
+            this.add_common(n);
+        }
+
+        public override void add(Gtk.Widget w) {
+            warning("You can only add GFlow.Nodes to GtkFlow.NodeViews. "
+                   +"Please use NodeView.add_node or NodeView.add_node_with_child");
+        }
+
+        public override void remove(Gtk.Widget w) {
+            warning("You can only remove GFlow.Nodes to GtkFlow.NodeViews. "
+                   +"Please use NodeView.remove_node");
+        }
+
+        private Node? get_node_from_gflow_node(GFlow.Node gn) {
+            foreach (Node n in this.nodes) {
+                if (n.gnode == gn) {
+                    return n;
+                }
+            }
+            return null;
         }
 
         private void remove_node(GFlow.Node n) {
-            if (this.nodes.index(n) != -1) {
-                this.nodes.remove(n);
-                n.set_node_view(null);
-                this.remove(n as Gtk.Widget);
+            Node gn = this.get_node_from_gflow_node(n);
+            if (this.nodes.index(gn) != -1) {
+                this.nodes.remove(gn);
+                gn.set_node_view(null);
+                this.remove(gn as Gtk.Widget);
             }
             this.queue_draw();
         }
 
-        private GFlow.Node? get_node_on_position(double x,double y) {
+        private Node? get_node_on_position(double x,double y) {
             Gtk.Allocation alloc;
             x += this.hadjustment.value;
             y += this.vadjustment.value;
-            foreach (GFlow.Node n in this.nodes) {
+            foreach (Node n in this.nodes) {
                 n.get_node_allocation(out alloc);
                 if ( x >= alloc.x && y >= alloc.y &&
                          x <= alloc.x + alloc.width && y <= alloc.y + alloc.height ) {
@@ -149,22 +162,22 @@ namespace GtkFlow {
         public override bool button_press_event(Gdk.EventButton e) {
             if (!this.editable)
                 return false;
-            GFlow.Node? n = this.get_node_on_position(e.x, e.y);
+            Node? n = this.get_node_on_position(e.x, e.y);
             GFlow.Dock? targeted_dock = null;
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
                 if (n.is_on_closebutton(pos))
                     this.close_button_pressed = true;
-                targeted_dock = n.get_dock_on_position(pos);
+                targeted_dock = n.node_renderer.get_dock_on_position(pos);
                 if (targeted_dock != null) {
                     this.drag_dock = targeted_dock;
-                    this.drag_dock.pressed = true;
+                    this.drag_dock.active = true;
                     Gdk.Point startpos;
                     if (this.drag_dock is Sink && this.drag_dock.is_connected()){
                         Source s = (this.drag_dock as Sink).source;
-                        Node srcnode = s.get_node();
+                        Node srcnode = this.get_node_from_gflow_node(s.node);
                         try {
-                            startpos = srcnode.get_dock_position(s);
+                            startpos = srcnode.node_renderer.get_dock_position(s);
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
@@ -173,7 +186,7 @@ namespace GtkFlow {
                                                (int)e.x-startpos.x, (int)e.y-startpos.y};
                     } else {
                         try {
-                            startpos = n.get_dock_position(this.drag_dock);
+                            startpos = n.node_renderer.get_dock_position(this.drag_dock);
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
@@ -211,7 +224,7 @@ namespace GtkFlow {
                 return false;
             // Determine if this was a closebutton press
             if (this.close_button_pressed) {
-                GFlow.Node? n = this.get_node_on_position(e.x, e.y);
+                Node? n = this.get_node_on_position(e.x, e.y);
                 if (n != null) {
                     Gdk.Point pos = {(int)e.x,(int)e.y};
                     if (n.is_on_closebutton(pos)) {
@@ -262,11 +275,11 @@ namespace GtkFlow {
             this.drag_diff_y = 0;
             this.drag_node = null;
             if (this.drag_dock != null) {
-                this.drag_dock.pressed = false;
+                this.drag_dock.active = false;
             }
             this.drag_dock = null;
             if (this.drop_dock != null) {
-                this.drop_dock.pressed = false;
+                this.drop_dock.active = false;
             }
             this.drop_dock = null;
             this.temp_connector = null;
@@ -292,7 +305,7 @@ namespace GtkFlow {
             // Check if we are on a node. If yes, check if we are
             // currently pointing on a dock. if this is true, we
             // Want to draw a new connector instead of dragging the node
-            GFlow.Node? n = this.get_node_on_position(e.x, e.y);
+            Node? n = this.get_node_on_position(e.x, e.y);
             GFlow.Dock? targeted_dock = null;
             if (n != null) {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
@@ -303,7 +316,7 @@ namespace GtkFlow {
                     this.get_window().set_cursor(this.get_resize_cursor());
                 else if (this.resize_node == null)
                     this.get_window().set_cursor(null);
-                targeted_dock = n.get_dock_on_position(pos);
+                targeted_dock = n.node_renderer.get_dock_on_position(pos);
                 if (this.drag_dock == null && targeted_dock != this.hovered_dock) {
                     this.set_hovered_dock(targeted_dock);
                 }
@@ -375,7 +388,7 @@ namespace GtkFlow {
         private void recalculate_size() {
             double x_min = 0, x_max = 0, y_min = 0, y_max = 0;
             Gtk.Allocation alloc;
-            foreach (GFlow.Node n in this.nodes) {
+            foreach (Node n in this.nodes) {
                 n.get_node_allocation(out alloc);
                 x_min = Math.fmin(x_min, alloc.x);
                 x_max = Math.fmax(x_max, alloc.x+alloc.width);
@@ -396,8 +409,8 @@ namespace GtkFlow {
             if (!from.has_same_type(to))
                 return false;
             // Check if the target would lead to a recursion
-            if (   from.get_node().is_recursive(to.get_node())
-                || to.get_node().is_recursive(from.get_node()))
+            if (   from.node.is_recursive(to.node)
+                || to.node.is_recursive(from.node))
                 return false;
             // If the from from-target is a sink, check if the
             // to target is either a source which does not belong to the own node
@@ -407,14 +420,14 @@ namespace GtkFlow {
                     && ((to is Sink
                     && to != from)
                     || (to is Source
-                    && !to.get_node().has_dock(from)))) {
+                    && !to.node.has_dock(from)))) {
                 return true;
             }
             // Check if the from-target is a source. if yes, make sure the
             // to-target is a sink and it does not belong to the own node
             else if (from is Source
                     && to is Sink
-                    && !to.get_node().has_dock(from)) {
+                    && !to.node.has_dock(from)) {
                 return true;
             }
             return false;
@@ -426,10 +439,10 @@ namespace GtkFlow {
          */
         private void set_drop_dock(GFlow.Dock? d) {
             if (this.drop_dock != null)
-                this.drop_dock.pressed = false;
+                this.drop_dock.active = false;
             this.drop_dock = d;
             if (this.drop_dock != null)
-                this.drop_dock.pressed = true;
+                this.drop_dock.active = true;
             this.queue_draw();
         }
 
@@ -452,27 +465,27 @@ namespace GtkFlow {
             cr.paint();
             // Draw nodes
             this.nodes.reverse();
-            foreach (GFlow.Node n in this.nodes)
-                n.draw_node(cr);
+            foreach (Node n in this.nodes)
+                n.node_renderer.draw_node(cr);
             this.nodes.reverse();
             // Draw connectors
-            foreach (GFlow.Node n in this.nodes) {
-                foreach(Source source in n.get_sources()) {
+            foreach (Node n in this.nodes) {
+                foreach(GFlow.Source source in n.gnode.get_sources()) {
                     Gdk.Point source_pos = {0,0};
                     try {
-                        source_pos = n.get_dock_position(source);
+                        source_pos = n.node_renderer.get_dock_position(source);
                     } catch (GFlow.NodeError e) {
                         warning("No dock on position. Ommiting connector");
                         continue;
                     }
-                    foreach(Sink sink in source.get_sinks()) {
+                    foreach(GFlow.Sink sink in source.sinks) {
                         // Don't draw the connection to a sink if we are dragging it
                         if (sink == this.drag_dock)
                             continue;
-                        Node? sink_node = sink.get_node();
+                        Node? sink_node = this.get_node_from_gflow_node(sink.node);
                         Gdk.Point sink_pos = {0,0};
                         try {
-                            sink_pos = sink_node.get_dock_position(sink);
+                            sink_pos = sink_node.node_renderer.get_dock_position(sink);
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Ommiting connector");
                             continue;
