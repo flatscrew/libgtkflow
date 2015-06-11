@@ -241,22 +241,22 @@ namespace GtkFlow {
             if (this.drag_dock != null) {
                 try {
                     if (this.drag_dock is GFlow.Source && this.drop_dock is GFlow.Sink) {
-                        (this.drag_dock as GFlow.Source).add_sink(this.drop_dock as GFlow.Sink);
+                        (this.drag_dock as GFlow.Source).connect(this.drop_dock as GFlow.Sink);
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Source) {
-                        (this.drop_dock as GFlow.Source).add_sink(this.drag_dock as GFlow.Sink);
+                        (this.drop_dock as GFlow.Source).connect(this.drag_dock as GFlow.Sink);
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Sink) {
                         GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.remove_sink(this.drag_dock as GFlow.Sink);
-                            src.add_sink(this.drop_dock as GFlow.Sink);
+                            src.disconnect(this.drag_dock as GFlow.Sink);
+                            src.connect(this.drop_dock as GFlow.Sink);
                         }
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock == null) {
                         GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.remove_sink(this.drag_dock as GFlow.Sink);
+                            src.disconnect(this.drag_dock as GFlow.Sink);
                         }
                     }
                 } catch (GFlow.NodeError e) {
