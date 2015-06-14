@@ -15,6 +15,7 @@ sources = \
 	namespace-info.vala \
 	gflow-dock.vala \
 	gflow-node.vala \
+	gflow-simple-node.vala \
 	gflow-simple-sink.vala \
 	gflow-simple-source.vala \
 	gflow-sink.vala \

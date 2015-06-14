@@ -35,25 +35,24 @@ namespace GFlow {
          * FIXME:*
          */
         public void add_source(Source s) throws NodeError {
-            if (s.get_node() != null)
+            if (s.node != null)
                 throw new NodeError.DOCK_ALREADY_BOUND_TO_NODE("This Source is already bound");
             if (this.sources.index(s) != -1)
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this source");
             sources.append(s);
-            s.set_node(this);
-            s.update_layout();
+            s.node = this;// FIXME: send a signal to update_layout and recalculate_size
             source_added (s);
         }
         /**
          * FIXME:*
          */
         public void add_sink (Sink s) throws NodeError {
-            if (s.get_node() != null)
+            if (s.node != null)
                 throw new NodeError.DOCK_ALREADY_BOUND_TO_NODE("This Sink is already bound" );
             if (this.sinks.index(s) != -1)
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this sink");
             sinks.append(s);
-            s.set_node(this); // FIXME: send a signal to update_layout and recalculate_size
+            s.node = this; // FIXME: send a signal to update_layout and recalculate_size
             sink_added (s);
         }
 
@@ -61,7 +60,7 @@ namespace GFlow {
             if (this.sources.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
             sources.remove(s);
-            s.set_node(null); // FIXME: send a signal to update_layout and recalculate_size
+            s.node = null; // FIXME: send a signal to update_layout and recalculate_size
             source_removed (s);
         }
 
@@ -69,7 +68,7 @@ namespace GFlow {
             if (this.sinks.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
             sinks.remove(s);
-            s.set_node(null); // FIXME: send a signal to update_layout and recalculate_size
+            s.node = null; // FIXME: send a signal to update_layout and recalculate_size
             sink_removed (s);
         }
 
@@ -86,6 +85,16 @@ namespace GFlow {
                 return this.has_source(d as Source);
             else
                 return this.has_sink(d as Sink);
+        }
+
+        public Dock? get_dock (string name) {
+            foreach (Sink s in this.sinks)
+                if (s.name == name)
+                    return s;
+            foreach (Source s in this.sources)
+                if (s.name == name)
+                    return s;
+            return null;
         }
 
         /**
@@ -110,8 +119,8 @@ namespace GFlow {
             if (!initial && this == from)
                 return true;
             foreach (Source source in this.get_sources()) {
-                foreach (Sink sink in source.get_sinks()) {
-                    if (sink.get_node().is_recursive(from, false))
+                foreach (Sink sink in source.sinks) {
+                    if (sink.node.is_recursive(from, false))
                         return true;
                 }
             }
@@ -123,10 +132,10 @@ namespace GFlow {
          */
         public void disconnect_all() {
             foreach (Source s in this.sources) {
-                s.remove_sinks();
+                s.disconnect_all();
             }
             foreach (Sink s in this.sinks) {
-                s.unset_source();
+                s.disconnect_all();
             }
         }
   }

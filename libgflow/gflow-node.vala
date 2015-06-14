@@ -81,11 +81,11 @@ namespace GFlow {
         public abstract bool has_dock(Dock d);
         public abstract unowned List<Source> get_sources ();
         public abstract unowned List<Sink> get_sinks ();
-        public abstract void add_source (Source source);
-        public abstract void remove_source (Source source);
+        public abstract void add_source (Source source) throws NodeError;
+        public abstract void remove_source (Source source) throws NodeError;
         public abstract bool has_source (Source s);
-        public abstract void add_sink (Sink sink);
+        public abstract void add_sink (Sink sink) throws NodeError;
         public abstract bool has_sink (Sink s);
-        public abstract void remove_sink (Sink sink);
+        public abstract void remove_sink (Sink sink) throws NodeError;
     }
 }

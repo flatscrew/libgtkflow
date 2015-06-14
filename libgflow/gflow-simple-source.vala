@@ -113,6 +113,10 @@ namespace GFlow {
             connected (dock);
           }
         }
+        public new void disconnect_all () throws GLib.Error {
+            foreach (Sink s in this._sinks)
+                this.disconnect(s);
+        }
         /**
          * FIXME This could be removed and make connected Dock to lisen updated () signal
          */

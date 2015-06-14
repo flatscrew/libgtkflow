@@ -76,8 +76,8 @@ namespace GFlow {
             this._valid = false;
             this.changed ();
         }
-        public new void disconnect (Dock dock) throws GLib.Error
-        {
+
+        public new void disconnect (Dock dock) throws GLib.Error {
           if (!dock.is_connected_to (this)) return;
           if (dock is Source) {
             if (source != null) {
@@ -87,8 +87,8 @@ namespace GFlow {
             disconnected (dock);
           }
         }
-        public new void connect (Dock dock) throws GLib.Error
-        {
+
+        public new void connect (Dock dock) throws GLib.Error {
           if (dock.is_connected_to (this)) return;
           if (dock is Source) {
             if (source != null) ((Dock) source).disconnect (this);
@@ -99,6 +99,10 @@ namespace GFlow {
             });
             connected (dock);
           }
+        }
+
+        public new void disconnect_all() throws GLib.Error {
+            this.disconnect(this.source);
         }
         // FIXME This oeverrides Dock.changed signals and set a value but this should not be the case
         // FIXME when change_value is callled it sets its value and send this signal

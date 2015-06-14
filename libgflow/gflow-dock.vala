@@ -101,13 +101,17 @@ namespace GFlow {
         public abstract bool is_connected_to (Dock dock);
 
         /**
-         * Disconnect this {@link Dock} from other {@link Dock}
+         * Connect this {@link Dock} to other {@link Dock}
          */
         public abstract void connect (Dock dock) throws GLib.Error;
         /**
-         * Connect this {@link Dock} to other {@link Dock}
+         * Disconnect this {@link Dock} from other {@link Dock}
          */
         public abstract void disconnect (Dock dock) throws GLib.Error;
+        /**
+         * Disconnect this {@link Dock} from all {@link Docks}s it is connected to
+         */
+        public abstract void disconnect_all () throws GLib.Error;
 
         // FIXME: This could be changed to get_stypestring
         public virtual string determine_typestring () {
