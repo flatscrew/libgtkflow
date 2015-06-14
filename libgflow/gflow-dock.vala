@@ -90,6 +90,11 @@ namespace GFlow {
         public signal void disconnected (Dock d);
 
         /**
+         * This signal triggers everytime a UI renderer should rerender this dock
+         */
+        public signal void render_request ();
+
+        /**
          * Triggers when something leads to this dock chaging in sources or sinks. // FIXME
          */
         public signal void changed ();

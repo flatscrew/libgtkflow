@@ -40,7 +40,8 @@ namespace GFlow {
             if (this.sources.index(s) != -1)
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this source");
             sources.append(s);
-            s.node = this;// FIXME: send a signal to update_layout and recalculate_size
+            s.node = this;
+            this.render_request();
             source_added (s);
         }
         /**
@@ -52,7 +53,8 @@ namespace GFlow {
             if (this.sinks.index(s) != -1)
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this sink");
             sinks.append(s);
-            s.node = this; // FIXME: send a signal to update_layout and recalculate_size
+            s.node = this;
+            this.render_request();
             sink_added (s);
         }
 
@@ -60,7 +62,8 @@ namespace GFlow {
             if (this.sources.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
             sources.remove(s);
-            s.node = null; // FIXME: send a signal to update_layout and recalculate_size
+            s.node = null;
+            this.render_request();
             source_removed (s);
         }
 
@@ -68,7 +71,8 @@ namespace GFlow {
             if (this.sinks.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
             sinks.remove(s);
-            s.node = null; // FIXME: send a signal to update_layout and recalculate_size
+            s.node = null;
+            this.render_request();
             sink_removed (s);
         }
 

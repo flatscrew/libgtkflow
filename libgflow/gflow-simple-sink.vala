@@ -29,8 +29,18 @@ namespace GFlow {
         protected GLib.Value? _initial = null;
         protected bool _valid = false;
 
-        public string? name { get; set; }
-        public string? typename { get; set; }
+        private string? _name = null;
+        public string? name { 
+            get { return this._name; }
+            set { this._name = value;
+                  this.render_request(); }
+        }
+        public string? _typename = null;
+        public string? typename {
+            get { return this._typename; }
+            set { this._typename = value;
+                  this.render_request(); }
+        }
         public bool highlight { get; set; default = false; }
         public bool active {get; set; default=false;}
         public weak Node? node { get; set; }
