@@ -71,7 +71,7 @@ namespace GFlow {
                     )
                 );
             }
-            this.sinks.append (s);
+            this._sinks.append (s);
             if (this.valid) {
                 s.val = this.val;
             }
@@ -79,8 +79,8 @@ namespace GFlow {
         }
         protected void remove_sink (Sink s) throws GLib.Error
         {
-            if (this.sinks.index(s) != -1)
-                this.sinks.remove(s);
+            if (this._sinks.index(s) != -1)
+                this._sinks.remove(s);
             if (s.is_connected_to(this))
                 s.disconnect (this);
             this.disconnected(s);
@@ -94,7 +94,7 @@ namespace GFlow {
          */
         public bool is_connected_to (Dock dock) {
             if (!(dock is Sink)) return false;
-            return this.sinks.index((Sink) dock) != -1;
+            return this._sinks.index((Sink) dock) != -1;
         }
 
         /**
@@ -116,7 +116,7 @@ namespace GFlow {
         }
         public new void connect (Dock dock) throws GLib.Error
         {
-          if (dock.is_connected_to (this)) return;
+          if (this.is_connected_to (dock)) return;
           if (dock is Sink) {
             add_sink ((Sink) dock);
             dock.connect (this);

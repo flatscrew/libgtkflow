@@ -99,7 +99,7 @@ namespace GFlow {
         }
 
         public new void connect (Dock dock) throws GLib.Error {
-          if (dock.is_connected_to (this)) return;
+          if (this.is_connected_to (dock)) return;
           if (dock is Source) {
             if (source != null) ((Dock) source).disconnect (this);
             _source = (Source) dock;
