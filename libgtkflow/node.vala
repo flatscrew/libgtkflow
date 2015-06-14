@@ -51,6 +51,10 @@ namespace GtkFlow {
 
         public Node (GFlow.Node n) {
             this.gnode = n;
+            foreach (GFlow.Dock d in this.gnode.get_sources())
+                this.register_dock(d);
+            foreach (GFlow.Dock d in this.gnode.get_sinks())
+                this.register_dock(d);
             this.gnode.source_added.connect((s)=>{this.register_dock(s);});
             this.gnode.sink_added.connect((s)=>{this.register_dock(s);});
             this.gnode.source_removed.connect((s)=>{this.unregister_dock(s);});

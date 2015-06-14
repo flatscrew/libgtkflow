@@ -229,6 +229,7 @@ namespace GtkFlow {
                     Gdk.Point pos = {(int)e.x,(int)e.y};
                     if (n.node_renderer.is_on_closebutton(pos)) {
                         n.gnode.disconnect_all();
+                        this.remove_node(n.gnode);
                         assert (n is Gtk.Widget);
                         (n as Gtk.Widget).destroy();
                         this.queue_draw();

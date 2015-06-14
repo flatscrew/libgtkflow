@@ -20,7 +20,7 @@ namespace GtkFlow {
 
         public DefaultNodeRenderer(Node n) {
             this.node = n;
-            this.node.gnode.notify["name"].connect(()=>this.update_name_layout());
+            this.node.gnode.render_request.connect(()=>this.update_name_layout());
         }
 
         public void update_name_layout() {
@@ -36,6 +36,8 @@ namespace GtkFlow {
             if (this.node.gnode.name == "") {
                  width = height = 0;
             } else {
+                if (this.layout == null)
+                    this.update_name_layout();
                 this.layout.get_pixel_size(out width, out height);
             }
             return (uint)Math.fmax(height, delete_btn_size) + title_spacing;
@@ -73,10 +75,11 @@ namespace GtkFlow {
             int t = 0;
             if (this.node.name != "") {
                 int width, height;
+                if (this.layout == null)
+                    this.update_name_layout();
                 this.layout.get_pixel_size(out width, out height);
                 mw = width + title_spacing + delete_btn_size;
             }
-
             DockRenderer dock_renderer;
             foreach (GFlow.Dock d in this.node.gnode.get_sinks()) {
                 dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
