@@ -94,21 +94,27 @@ namespace GFlow {
               source.disconnect (this);
             }
             _source = null;
+            _valid = false;
+            changed();
             disconnected (dock);
           }
         }
 
         public new void connect (Dock dock) throws GLib.Error {
-          if (this.is_connected_to (dock)) return;
-          if (dock is Source) {
-            if (source != null) ((Dock) source).disconnect (this);
-            _source = (Source) dock;
-            dock.connect (this);
-            _source.changed.connect (() =>{
-              val = _source.val;
-            });
-            connected (dock);
-          }
+            if (this.is_connected_to (dock)) return;
+            if (dock is Source) {
+                if (source != null) ((Dock) source).disconnect (this);
+                _source = (Source) dock;
+                val = _source.val;
+                if (!_source.valid)
+                    _valid = false;
+                changed();
+                dock.connect (this);
+                _source.changed.connect (() =>{
+                    val = _source.val;
+                });
+                connected (dock);
+            }
         }
 
         public new void disconnect_all() throws GLib.Error {

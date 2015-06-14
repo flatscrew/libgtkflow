@@ -102,9 +102,13 @@ namespace GFlow {
         public bool is_connected () {
             return this.sinks.length () > 0;
         }
-        // FIXME: Added to implement the one on Dock - Review
-        public void invalidate () { _valid = false; }
-        // FIXME Added to simplify Source interface
+
+        public void invalidate () {
+            _valid = false;
+            foreach (Sink s in this.sinks)
+                s.invalidate();
+        }
+
         public new void disconnect (Dock dock) throws GLib.Error
         {
           if (!this.is_connected_to (dock)) return;
@@ -137,6 +141,7 @@ namespace GFlow {
                         v.type().name(),this.val.type().name())
                 );
             this.val = v;
+            this._valid = true;
             foreach (Sink s in this.sinks)
                 s.val = v;
             updated ();
