@@ -25,6 +25,7 @@ namespace GtkFlow {
             //          i'd like to have sink_added, source_added,
             //       sink_removed, source_removed as signal on node
             //       as parameter they should supply the dock in question
+            this.update_name_layout();
             this.node.gnode.render_request.connect(()=>this.update_name_layout());
         }
 
