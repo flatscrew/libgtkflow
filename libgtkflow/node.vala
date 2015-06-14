@@ -87,10 +87,6 @@ namespace GtkFlow {
             this.add(c);
         }
 
-        public void set_node_renderer(NodeRenderer r) {
-            this.node_renderer = r;
-        }
-
         public void set_node_allocation(Gtk.Allocation alloc) {
             if (alloc.width < (int)this.node_renderer.get_min_width())
                 alloc.width = (int)this.node_renderer.get_min_width();
@@ -134,10 +130,6 @@ namespace GtkFlow {
             this.node_view.queue_draw();
         }
 
-        public void set_node_view(NodeView? n) {
-            this.node_view = n;
-        }
-
         /**
          * Checks if the node needs to be resized in order to fill the minimum
          * size requirements
@@ -153,14 +145,5 @@ namespace GtkFlow {
                 alloc.height = (int)mh;
             this.set_node_allocation(alloc);
         }
-
-        /**
-         * Causes this node's NodeRenderer to draw
-         * the node
-         */
-        public void draw_node(Cairo.Context cr) {
-            this.node_renderer.draw_node(cr);
-        }
-
     }
 }

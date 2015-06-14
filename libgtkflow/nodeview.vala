@@ -99,7 +99,7 @@ namespace GtkFlow {
         private void add_common(Node n) {
             if (this.nodes.index(n) == -1) {
                 this.nodes.insert(n,0);
-                n.set_node_view(this);
+                n.node_view = this;
                 this.add(n as Gtk.Widget);
             }
             this.queue_draw();
@@ -139,7 +139,7 @@ namespace GtkFlow {
             Node gn = this.get_node_from_gflow_node(n);
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
-                gn.set_node_view(null);
+                gn.node_view = null;
                 this.remove(gn as Gtk.Widget);
             }
             this.queue_draw();
