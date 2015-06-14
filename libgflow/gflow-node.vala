@@ -62,7 +62,11 @@ namespace GFlow {
          * Throw when the user tries to remove a dock from a node
          * that hasn't yet been added to the node
          */
-        NO_SUCH_DOCK
+        NO_SUCH_DOCK,
+        /**
+         * Throw when the value of a sink is invalid
+         */
+        INVALID
     }
     /**
      * Represents an element that can generate, process or receive data

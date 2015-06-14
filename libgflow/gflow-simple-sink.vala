@@ -60,8 +60,8 @@ namespace GFlow {
           set {
             if (!_val.holds (value.type ())) return;
             _val = value;
+            this._valid = true;
             // FIXME: This properly is read-only then may let implementators to define how "Change a Value"
-            //this.valid = true;
             changed ();
           }
         }
@@ -113,6 +113,14 @@ namespace GFlow {
 
         public new void disconnect_all() throws GLib.Error {
             this.disconnect(this.source);
+        }
+
+        public Value? get_value() throws NodeError {
+            if (!this.valid) {
+                throw new NodeError.INVALID("This sink does not hold a valid value");
+            } else {
+                return _val;
+            }
         }
         // FIXME This oeverrides Dock.changed signals and set a value but this should not be the case
         // FIXME when change_value is callled it sets its value and send this signal
