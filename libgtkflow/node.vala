@@ -89,6 +89,9 @@ namespace GtkFlow {
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
             this(n);
             this.add(c);
+            this.show_all();
+            this.recalculate_size();
+            this.node_view.queue_draw();
         }
 
         public void set_node_allocation(Gtk.Allocation alloc) {
