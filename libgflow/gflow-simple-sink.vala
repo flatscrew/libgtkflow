@@ -88,7 +88,7 @@ namespace GFlow {
         }
 
         public new void disconnect (Dock dock) throws GLib.Error {
-          if (!dock.is_connected_to (this)) return;
+          if (!this.is_connected_to (dock)) return;
           if (dock is Source) {
             if (source != null) {
               source.disconnect (this);

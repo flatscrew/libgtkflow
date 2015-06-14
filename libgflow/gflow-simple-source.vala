@@ -108,7 +108,7 @@ namespace GFlow {
         // FIXME Added to simplify Source interface
         public new void disconnect (Dock dock) throws GLib.Error
         {
-          if (!dock.is_connected_to (this)) return;
+          if (!this.is_connected_to (dock)) return;
           if (dock is Sink) {
             remove_sink ((Sink) dock);
             if (sinks.length () == 0) disconnected (dock);
