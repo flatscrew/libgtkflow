@@ -11,6 +11,7 @@ namespace GtkFlow {
         public abstract bool is_on_resize_handle(Gdk.Point p);
         public abstract uint get_min_width();
         public abstract uint get_min_height();
+        public abstract void update_name_layout();
     }
 
     private class DefaultNodeRenderer : NodeRenderer {
@@ -25,7 +26,7 @@ namespace GtkFlow {
             });
         }
 
-        public void update_name_layout() {
+        public override void update_name_layout() {
             this.layout = this.node.create_pango_layout("");
             this.layout.set_markup("<b>%s</b>".printf(this.node.gnode.name),-1);
             this.node.recalculate_size();

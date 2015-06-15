@@ -56,6 +56,11 @@ namespace GtkFlow {
         // The connector that is being used to draw a non-established connection
         private Gtk.Allocation? temp_connector = null;
 
+        /**
+         * Determines whether docks should render type-indicators
+         */
+        public bool show_types {get; set; default=false;}
+
         public Gtk.Adjustment _hadjustment = null;
         public Gtk.Adjustment hadjustment {
             get {
@@ -94,6 +99,7 @@ namespace GtkFlow {
             this.vadjustment = new Gtk.Adjustment(0, 0, 100, 50, 100, 100);
             this.hadjustment = new Gtk.Adjustment(0, 0, 100, 50, 100, 100);
             this.set_size_request(100,100);
+            this.notify["show-types"].connect(()=>{this.render_all();});
         }
 
         private void add_common(Node n) {
@@ -104,6 +110,12 @@ namespace GtkFlow {
             }
             this.queue_draw();
             n.set_parent(this);
+        }
+
+        private void render_all() {
+            foreach (Node n in this.nodes)
+                n.render_all();
+            this.queue_draw();
         }
 
         public void add_node(GFlow.Node gn) {

@@ -8,6 +8,7 @@ namespace GtkFlow {
                                          int offset_x, int offset_y, int width);
         public abstract int get_min_height();
         public abstract int get_min_width();
+        public abstract void update_name_layout();
     }
 
     private class DefaultDockRenderer : DockRenderer {
@@ -30,9 +31,10 @@ namespace GtkFlow {
             });
         }
 
-        public void update_name_layout() {
+        public override void update_name_layout() {
             string labelstring;
-            if (this.node != null && this.node.show_types) {
+            if (this.node != null && this.node.node_view != null
+                && this.node.node_view.show_types) {
                 labelstring = "<i>%s</i> : %s".printf(
                     this.d.typename ?? this.d.determine_typestring(),
                     this.d.name

@@ -47,8 +47,6 @@ namespace GtkFlow {
 
         private Gtk.Allocation node_allocation;
 
-        public bool show_types {get; set; default=false;}
-
         public Node (GFlow.Node n) {
             this.gnode = n;
             foreach (GFlow.Dock d in this.gnode.get_sources())
@@ -61,8 +59,17 @@ namespace GtkFlow {
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
             this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
+            this.notify["node-view"].connect(()=>{this.render_all();});
             this.set_border_width(this.node_renderer.resize_handle_size);
             this.recalculate_size();
+        }
+
+        public void render_all() {
+            if (this.node_renderer != null)
+                this.node_renderer.update_name_layout();
+            foreach(DockRendererMapping drm in this.dock_renderers)
+                if (drm.renderer != null)
+                    drm.renderer.update_name_layout();
         }
 
         private void register_dock(GFlow.Dock d) {
