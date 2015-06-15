@@ -20,7 +20,9 @@ namespace GtkFlow {
 
         public DefaultNodeRenderer(Node n) {
             this.node = n;
-            this.node.gnode.render_request.connect(()=>this.update_name_layout());
+            this.node.gnode.render_request.connect(()=>{
+                this.update_name_layout();
+            });
         }
 
         public void update_name_layout() {

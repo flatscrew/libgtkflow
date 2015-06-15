@@ -54,8 +54,8 @@ namespace GFlow {
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this sink");
             sinks.append(s);
             s.node = this;
-            this.render_request();
             sink_added (s);
+            this.render_request();
         }
 
         public void remove_source(Source s) throws NodeError {

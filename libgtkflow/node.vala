@@ -66,8 +66,10 @@ namespace GtkFlow {
         }
 
         private void register_dock(GFlow.Dock d) {
-            DockRendererMapping m = {d, new DefaultDockRenderer(this, d)};
+            DefaultDockRenderer dr = new DefaultDockRenderer(this, d);
+            DockRendererMapping m = {d,dr};
             this.dock_renderers.append(m);
+            dr.update_name_layout();
         }
 
         public DockRendererMapping? get_dock_renderer_mapping(GFlow.Dock d) {
