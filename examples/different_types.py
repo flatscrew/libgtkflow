@@ -1,31 +1,35 @@
 #!/usr/bin/python3
 
+from gi.repository import GLib
 from gi.repository import Gtk
+from gi.repository import GFlow
 from gi.repository import GtkFlow
 
 import sys
 
-class ConcatNode(GtkFlow.Node):
-    def __init__(self):
-        GtkFlow.Node.__init__(self)
+class ExampleNode(GFlow.SimpleNode):
+    def __new__(cls):
+        x = GFlow.SimpleNode.new()
+        x.__class__ = cls
+        return x
 
-        self.string_a = GtkFlow.Sink.new("")
-        self.string_b = GtkFlow.Sink.new("")
-        self.string_a.set_label("string A")
-        self.string_b.set_label("string B")
+class ConcatNode(ExampleNode):
+    def __init__(self):
+        self.string_a = GFlow.SimpleSink.new("")
+        self.string_b = GFlow.SimpleSink.new("")
+        self.string_a.set_name("string A")
+        self.string_b.set_name("string B")
         self.add_sink(self.string_a)
         self.add_sink(self.string_b)
 
-        self.result = GtkFlow.Source.new("")
-        self.result.set_label("output")
+        self.result = GFlow.SimpleSource.new("")
+        self.result.set_name("output")
         self.add_source(self.result)
 
         self.string_a.connect("changed", self.do_concatenation)
         self.string_b.connect("changed", self.do_concatenation)
-        self.set_title("Concatenation")
+        self.set_name("Concatenation")
 
-        self.set_border_width(10)
-        self.set_show_types(True)
 
     def do_concatenation(self, dock, val=None):
         val_a = val_b = ""
@@ -39,22 +43,18 @@ class ConcatNode(GtkFlow.Node):
             pass
         self.result.set_value(val_a+val_b)
 
-class ConversionNode(GtkFlow.Node):
+class ConversionNode(ExampleNode):
     def __init__(self):
-        GtkFlow.Node.__init__(self)
-
-        self.sink = GtkFlow.Sink.new(float(0))
-        self.sink.set_label("input")
+        self.sink = GFlow.SimpleSink.new(float(0))
+        self.sink.set_name("input")
         self.add_sink(self.sink)
 
-        self.source = GtkFlow.Source.new("")
-        self.source.set_label("output")
+        self.source = GFlow.SimpleSource.new("")
+        self.source.set_name("output")
         self.add_source(self.source)
 
         self.sink.connect("changed", self.do_conversion)
-        self.set_title("Number2String")
-        self.set_border_width(10)
-        self.set_show_types(True)
+        self.set_name("Number2String")
 
     def do_conversion(self, dock, val=None):
         try:
@@ -63,48 +63,36 @@ class ConversionNode(GtkFlow.Node):
         except:
             self.source.invalidate()
 
-class StringNode(GtkFlow.Node):
+class StringNode(ExampleNode):
     def __init__(self):
-        GtkFlow.Node.__init__(self)
+        ExampleNode.__init__(self)
         
-        self.source = GtkFlow.Source.new("")
-        self.source.set_label("output")
+        self.source = GFlow.SimpleSource.new("")
+        self.source.set_name("output")
         self.source.set_valid()
         self.add_source(self.source)
 
         self.entry = Gtk.Entry()
-        self.add(self.entry)
         self.entry.connect("changed", self.do_changed)
-        self.show_all()
 
-        self.set_title("String")
-        self.set_border_width(10)
-        self.set_show_types(True)
+        self.set_name("String")
 
     def do_changed(self, widget=None, data=None):
         self.source.set_value(self.entry.get_text())
 
-class OperationNode(GtkFlow.Node):
+class OperationNode(ExampleNode):
     def __init__(self):
-        GtkFlow.Node.__init__(self)
-        self.set_show_types(True)
        
-        self.summand_a = GtkFlow.Sink.new(float(0))
-        self.summand_b = GtkFlow.Sink.new(float(0))
-        self.summand_a.set_label("operand A")
-        self.summand_b.set_label("operand B")
+        self.summand_a = GFlow.SimpleSink.new(float(0))
+        self.summand_b = GFlow.SimpleSink.new(float(0))
+        self.summand_a.set_name("operand A")
+        self.summand_b.set_name("operand B")
         self.add_sink(self.summand_a)
         self.add_sink(self.summand_b)    
     
-        self.result = GtkFlow.Source.new(float(0))
-        self.result.set_label("result")
+        self.result = GFlow.SimpleSource.new(float(0))
+        self.result.set_name("result")
         self.add_source(self.result)
-
-        self.operations = Gtk.ListStore(str)
-        self.operations.append(("+",))
-        self.operations.append(("-",))
-        self.operations.append(("*",))
-        self.operations.append(("/",))
 
         operations = ["+", "-", "*", "/"]
         self.combobox = Gtk.ComboBoxText()
@@ -112,15 +100,12 @@ class OperationNode(GtkFlow.Node):
         self.combobox.set_entry_text_column(0)
         for op in operations:
             self.combobox.append_text(op)
-        self.add(self.combobox)
-        self.show_all()
 
         self.summand_a.connect("changed", self.do_calculations)
         self.summand_b.connect("changed", self.do_calculations)
 
-        self.set_title("Operation")
+        self.set_name("Operation")
     
-        self.set_border_width(10)
 
     def do_calculations(self, dock, val=None):
         op = self.combobox.get_active_text() 
@@ -143,12 +128,10 @@ class OperationNode(GtkFlow.Node):
         else:
             self.result.invalidate()
 
-class NumberNode(GtkFlow.Node):
+class NumberNode(ExampleNode):
     def __init__(self, number=0):
-        GtkFlow.Node.__init__(self)
-        self.set_show_types(True)
-        self.number = GtkFlow.Source.new(float(number))
-        self.number.set_label("output")
+        self.number = GFlow.SimpleSource.new(float(number))
+        self.number.set_name("output")
         self.number.set_valid()
         self.add_source(self.number)
         
@@ -157,32 +140,22 @@ class NumberNode(GtkFlow.Node):
         self.spinbutton.set_adjustment(adjustment)
         self.spinbutton.set_size_request(50,20)
         self.spinbutton.connect("value_changed", self.do_value_changed)
-        self.add(self.spinbutton)
-        self.show_all()
 
-        self.set_title("NumberGenerator")
-
-        self.set_border_width(10)
+        self.set_name("NumberGenerator")
 
     def do_value_changed(self, widget=None, data=None):
         self.number.set_value(float(self.spinbutton.get_value()))
 
-class PrintNode(GtkFlow.Node):
+class PrintNode(ExampleNode):
     def __init__(self):
-        GtkFlow.Node.__init__(self)
-        self.set_show_types(True)
-        self.sink = GtkFlow.Sink.new("")
-        self.sink.set_label("")
+        self.sink = GFlow.SimpleSink.new("")
+        self.sink.set_name("")
         self.sink.connect("changed", self.do_printing)
         self.add_sink(self.sink)
 
         self.childlabel = Gtk.Label()
-        self.add(self.childlabel)
-        self.show_all()
 
-        self.set_title("Output")
-
-        self.set_border_width(10)
+        self.set_name("Output")
 
     def do_printing(self, dock, val):
         try:
@@ -195,6 +168,7 @@ class TypesExampleApplication(object):
     def __init__(self):
         w = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
         self.nv = GtkFlow.NodeView.new()
+        self.nv.set_show_types(True)
 
         hbox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         create_numbernode_button = Gtk.Button("Create NumberNode")
@@ -227,17 +201,24 @@ class TypesExampleApplication(object):
         Gtk.main()
 
     def do_create_addnode(self, widget=None, data=None):
-        self.nv.add(OperationNode())
+        n = OperationNode()
+        self.nv.add_with_child(n, n.combobox)
     def do_create_numbernode(self, widget=None, data=None):
-        self.nv.add(NumberNode())
+        n = NumberNode()
+        self.nv.add_with_child(n, n.spinbutton)
+        self.nv.set_show_types(False)
     def do_create_printnode(self, widget=None, data=None):
-        self.nv.add(PrintNode())
+        n = PrintNode()
+        self.nv.add_with_child(n, n.childlabel)
+        self.nv.set_show_types(True)
     def do_create_concatnode(self, widget=None, data=None):
-        self.nv.add(ConcatNode())
+        n = ConcatNode()
+        self.nv.add_node(n)
     def do_create_stringnode(self, widget=None, data=None):
-        self.nv.add(StringNode())
+        n = StringNode()
+        self.nv.add_with_child(n, n.entry)
     def do_create_conversionnode(self, widget=None, data=None):
-        self.nv.add(ConversionNode())
+        self.nv.add_node(ConversionNode())
     def do_quit(self, widget=None, data=None):
         Gtk.main_quit()
         sys.exit(0)
