@@ -471,6 +471,14 @@ namespace GtkFlow {
             this.queue_draw();
         }
 
+        /**
+         * Manually set the position of the given node on this nodeview
+         */
+        public void set_node_position(GFlow.Node gn, int x, int y) {
+            Node n = this.get_node_from_gflow_node(gn);
+            n.set_position(x,y);
+        }
+
         public override bool draw(Cairo.Context cr) {
             Gtk.StyleContext sc = this.get_style_context();
             Gdk.RGBA bg = sc.get_background_color(Gtk.StateFlags.NORMAL);
