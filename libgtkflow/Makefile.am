@@ -56,7 +56,7 @@ AM_VALAFLAGS += \
 	--pkg gflow-0.2 \
 	--includedir libgtkflow \
 	--vapi gtkflow-0.2.vapi \
-	--vapidir libgflow \
+	--vapidir=$(top_builddir)/libgflow \
 	-H gtkflow.h \
 	-C \
 	$(NULL)
