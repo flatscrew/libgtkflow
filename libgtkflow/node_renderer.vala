@@ -82,7 +82,7 @@ namespace GtkFlow {
                 dock_renderer = this.node.get_dock_renderer_mapping(d).renderer;
                 mw += dock_renderer.get_min_height();
             }
-            Gtk.Widget child = this.node.get_child();
+            Gtk.Widget child = this.node.get_first_child();
             if (child != null) {
                 int child_height, _;
                 child.get_preferred_height(out child_height, out _);
@@ -117,7 +117,7 @@ namespace GtkFlow {
                 if (t > mw)
                     mw = t;
             }
-            Gtk.Widget child = this.node.get_child();
+            Gtk.Widget child = this.node.get_first_child();
             if (child != null) {
                 int child_width, _;
                 child.get_preferred_width(out child_width, out _);
@@ -323,7 +323,7 @@ namespace GtkFlow {
                 y_offset += dock_renderer.get_min_height();
             }
 
-            Gtk.Widget child = this.node.get_child();
+            Gtk.Widget child = this.node.get_first_child();
             if (child != null) {
                 Gtk.Allocation child_alloc = {0,0,0,0};
                 child_alloc.x = alloc.x + (int)this.node.border_width;

@@ -47,6 +47,8 @@ namespace GtkFlow {
 
         private Gtk.Allocation node_allocation;
 
+        private List<Gtk.Widget> children = new List<Gtk.Widget>();
+
         public Node (GFlow.Node n) {
             this.gnode = n;
             foreach (GFlow.Dock d in this.gnode.get_sources())
@@ -95,6 +97,13 @@ namespace GtkFlow {
             }
         }
 
+        public unowned Gtk.Widget? get_first_child() {
+            if (this.children.length() > 0)
+                return this.children.nth_data(0);
+            else
+                return null;
+        }
+
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
             this(n);
             this.add(c);
@@ -127,11 +136,13 @@ namespace GtkFlow {
 
         public override void add(Gtk.Widget w) {
             w.set_parent(this);
+            this.children.append(w);
             base.add(w);
         }
 
         public override void remove(Gtk.Widget w) {
             w.unparent();
+            this.children.remove(w);
             base.remove(w);
         }
 

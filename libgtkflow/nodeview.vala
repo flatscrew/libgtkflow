@@ -128,6 +128,28 @@ namespace GtkFlow {
             this.add_common(n);
         }
 
+        /**
+         * Use this method to register childwidgets for custom node
+         * renderes to the node.
+         */
+        public void register_child(GFlow.Node gn, Gtk.Widget child) {
+            Node n = this.get_node_from_gflow_node(gn);
+            if (n != null) {
+                n.add(child);
+            }
+        }
+
+        /**
+         * Use this method to register childwidgets for custom node
+         * renderes to the node.
+         */
+        public void unregister_child(GFlow.Node gn, Gtk.Widget child) {
+            Node n = this.get_node_from_gflow_node(gn);
+            if (n != null) {
+                n.remove(child);
+            }
+        }
+
         public override void add(Gtk.Widget w) {
             warning("You can only add GFlow.Nodes to GtkFlow.NodeViews. "
                    +"Please use NodeView.add_node or NodeView.add_node_with_child");
