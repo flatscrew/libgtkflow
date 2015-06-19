@@ -77,7 +77,6 @@ namespace GFlow {
         public signal void source_added (Source s);
         public signal void sink_removed (Sink s);
         public signal void source_removed (Source s);
-        public signal void render_request ();
 
         public abstract string name { get; set; }
         public abstract void disconnect_all ();

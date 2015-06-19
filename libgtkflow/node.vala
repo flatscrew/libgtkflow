@@ -61,9 +61,17 @@ namespace GtkFlow {
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
             this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
-            this.notify["node-view"].connect(()=>{this.render_all();});
+            this.node_renderer.size_changed.connect(()=>{this.render();});
+            this.gnode.notify["name"].connect(()=>{this.node_renderer.update_name_layout();});
             this.set_border_width(this.node_renderer.resize_handle_size);
+            this.render();
+        }
+
+        public void render() {
             this.recalculate_size();
+            if (this.node_view != null) {
+                this.node_view.queue_draw();
+            }
         }
 
         public void render_all() {
@@ -77,8 +85,12 @@ namespace GtkFlow {
         private void register_dock(GFlow.Dock d) {
             DefaultDockRenderer dr = new DefaultDockRenderer(this, d);
             DockRendererMapping m = {d,dr};
+            dr.size_changed.connect(()=>{this.render();});
+            d.notify["name"].connect(()=>{dr.update_name_layout();});
+            d.notify["typename"].connect(()=>{dr.update_name_layout();});
             this.dock_renderers.append(m);
             dr.update_name_layout();
+            this.render();
         }
 
         public DockRendererMapping? get_dock_renderer_mapping(GFlow.Dock d) {
@@ -95,6 +107,7 @@ namespace GtkFlow {
                 this.dock_renderers.remove(m);
                 //m.free();
             }
+            this.render();
         }
 
         public unowned Gtk.Widget? get_first_child() {
@@ -108,8 +121,7 @@ namespace GtkFlow {
             this(n);
             this.add(c);
             this.show_all();
-            this.recalculate_size();
-            this.node_view.queue_draw();
+            this.render();
         }
 
         public void set_node_allocation(Gtk.Allocation alloc) {
@@ -153,8 +165,7 @@ namespace GtkFlow {
                 return;
             }
             base.set_border_width(border_width);
-            this.recalculate_size();
-            this.node_view.queue_draw();
+            this.render();
         }
 
         /**

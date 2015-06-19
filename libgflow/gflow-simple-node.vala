@@ -41,7 +41,6 @@ namespace GFlow {
                 throw new NodeError.ALREADY_HAS_DOCK("This node already has this source");
             sources.append(s);
             s.node = this;
-            this.render_request();
             source_added (s);
         }
         /**
@@ -55,7 +54,6 @@ namespace GFlow {
             sinks.append(s);
             s.node = this;
             sink_added (s);
-            this.render_request();
         }
 
         public void remove_source(Source s) throws NodeError {
@@ -63,7 +61,6 @@ namespace GFlow {
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
             sources.remove(s);
             s.node = null;
-            this.render_request();
             source_removed (s);
         }
 
@@ -72,7 +69,6 @@ namespace GFlow {
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
             sinks.remove(s);
             s.node = null;
-            this.render_request();
             sink_removed (s);
         }
 

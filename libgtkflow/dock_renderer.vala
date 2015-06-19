@@ -25,6 +25,8 @@ namespace GtkFlow {
         public int spacing_x {get; set; default=5;}
         public int spacing_y {get; set; default=3;}
 
+        public signal void size_changed();
+
         public abstract void draw_dock(Cairo.Context cr, 
                                          int offset_x, int offset_y, int width);
         public abstract int get_min_height();
@@ -40,16 +42,7 @@ namespace GtkFlow {
         public DefaultDockRenderer(Node n, GFlow.Dock d) {
             this.node = n;
             this.d = d;
-            this.layout = this.node.create_pango_layout("");
-            //FIXME: to listen to the signals we will need
-            //       create a DockRenderer for each dock.
-            //       would be nice to get signals for this
-            //          i'd like to have sink_added, source_added,
-            //       sink_removed, source_removed as signal on node
-            //       as parameter they should supply the dock in question
-            this.node.gnode.render_request.connect(()=>{
-                this.update_name_layout();
-            });
+            this.layout = (new Gtk.Label("")).create_pango_layout("");
         }
 
         public override void update_name_layout() {
@@ -64,7 +57,7 @@ namespace GtkFlow {
                 labelstring = this.d.name;
             }
             this.layout.set_markup(labelstring, -1);
-            this.node.recalculate_size();
+            this.size_changed();
         }
 
         /**

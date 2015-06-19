@@ -32,14 +32,12 @@ namespace GFlow {
         private string? _name = null;
         public string? name { 
             get { return this._name; }
-            set { this._name = value;
-                  this.render_request(); }
+            set { this._name = value; }
         }
         public string? _typename = null;
         public string? typename {
             get { return this._typename; }
-            set { this._typename = value;
-                  this.render_request(); }
+            set { this._typename = value; }
         }
         public bool highlight { get; set; default = false; }
         public bool active {get; set; default=false;}

@@ -25,6 +25,8 @@ namespace GtkFlow {
         public int delete_btn_size {get; set; default=16;}
         public int resize_handle_size {get; set; default=10;}
 
+        public signal void size_changed();
+
         public abstract void draw_node (Cairo.Context cr);
         public abstract GFlow.Dock? get_dock_on_position(Gdk.Point p);
         public abstract Gdk.Point get_dock_position(GFlow.Dock d) throws GFlow.NodeError;
@@ -42,15 +44,12 @@ namespace GtkFlow {
 
         public DefaultNodeRenderer(Node n) {
             this.node = n;
-            this.node.gnode.render_request.connect(()=>{
-                this.update_name_layout();
-            });
         }
 
         public override void update_name_layout() {
-            this.layout = this.node.create_pango_layout("");
+            this.layout = (new Gtk.Label("")).create_pango_layout("");
             this.layout.set_markup("<b>%s</b>".printf(this.node.gnode.name),-1);
-            this.node.recalculate_size();
+            this.size_changed();
             this.node.node_view.queue_draw();
         }
 
