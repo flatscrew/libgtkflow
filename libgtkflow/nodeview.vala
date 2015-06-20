@@ -200,9 +200,22 @@ namespace GtkFlow {
             GFlow.Dock? targeted_dock = null;
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
-                if (n.node_renderer.is_on_closebutton(pos))
+                Gtk.Allocation alloc;
+                n.get_node_allocation(out alloc);
+                bool cbp = n.node_renderer.is_on_closebutton(
+                    pos, alloc,
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width
+                );
+                if (cbp)
                     this.close_button_pressed = true;
-                targeted_dock = n.node_renderer.get_dock_on_position(pos);
+                targeted_dock = n.node_renderer.get_dock_on_position(
+                    pos, n.get_dock_renderers(),
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width, alloc
+                );
                 if (targeted_dock != null) {
                     this.drag_dock = targeted_dock;
                     this.drag_dock.active = true;
@@ -210,8 +223,15 @@ namespace GtkFlow {
                     if (this.drag_dock is GFlow.Sink && this.drag_dock.is_connected()){
                         GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
+                        Gtk.Allocation src_alloc;
+                        srcnode.get_node_allocation(out src_alloc);
                         try {
-                            startpos = srcnode.node_renderer.get_dock_position(s);
+                            startpos = srcnode.node_renderer.get_dock_position(
+                                s, srcnode.get_dock_renderers(),
+                                (int)this.hadjustment.value,
+                                (int)this.vadjustment.value,
+                                (int)srcnode.border_width, src_alloc
+                            );
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
@@ -220,7 +240,12 @@ namespace GtkFlow {
                                                (int)e.x-startpos.x, (int)e.y-startpos.y};
                     } else {
                         try {
-                            startpos = n.node_renderer.get_dock_position(this.drag_dock);
+                            startpos = n.node_renderer.get_dock_position(
+                                this.drag_dock, n.get_dock_renderers(),
+                                (int)this.hadjustment.value,
+                                (int)this.vadjustment.value,
+                                (int)n.border_width, alloc
+                            );
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Aborting drag");
                             return false;
@@ -234,7 +259,15 @@ namespace GtkFlow {
             // Set a new drag node.
             if (n != null) {
                 Gtk.Allocation alloc;
-                if (n.node_renderer.is_on_resize_handle(pos) && this.resize_node == null) {
+                n.get_node_allocation(out alloc);
+                bool on_resize = n.node_renderer.is_on_resize_handle(
+                    pos, alloc,
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width
+                );
+
+                if (on_resize && this.resize_node == null) {
                     this.resize_node = n;
                     this.resize_node.get_node_allocation(out alloc);
                     this.resize_start_x = alloc.width;
@@ -261,7 +294,15 @@ namespace GtkFlow {
                 Node? n = this.get_node_on_position(e.x, e.y);
                 if (n != null) {
                     Gdk.Point pos = {(int)e.x,(int)e.y};
-                    if (n.node_renderer.is_on_closebutton(pos)) {
+                    Gtk.Allocation alloc;
+                    n.get_node_allocation(out alloc);
+                    bool cbp = n.node_renderer.is_on_closebutton(
+                        pos, alloc,
+                        (int)this.hadjustment.value,
+                        (int)this.vadjustment.value,
+                        n.border_width
+                    );
+                    if (cbp) {
                         n.gnode.disconnect_all();
                         this.remove_node(n.gnode);
                         assert (n is Gtk.Widget);
@@ -344,14 +385,33 @@ namespace GtkFlow {
             GFlow.Dock? targeted_dock = null;
             if (n != null) {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
-                if (!n.node_renderer.is_on_closebutton(pos))
+                Gtk.Allocation alloc;
+                n.get_node_allocation(out alloc);
+                bool cbp = n.node_renderer.is_on_closebutton(
+                    pos, alloc,
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width
+                );
+                if (!cbp)
                     this.close_button_pressed = false;
                 // Update cursor if we are on the resize area
-                if (n.node_renderer.is_on_resize_handle(pos))
+                bool on_resize = n.node_renderer.is_on_resize_handle(
+                    pos, alloc,
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width
+                );
+                if (on_resize)
                     this.get_window().set_cursor(this.get_resize_cursor());
                 else if (this.resize_node == null)
                     this.get_window().set_cursor(null);
-                targeted_dock = n.node_renderer.get_dock_on_position(pos);
+                targeted_dock = n.node_renderer.get_dock_on_position(
+                    pos, n.get_dock_renderers(),
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    n.border_width, alloc
+                );
                 if (this.drag_dock == null && targeted_dock != this.hovered_dock) {
                     this.set_hovered_dock(targeted_dock);
                 }
@@ -508,15 +568,37 @@ namespace GtkFlow {
             cr.paint();
             // Draw nodes
             this.nodes.reverse();
-            foreach (Node n in this.nodes)
-                n.node_renderer.draw_node(cr);
+            foreach (Node n in this.nodes) {
+                Gtk.Allocation alloc;
+                n.get_node_allocation(out alloc);
+                n.node_renderer.draw_node(
+                    cr,
+                    n.get_style_context(),
+                    alloc,
+                    n.get_dock_renderers(),
+                    n.get_children(),
+                    (int)this.hadjustment.value,
+                    (int)this.vadjustment.value,
+                    (int)n.border_width,
+                    this.editable
+                );
+            }
             this.nodes.reverse();
             // Draw connectors
             foreach (Node n in this.nodes) {
                 foreach(GFlow.Source source in n.gnode.get_sources()) {
                     Gdk.Point source_pos = {0,0};
                     try {
-                        source_pos = n.node_renderer.get_dock_position(source);
+                        Gtk.Allocation alloc;
+                        n.get_node_allocation(out alloc);
+                        source_pos = n.node_renderer.get_dock_position(
+                            source,
+                            n.get_dock_renderers(),
+                            (int)this.hadjustment.value,
+                            (int)this.vadjustment.value,
+                            (int)n.border_width,
+                            alloc
+                        );
                     } catch (GFlow.NodeError e) {
                         warning("No dock on position. Ommiting connector");
                         continue;
@@ -528,7 +610,16 @@ namespace GtkFlow {
                         Node? sink_node = this.get_node_from_gflow_node(sink.node);
                         Gdk.Point sink_pos = {0,0};
                         try {
-                            sink_pos = sink_node.node_renderer.get_dock_position(sink);
+                            Gtk.Allocation alloc;
+                            sink_node.get_node_allocation(out alloc);
+                            sink_pos = sink_node.node_renderer.get_dock_position(
+                                sink,
+                                sink_node.get_dock_renderers(),
+                                (int)this.hadjustment.value,
+                                (int)this.vadjustment.value,
+                                (int)sink_node.border_width,
+                                alloc
+                            );
                         } catch (GFlow.NodeError e) {
                             warning("No dock on position. Ommiting connector");
                             continue;

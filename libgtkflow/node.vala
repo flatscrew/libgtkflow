@@ -23,11 +23,6 @@
  * Flowgraphs for Gtk
  */
 namespace GtkFlow {
-    private struct DockRendererMapping {
-        public GFlow.Dock dock;
-        public DockRenderer renderer;
-    }
-
     /**
      * Represents an element that can generate, process or receive data
      * This is done by adding Sources and Sinks to it. The inner logic of
@@ -43,7 +38,7 @@ namespace GtkFlow {
 
         public NodeRenderer? node_renderer {get; set; default=null;}
 
-        private List<DockRendererMapping?> dock_renderers = new List<DockRendererMapping?>();
+        private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
 
         private Gtk.Allocation node_allocation;
 
@@ -62,7 +57,10 @@ namespace GtkFlow {
             this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
             this.node_renderer.size_changed.connect(()=>{this.render();});
-            this.gnode.notify["name"].connect(()=>{this.node_renderer.update_name_layout();});
+            this.node_renderer.child_redraw.connect((ch, cr)=>{this.propagate_draw(ch,cr);});
+            this.gnode.notify["name"].connect(()=>{
+                this.node_renderer.update_name_layout(this.gnode.name);
+            });
             this.set_border_width(this.node_renderer.resize_handle_size);
             this.render();
         }
@@ -76,45 +74,43 @@ namespace GtkFlow {
 
         public void render_all() {
             if (this.node_renderer != null)
-                this.node_renderer.update_name_layout();
-            foreach(DockRendererMapping drm in this.dock_renderers)
-                if (drm.renderer != null)
-                    drm.renderer.update_name_layout();
+                this.node_renderer.update_name_layout(this.gnode.name);
+            foreach(DockRenderer dr in this.dock_renderers)
+                if (dr != null) {
+                    bool show_types = this.node_view != null ? this.node_view.show_types : false;
+                    dr.update_name_layout(show_types);
+                }
         }
 
         private void register_dock(GFlow.Dock d) {
             DefaultDockRenderer dr = new DefaultDockRenderer(this, d);
-            DockRendererMapping m = {d,dr};
             dr.size_changed.connect(()=>{this.render();});
-            d.notify["name"].connect(()=>{dr.update_name_layout();});
-            d.notify["typename"].connect(()=>{dr.update_name_layout();});
-            this.dock_renderers.append(m);
-            dr.update_name_layout();
+            d.notify["name"].connect(()=>{
+                dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
+            });
+            d.notify["typename"].connect(()=>{
+                dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
+            });
+            this.dock_renderers.append(dr);
+            dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
             this.render();
         }
 
-        public DockRendererMapping? get_dock_renderer_mapping(GFlow.Dock d) {
-            foreach (DockRendererMapping m in this.dock_renderers) {
-                if (m.dock == d)
-                    return m;
+        public DockRenderer? get_dock_renderer(GFlow.Dock d) {
+            foreach (DockRenderer dock_renderer in this.dock_renderers) {
+                if (dock_renderer.get_dock() == d)
+                    return dock_renderer;
             }
             return null;
         }
 
         private void unregister_dock(GFlow.Dock d) {
-            DockRendererMapping? m = this.get_dock_renderer_mapping(d);
-            if (m != null) {
-                this.dock_renderers.remove(m);
+            DockRenderer? dr = this.get_dock_renderer(d);
+            if (dr != null) {
+                this.dock_renderers.remove(dr);
                 //m.free();
             }
             this.render();
-        }
-
-        public unowned Gtk.Widget? get_first_child() {
-            if (this.children.length() > 0)
-                return this.children.nth_data(0);
-            else
-                return null;
         }
 
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
@@ -125,10 +121,19 @@ namespace GtkFlow {
         }
 
         public void set_node_allocation(Gtk.Allocation alloc) {
-            if (alloc.width < (int)this.node_renderer.get_min_width())
-                alloc.width = (int)this.node_renderer.get_min_width();
-            if (alloc.height < (int)this.node_renderer.get_min_height())
-                alloc.height = (int)this.node_renderer.get_min_height();
+            int mw = (int)this.node_renderer.get_min_width(
+                this.dock_renderers, this.get_children(),
+                (int)this.get_border_width()
+            );
+            int mh = (int)this.node_renderer.get_min_height(
+                this.dock_renderers, this.get_children(),
+                (int)this.get_border_width()
+            );
+
+            if (alloc.width < mw)
+                alloc.width = mw;
+            if (alloc.height < mh)
+                alloc.height = mh;
             this.node_allocation = alloc;
         }
 
@@ -136,6 +141,10 @@ namespace GtkFlow {
             this.node_allocation.x = x;
             this.node_allocation.y = y;
             this.node_view.queue_draw();
+        }
+
+        public unowned List<DockRenderer> get_dock_renderers() {
+            return this.dock_renderers;
         }
 
         public void get_node_allocation(out Gtk.Allocation alloc) {
@@ -175,8 +184,14 @@ namespace GtkFlow {
         public void recalculate_size() {
             Gtk.Allocation alloc;
             this.get_node_allocation(out alloc);
-            uint mw = this.node_renderer.get_min_width();
-            uint mh = this.node_renderer.get_min_height();
+            uint mw = this.node_renderer.get_min_width(
+                this.dock_renderers, this.get_children(),
+                (int) this.get_border_width()
+            );
+            uint mh = this.node_renderer.get_min_height(
+                this.dock_renderers, this.get_children(),
+                (int) this.get_border_width()
+            );
             if (mw > alloc.width)
                 alloc.width = (int)mw;
             if (mh > alloc.height)

@@ -27,28 +27,30 @@ namespace GtkFlow {
 
         public signal void size_changed();
 
-        public abstract void draw_dock(Cairo.Context cr, 
+        public abstract void draw_dock(Cairo.Context cr, Gtk.StyleContext sc,
                                          int offset_x, int offset_y, int width);
         public abstract int get_min_height();
         public abstract int get_min_width();
-        public abstract void update_name_layout();
+        public abstract void update_name_layout(bool show_types);
+        public abstract GFlow.Dock get_dock();
     }
 
     private class DefaultDockRenderer : DockRenderer {
         private Pango.Layout layout = null;
         private GFlow.Dock d = null;
-        private Node node = null;
 
         public DefaultDockRenderer(Node n, GFlow.Dock d) {
-            this.node = n;
             this.d = d;
             this.layout = (new Gtk.Label("")).create_pango_layout("");
         }
 
-        public override void update_name_layout() {
+        public override GFlow.Dock get_dock () {
+            return this.d;
+        }
+
+        public override void update_name_layout(bool show_types) {
             string labelstring;
-            if (this.node != null && this.node.node_view != null
-                && this.node.node_view.show_types) {
+            if (show_types) {
                 labelstring = "<i>%s</i> : %s".printf(
                     this.d.typename ?? this.d.determine_typestring(),
                     this.d.name
@@ -78,19 +80,19 @@ namespace GtkFlow {
             return (int)(width + dockpoint_height + spacing_y);
         }
 
-        public override void draw_dock(Cairo.Context cr, int offset_x, int offset_y, int width) {
+        public override void draw_dock(Cairo.Context cr, Gtk.StyleContext sc,
+                                       int offset_x, int offset_y, int width) {
             if (d is GFlow.Sink)
-                draw_sink(cr,offset_x,offset_y,width);
+                draw_sink(cr, sc, offset_x, offset_y, width);
             if (d is GFlow.Source)
-                draw_source(cr,offset_x,offset_y,width);
+                draw_source(cr, sc, offset_x, offset_y, width);
         }
 
         /**
          * Draw the given source onto a cairo context
          */
-        public void draw_source(Cairo.Context cr,
+        public void draw_source(Cairo.Context cr, Gtk.StyleContext sc,
                                 int offset_x, int offset_y, int width) {
-            Gtk.StyleContext sc = this.node.get_style_context();
             sc.save();
             if (this.d.is_connected())
                 sc.set_state(Gtk.StateFlags.CHECKED);
@@ -113,8 +115,8 @@ namespace GtkFlow {
         /**
          * Draw the given sink onto a cairo context
          */
-        public void draw_sink(Cairo.Context cr, int offset_x, int offset_y, int width) {
-            Gtk.StyleContext sc = this.node.get_style_context();
+        public void draw_sink(Cairo.Context cr, Gtk.StyleContext sc,
+                              int offset_x, int offset_y, int width) {
             sc.save();
             if (this.d.is_connected())
                 sc.set_state(Gtk.StateFlags.CHECKED);
