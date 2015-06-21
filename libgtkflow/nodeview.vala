@@ -128,6 +128,12 @@ namespace GtkFlow {
             this.add_common(n);
         }
 
+        public void set_node_renderer(GFlow.Node gn, NodeRenderer nr) {
+            Node n = this.get_node_from_gflow_node(gn);
+            n.node_renderer = nr;
+            this.queue_draw();
+        }
+
         /**
          * Use this method to register childwidgets for custom node
          * renderes to the node.

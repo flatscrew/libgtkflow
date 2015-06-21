@@ -107,7 +107,9 @@ namespace GtkFlow {
         private void unregister_dock(GFlow.Dock d) {
             DockRenderer? dr = this.get_dock_renderer(d);
             if (dr != null) {
-                this.dock_renderers.remove(dr);
+                this.dock_renderers.remove_link(
+                    this.dock_renderers.find_custom(dr, (x,y)=>{return (int)(x!=y);})
+                );
                 //m.free();
             }
             this.render();
@@ -157,13 +159,15 @@ namespace GtkFlow {
 
         public override void add(Gtk.Widget w) {
             w.set_parent(this);
-            this.children.append(w);
+            this.children.prepend(w);
             base.add(w);
         }
 
         public override void remove(Gtk.Widget w) {
             w.unparent();
-            this.children.remove(w);
+            this.children.remove_link(
+                this.children.find_custom(w, (x,y)=>{return (int)(x!=y);})
+            );
             base.remove(w);
         }
 

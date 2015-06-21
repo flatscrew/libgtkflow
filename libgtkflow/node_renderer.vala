@@ -20,13 +20,15 @@
 *********************************************************************/
 
 namespace GtkFlow {
-    public abstract class NodeRenderer {
+    public abstract class NodeRenderer : GLib.Object {
         public int title_spacing {get; set; default=15;}
         public int delete_btn_size {get; set; default=16;}
         public int resize_handle_size {get; set; default=10;}
 
         public signal void size_changed();
         public signal void child_redraw(Gtk.Widget child, Cairo.Context cr);
+
+        protected NodeRenderer () {}
 
         public abstract void draw_node(Cairo.Context cr,
                                        Gtk.StyleContext sc,

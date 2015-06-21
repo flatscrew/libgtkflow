@@ -20,7 +20,7 @@
 *********************************************************************/
 
 namespace GtkFlow {
-    public abstract class DockRenderer {
+    public abstract class DockRenderer : GLib.Object {
         public int dockpoint_height {get;set;default=16;}
         public int spacing_x {get; set; default=5;}
         public int spacing_y {get; set; default=3;}
