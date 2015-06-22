@@ -225,37 +225,35 @@ namespace GtkFlow {
                 if (targeted_dock != null) {
                     this.drag_dock = targeted_dock;
                     this.drag_dock.active = true;
-                    Gdk.Point startpos;
+                    int startpos_x = 0, startpos_y = 0;
                     if (this.drag_dock is GFlow.Sink && this.drag_dock.is_connected()){
                         GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         Gtk.Allocation src_alloc;
                         srcnode.get_node_allocation(out src_alloc);
-                        try {
-                            startpos = srcnode.node_renderer.get_dock_position(
+                        if (!srcnode.node_renderer.get_dock_position(
                                 s, srcnode.get_dock_renderers(),
                                 (int)this.hadjustment.value,
                                 (int)this.vadjustment.value,
-                                (int)srcnode.border_width, src_alloc
-                            );
-                        } catch (GFlow.NodeError e) {
+                                (int)srcnode.border_width, src_alloc,
+                                out startpos_x, out startpos_y )) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
+                        Gdk.Point startpos = {startpos_x,startpos_y};
                         this.temp_connector = {startpos.x, startpos.y,
                                                (int)e.x-startpos.x, (int)e.y-startpos.y};
                     } else {
-                        try {
-                            startpos = n.node_renderer.get_dock_position(
+                        if (!n.node_renderer.get_dock_position(
                                 this.drag_dock, n.get_dock_renderers(),
                                 (int)this.hadjustment.value,
                                 (int)this.vadjustment.value,
-                                (int)n.border_width, alloc
-                            );
-                        } catch (GFlow.NodeError e) {
+                                (int)n.border_width, alloc,
+                                out startpos_x, out startpos_y )) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
+                        Gdk.Point startpos = {startpos_x,startpos_y};
                         this.temp_connector = {startpos.x, startpos.y, 0, 0};
                     }
                     this.queue_draw();
@@ -593,43 +591,38 @@ namespace GtkFlow {
             // Draw connectors
             foreach (Node n in this.nodes) {
                 foreach(GFlow.Source source in n.gnode.get_sources()) {
-                    Gdk.Point source_pos = {0,0};
-                    try {
-                        Gtk.Allocation alloc;
-                        n.get_node_allocation(out alloc);
-                        source_pos = n.node_renderer.get_dock_position(
+                    Gtk.Allocation alloc;
+                    n.get_node_allocation(out alloc);
+                    int source_pos_x = 0, source_pos_y = 0;
+                    if (!n.node_renderer.get_dock_position(
                             source,
                             n.get_dock_renderers(),
                             (int)this.hadjustment.value,
                             (int)this.vadjustment.value,
                             (int)n.border_width,
-                            alloc
-                        );
-                    } catch (GFlow.NodeError e) {
+                            alloc, out source_pos_x, out source_pos_y)) {
                         warning("No dock on position. Ommiting connector");
                         continue;
                     }
+                    Gdk.Point source_pos = {source_pos_x,source_pos_y};
                     foreach(GFlow.Sink sink in source.sinks) {
                         // Don't draw the connection to a sink if we are dragging it
                         if (sink == this.drag_dock)
                             continue;
                         Node? sink_node = this.get_node_from_gflow_node(sink.node);
-                        Gdk.Point sink_pos = {0,0};
-                        try {
-                            Gtk.Allocation alloc;
-                            sink_node.get_node_allocation(out alloc);
-                            sink_pos = sink_node.node_renderer.get_dock_position(
+                        sink_node.get_node_allocation(out alloc);
+                        int sink_pos_x = 0, sink_pos_y = 0;
+                        if (!sink_node.node_renderer.get_dock_position(
                                 sink,
                                 sink_node.get_dock_renderers(),
                                 (int)this.hadjustment.value,
                                 (int)this.vadjustment.value,
                                 (int)sink_node.border_width,
-                                alloc
-                            );
-                        } catch (GFlow.NodeError e) {
+                                alloc, out sink_pos_x, out sink_pos_y )) {
                             warning("No dock on position. Ommiting connector");
                             continue;
                         }
+                        Gdk.Point sink_pos = {sink_pos_x,sink_pos_y};
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
                         cr.move_to(source_pos.x, source_pos.y);

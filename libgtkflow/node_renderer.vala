@@ -45,13 +45,14 @@ namespace GtkFlow {
                                                     int scroll_y,
                                                     uint border_width,
                                                     Gtk.Allocation alloc );
-        public abstract Gdk.Point get_dock_position(GFlow.Dock d,
+        public abstract bool get_dock_position(GFlow.Dock d,
                                                     List<DockRenderer> dock_renderers,
                                                     int scroll_x,
                                                     int scroll_y,
                                                     int border_width,
-                                                    Gtk.Allocation alloc
-                                                    ) throws GFlow.NodeError;
+                                                    Gtk.Allocation alloc,
+                                                    out int x,
+                                                    out int y);
         public abstract bool is_on_closebutton(Gdk.Point p,
                                                Gtk.Allocation alloc,
                                                int scroll_x,
@@ -180,17 +181,18 @@ namespace GtkFlow {
          * This is obviously bullshit. GFlow.Docks should be able to know
          * their own position
          */
-        public override Gdk.Point get_dock_position(GFlow.Dock d,
+        public override bool get_dock_position(GFlow.Dock d,
                                                     List<DockRenderer> dock_renderers,
                                                     int scroll_x,
                                                     int scroll_y,
                                                     int border_width,
-                                                    Gtk.Allocation alloc
-                                                    ) throws GFlow.NodeError {
+                                                    Gtk.Allocation alloc,
+                                                    out int x,
+                                                    out int y) {
             int i = 0;
-            Gdk.Point p = {0,0};
-            p.x -= scroll_x;
-            p.y -= scroll_y;
+            x = y = 0;
+            x -= scroll_x;
+            y -= scroll_y;
 
             uint title_offset = this.get_title_line_height();
 
@@ -198,24 +200,24 @@ namespace GtkFlow {
                 GFlow.Dock s = dock_renderer.get_dock();
                 if (s == d) {
                     if (s is GFlow.Sink) {
-                        p.x += alloc.x + border_width
+                        x += alloc.x + border_width
                                      + dock_renderer.dockpoint_height/2;
-                        p.y += alloc.y + border_width + (int)title_offset
+                        y += alloc.y + border_width + (int)title_offset
                                   + dock_renderer.dockpoint_height/2 + i
                                   * dock_renderer.get_min_height();
-                        return p;
+                        return true;
                     } else if (s is GFlow.Source) {
-                        p.x += alloc.x - border_width
+                        x += alloc.x - border_width
                                   + alloc.width - dock_renderer.dockpoint_height/2;
-                        p.y += alloc.y + border_width + (int)title_offset
+                        y += alloc.y + border_width + (int)title_offset
                                   + dock_renderer.dockpoint_height/2 + i
                                   * dock_renderer.get_min_height();
-                        return p;
+                        return true;
                     }
                 }
                 i++;
             }
-            throw new GFlow.NodeError.NO_SUCH_DOCK("There is no such dock in this.node node");
+            return false;
         }
 
         /**
