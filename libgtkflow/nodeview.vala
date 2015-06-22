@@ -142,6 +142,7 @@ namespace GtkFlow {
             Node n = this.get_node_from_gflow_node(gn);
             if (n != null) {
                 n.add(child);
+                n.show_all();
             }
         }
 
@@ -580,7 +581,7 @@ namespace GtkFlow {
                     n.get_style_context(),
                     alloc,
                     n.get_dock_renderers(),
-                    n.get_children(),
+                    n.get_childlist(),
                     (int)this.hadjustment.value,
                     (int)this.vadjustment.value,
                     (int)n.border_width,
