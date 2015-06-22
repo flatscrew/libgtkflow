@@ -36,7 +36,27 @@ namespace GtkFlow {
 
         public NodeView? node_view {get; set; default=null;}
 
-        public NodeRenderer? node_renderer {get; set; default=null;}
+        private NodeRenderer? _node_renderer = null;
+        public NodeRenderer? node_renderer {
+            get {return this._node_renderer;}
+            set {
+                if (this._node_renderer != null) {
+                    this._node_renderer.size_changed.disconnect(this.size_changed_callback);
+                    this._node_renderer.child_redraw.disconnect(this.child_redraw_callback);
+                }
+                this._node_renderer = value;
+                this._node_renderer.size_changed.connect(this.size_changed_callback);
+                this._node_renderer.child_redraw.connect(this.child_redraw_callback);
+            }
+        }
+
+        private void size_changed_callback() {
+            this.render();
+        }
+
+        private void child_redraw_callback(Gtk.Widget w, Cairo.Context cr ) {
+            this.propagate_draw(w,cr);
+        }
 
         private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
 
@@ -56,8 +76,6 @@ namespace GtkFlow {
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
             this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
-            this.node_renderer.size_changed.connect(()=>{this.render();});
-            this.node_renderer.child_redraw.connect((ch, cr)=>{this.propagate_draw(ch,cr);});
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
             });
