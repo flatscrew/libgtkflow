@@ -19,6 +19,8 @@
 # If not, see http://www.gnu.org/licenses/.
 *********************************************************************/
 
+using GFlow;
+
 /**
  * Flowgraphs for Gtk
  */

@@ -65,22 +65,24 @@ namespace GFlow {
          * Returns true if this Source is connected to the given Sink
          */
         public bool is_connected_to (Dock dock) {
-            dock.is_connected_to (this);
+            return dock.is_connected_to (this);
         }
 
         /**
-         * Returns true if this Source is connected to one or more Sinks
+         * All {@link GFlow.Source} object are connected by default, because they
+         * just update its value and any {@link GFlow.Sink} connected to it catch
+         * any change.
          */
         public bool is_connected () {
-            return this.sinks.length () > 0;
+            return true;
         }
-
+        /**
+         * Mark this {@link Source} as invalid.
+         */
         public void invalidate () {
             _valid = false;
-            foreach (Sink s in this.sinks)
-                s.invalidate();
         }
-
+// FIXME: This operation are valid for GFlow.Sink consider move to Sink interface from Dock
         public new void disconnect (Dock dock) throws GLib.Error
         {
           dock.disconnect (this);
@@ -88,6 +90,10 @@ namespace GFlow {
         public new void connect (Dock dock) throws GLib.Error
         {
           dock.connect (this);
+        }
+        public void disconnect_all () throws GLib.Error
+        {
+          return;
         }
     }
 }

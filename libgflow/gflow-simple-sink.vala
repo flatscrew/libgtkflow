@@ -120,6 +120,11 @@ namespace GFlow {
             connected (dock);
           }
         }
+// FIXME: This method is just useful for GFlow.Node objects no more than one connection is valid a given time
+        public void disconnect_all () throws GLib.Error
+        {
+          disconnect (source);
+        }
         // FIXME This oeverrides Dock.changed signals and set a value but this should not be the case
         // FIXME when change_value is callled it sets its value and send this signal
 /*        public virtual signal void changed (GLib.Value v) {
