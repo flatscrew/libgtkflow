@@ -55,11 +55,12 @@ namespace GtkFlow {
         }
 
         private void child_redraw_callback(Gtk.Widget w, Cairo.Context cr ) {
-            stdout.printf("redraw\n");
-            stdout.printf("widget: %s\n", w == null ? "null" : "not null");
-            stdout.printf("context: %s\n", cr == null ? "null" : "not null");
-            this.propagate_draw(w,cr);
-            stdout.printf("redraw done\n");
+            cr.save();
+            Gtk.Allocation alloc;
+            w.get_allocation(out alloc);
+            cr.translate(alloc.x,alloc.y);
+            w.draw(cr);
+            cr.restore();
         }
 
         private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
