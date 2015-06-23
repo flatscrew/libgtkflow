@@ -47,6 +47,7 @@ namespace GFlow {
           set {
             if (!_val.holds (value.type ())) return;
             _val = value;
+            changed ();
           }
         }
         public SimpleSource (GLib.Value initial) {
@@ -82,18 +83,33 @@ namespace GFlow {
         public void invalidate () {
             _valid = false;
         }
-// FIXME: This operation are valid for GFlow.Sink consider move to Sink interface from Dock
+// FIXME: This operation are valid just for GFlow.Sink consider move to Sink interface from Dock
         public new void disconnect (Dock dock) throws GLib.Error
         {
           dock.disconnect (this);
+          dock.connected.disconnect (connection_event);
+          dock.disconnected.disconnect (disconnection_event);
         }
         public new void connect (Dock dock) throws GLib.Error
         {
+          dock.connected.connect (connection_event);
+          dock.disconnected.connect (disconnection_event);
           dock.connect (this);
         }
         public void disconnect_all () throws GLib.Error
         {
           return;
+        }
+        private void connection_event (Dock dock)
+        {
+          if (dock == ((Dock) this))
+            connected (dock);
+        }
+        private void disconnection_event (Dock dock)
+        {
+          if (dock == ((Dock) this)) {
+            disconnected (dock);
+          }
         }
     }
 }

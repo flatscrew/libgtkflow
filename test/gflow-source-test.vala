@@ -44,7 +44,7 @@ public class GFlowTest.SourceTest
       assert (src.val != null);
       assert (src.val.holds (typeof (int)));
       assert (src.val.get_int () == 1);
-      assert (!src.is_connected ());
+      assert (src.is_connected ()); // No connection oriented this should allways true for Source
       src.val.set_int (10);
       assert (src.val.get_int () == 10);
       src.val = 0.10;
@@ -60,7 +60,7 @@ public class GFlowTest.SourceTest
       assert (src.val != null);
       assert (src.val.holds (typeof (int)));
       assert (((int) src.val) == 0);
-      assert (!src.is_connected ());
+      assert (src.is_connected ()); // No connection oriented this should allways true for Source
       bool fail = true;
       try { src.connect (s); } catch { fail = false; }
       if (fail) assert_not_reached ();
@@ -93,7 +93,7 @@ public class GFlowTest.SourceTest
       assert (!src.val.get_boolean ());
       src.update ();
       assert (src.val.get_boolean ());
-      assert (!src.is_connected ());
+      assert (src.is_connected ());
     });
   }
 }
