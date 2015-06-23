@@ -103,9 +103,7 @@ namespace GtkFlow {
                 mh += dock_renderer.get_min_height();
             }
             Gtk.Widget child = children.nth_data(0);
-            stdout.printf("boo\n");
             if (child != null) {
-                stdout.printf("far\n");
                 int child_height, _;
                 child.get_preferred_height(out child_height, out _);
                 mh += child_height;
@@ -331,15 +329,12 @@ namespace GtkFlow {
             }
 
             Gtk.Widget child = children.nth_data(0);
-            stdout.printf("foo\n");
             if (child != null) {
-                stdout.printf("bar\n");
                 Gtk.Allocation child_alloc = {0,0,0,0};
-                child_alloc.x = alloc.x + (int)border_width;
-                child_alloc.y = alloc.y + (int)border_width + y_offset;
+                child_alloc.x = (int)border_width;
+                child_alloc.y = (int)border_width + y_offset;
                 child_alloc.width = alloc.width - 2 * (int)border_width;
                 child_alloc.height = alloc.height - 2 * (int)border_width - y_offset;
-                stdout.printf("%d %d %d %d\n", child_alloc.x,child_alloc.y,child_alloc.width,child_alloc.height);
                 child.size_allocate(child_alloc);
                 this.child_redraw(child, cr);
 

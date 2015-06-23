@@ -191,7 +191,7 @@ namespace GtkFlow {
             x += this.hadjustment.value;
             y += this.vadjustment.value;
             foreach (Node n in this.nodes) {
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 if ( x >= alloc.x && y >= alloc.y &&
                          x <= alloc.x + alloc.width && y <= alloc.y + alloc.height ) {
                     return n;
@@ -208,7 +208,7 @@ namespace GtkFlow {
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
                 Gtk.Allocation alloc;
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 bool cbp = n.node_renderer.is_on_closebutton(
                     pos, alloc,
                     (int)this.hadjustment.value,
@@ -231,7 +231,7 @@ namespace GtkFlow {
                         GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         Gtk.Allocation src_alloc;
-                        srcnode.get_node_allocation(out src_alloc);
+                        srcnode.get_allocation(out src_alloc);
                         if (!srcnode.node_renderer.get_dock_position(
                                 s, srcnode.get_dock_renderers(),
                                 (int)this.hadjustment.value,
@@ -264,7 +264,7 @@ namespace GtkFlow {
             // Set a new drag node.
             if (n != null) {
                 Gtk.Allocation alloc;
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 bool on_resize = n.node_renderer.is_on_resize_handle(
                     pos, alloc,
                     (int)this.hadjustment.value,
@@ -274,12 +274,12 @@ namespace GtkFlow {
 
                 if (on_resize && this.resize_node == null) {
                     this.resize_node = n;
-                    this.resize_node.get_node_allocation(out alloc);
+                    this.resize_node.get_allocation(out alloc);
                     this.resize_start_x = alloc.width;
                     this.resize_start_y = alloc.height;
                 } else if (this.resize_node == null && this.drag_node == null) {
                     this.drag_node = n;
-                    this.drag_node.get_node_allocation(out alloc);
+                    this.drag_node.get_allocation(out alloc);
                 } else {
                     return false;
                 }
@@ -300,7 +300,7 @@ namespace GtkFlow {
                 if (n != null) {
                     Gdk.Point pos = {(int)e.x,(int)e.y};
                     Gtk.Allocation alloc;
-                    n.get_node_allocation(out alloc);
+                    n.get_allocation(out alloc);
                     bool cbp = n.node_renderer.is_on_closebutton(
                         pos, alloc,
                         (int)this.hadjustment.value,
@@ -391,7 +391,7 @@ namespace GtkFlow {
             if (n != null) {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
                 Gtk.Allocation alloc;
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 bool cbp = n.node_renderer.is_on_closebutton(
                     pos, alloc,
                     (int)this.hadjustment.value,
@@ -453,10 +453,10 @@ namespace GtkFlow {
                 if (this.drag_node != null) {
                     // Actually move the node
                     Gtk.Allocation alloc;
-                    this.drag_node.get_node_allocation(out alloc);
+                    this.drag_node.get_allocation(out alloc);
                     alloc.x = (int)e.x - this.drag_diff_x;
                     alloc.y = (int)e.y - this.drag_diff_y;
-                    this.drag_node.set_node_allocation(alloc);
+                    this.drag_node.size_allocate(alloc);
                     this.recalculate_size();
                     this.queue_draw();
                 }
@@ -475,10 +475,10 @@ namespace GtkFlow {
                 if (this.resize_node != null) {
                     // resize the node
                     Gtk.Allocation alloc;
-                    this.resize_node.get_node_allocation(out alloc);
+                    this.resize_node.get_allocation(out alloc);
                     alloc.width =  resize_start_x + (int)e.x - (int)this.drag_start_x;
                     alloc.height = resize_start_y + (int)e.y - (int)this.drag_start_y;
-                    this.resize_node.set_node_allocation(alloc);
+                    this.resize_node.size_allocate(alloc);
                     this.queue_draw();
                 }
             }
@@ -489,7 +489,7 @@ namespace GtkFlow {
             double x_min = 0, x_max = 0, y_min = 0, y_max = 0;
             Gtk.Allocation alloc;
             foreach (Node n in this.nodes) {
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 x_min = Math.fmin(x_min, alloc.x);
                 x_max = Math.fmax(x_max, alloc.x+alloc.width);
                 y_min = Math.fmin(y_min, alloc.y);
@@ -575,7 +575,7 @@ namespace GtkFlow {
             this.nodes.reverse();
             foreach (Node n in this.nodes) {
                 Gtk.Allocation alloc;
-                n.get_node_allocation(out alloc);
+                n.get_allocation(out alloc);
                 n.node_renderer.draw_node(
                     cr,
                     n.get_style_context(),
@@ -593,7 +593,7 @@ namespace GtkFlow {
             foreach (Node n in this.nodes) {
                 foreach(GFlow.Source source in n.gnode.get_sources()) {
                     Gtk.Allocation alloc;
-                    n.get_node_allocation(out alloc);
+                    n.get_allocation(out alloc);
                     int source_pos_x = 0, source_pos_y = 0;
                     if (!n.node_renderer.get_dock_position(
                             source,
@@ -611,7 +611,7 @@ namespace GtkFlow {
                         if (sink == this.drag_dock)
                             continue;
                         Node? sink_node = this.get_node_from_gflow_node(sink.node);
-                        sink_node.get_node_allocation(out alloc);
+                        sink_node.get_allocation(out alloc);
                         int sink_pos_x = 0, sink_pos_y = 0;
                         if (!sink_node.node_renderer.get_dock_position(
                                 sink,

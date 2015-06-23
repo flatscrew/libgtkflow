@@ -56,16 +56,15 @@ namespace GtkFlow {
 
         private void child_redraw_callback(Gtk.Widget w, Cairo.Context cr ) {
             cr.save();
-            Gtk.Allocation alloc;
-            w.get_allocation(out alloc);
-            cr.translate(alloc.x,alloc.y);
+            Gtk.Allocation node_alloc, child_alloc;
+            this.get_allocation(out node_alloc);
+            w.get_allocation(out child_alloc);
+            cr.translate(node_alloc.x + child_alloc.x, node_alloc.y + child_alloc.y);
             w.draw(cr);
             cr.restore();
         }
 
         private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
-
-        private Gtk.Allocation node_allocation;
 
         private List<weak Gtk.Widget> childlist = new List<Gtk.Widget>();
 
@@ -79,7 +78,6 @@ namespace GtkFlow {
             this.gnode.sink_added.connect((s)=>{this.register_dock(s);});
             this.gnode.source_removed.connect((s)=>{this.unregister_dock(s);});
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
-            this.node_allocation = {0,0,0,0};
             this.node_renderer = new DefaultNodeRenderer(this);
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
@@ -145,7 +143,7 @@ namespace GtkFlow {
             this.render();
         }
 
-        public void set_node_allocation(Gtk.Allocation alloc) {
+        public new void size_allocate(Gtk.Allocation alloc) {
             int mw = (int)this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
                 (int)this.get_border_width()
@@ -159,25 +157,20 @@ namespace GtkFlow {
                 alloc.width = mw;
             if (alloc.height < mh)
                 alloc.height = mh;
-            this.node_allocation = alloc;
+            base.size_allocate(alloc);
         }
 
         public void set_position(int x, int y) {
-            this.node_allocation.x = x;
-            this.node_allocation.y = y;
+            Gtk.Allocation alloc;
+            this.get_allocation(out alloc);
+            alloc.x = x;
+            alloc.y = y;
+            this.size_allocate(alloc);
             this.node_view.queue_draw();
         }
 
         public unowned List<DockRenderer> get_dock_renderers() {
             return this.dock_renderers;
-        }
-
-        public void get_node_allocation(out Gtk.Allocation alloc) {
-            alloc = Gtk.Allocation();
-            alloc.x = this.node_allocation.x;
-            alloc.y = this.node_allocation.y;
-            alloc.width = this.node_allocation.width;
-            alloc.height = this.node_allocation.height;
         }
 
         public override void forall_internal(bool include_internals, Gtk.Callback c) {
@@ -186,12 +179,16 @@ namespace GtkFlow {
             }
         }
 
+        public new void forall(Gtk.Callback c) {
+            foreach (Gtk.Widget child in this.childlist) {
+                c(child);
+            }
+        }
+
         public override void add(Gtk.Widget w) {
-            stdout.printf("adding child\n");
             w.set_parent(this);
             this.childlist.append(w);
             this.render();
-            stdout.printf("%u\n",this.childlist.length());
         }
 
         public override void remove(Gtk.Widget w) {
@@ -220,12 +217,15 @@ namespace GtkFlow {
         }
 
         public override void realize() {
+            this.recalculate_size();
+            Gtk.Allocation alloc;
+            this.get_allocation(out alloc);
             var attr = Gdk.WindowAttr();
             attr.window_type = Gdk.WindowType.CHILD;
-            attr.x = 0;
-            attr.y = 0;
-            attr.width = 10000;
-            attr.height = 10000;
+            attr.x = alloc.x;
+            attr.y = alloc.y;
+            attr.width = alloc.width;
+            attr.height = alloc.height;
             attr.visual = this.get_visual();
             attr.event_mask = this.get_events();
             Gdk.WindowAttributesType mask = Gdk.WindowAttributesType.X 
@@ -243,7 +243,7 @@ namespace GtkFlow {
          */
         public void recalculate_size() {
             Gtk.Allocation alloc;
-            this.get_node_allocation(out alloc);
+            this.get_allocation(out alloc);
             uint mw = this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
                 (int) this.get_border_width()
@@ -256,7 +256,7 @@ namespace GtkFlow {
                 alloc.width = (int)mw;
             if (mh > alloc.height)
                 alloc.height = (int)mh;
-            this.set_node_allocation(alloc);
+            this.size_allocate(alloc);
         }
     }
 }
