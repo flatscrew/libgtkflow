@@ -34,6 +34,7 @@ AM_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(VALA_CFLAGS) \
 	$(GTK_CFLAGS) \
+	-I$(top_builddir) \
 	$(NULL)
 
 # -Wall   # TODO: add this back when we can properly handle more libxml2/vala warnings
@@ -49,14 +50,11 @@ endif
 # library flags
 AM_VALAFLAGS += \
 	$(ERROR_VALAFLAGS) \
-	--library=gtkflow-0.2 \
-	--vapidir=. \
+	--vapidir=$(top_builddir)/libgflow \
 	--pkg glib-2.0 \
 	--pkg gtk+-3.0 \
 	--pkg gflow-0.2 \
-	--includedir libgtkflow \
-	--vapi gtkflow-0.2.vapi \
-	--vapidir=$(top_builddir)/libgflow \
+	--library=gtkflow-0.2 \
 	-H gtkflow.h \
 	-C \
 	$(NULL)
@@ -65,6 +63,7 @@ libgtkflow_0_2_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(VALA_LIBS) \
 	$(GTK_LIBS) \
+	$(top_builddir)/libgflow/libgflow-0.2.la \
 	$(NULL)
 
 libgtkflow_0_2_la_LDFLAGS = \
@@ -127,7 +126,7 @@ AM_VALAFLAGS += \
 	--gir=GtkFlow-$(API_VERSION).gir
 
 INTROSPECTION_GIRS = GtkFlow-$(API_VERSION).gir
-INTROSPECTION_COMPILER_ARGS = --includedir=. -l $(libgtkflow_dlname)
+INTROSPECTION_COMPILER_ARGS = --includedir=$(top_builddir)/libgflow -l $(libgtkflow_dlname)
 
 GtkFlow-0.2.gir: libgtkflow-0.2.la
 
