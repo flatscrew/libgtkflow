@@ -99,7 +99,7 @@ public class GFlowTest.SinkTest
       try { s.connect (src1); } catch { fail = false; }
       if (fail) assert_not_reached ();
       try {
-        assert (src.is_connected ()); // Always connected as is connectionless
+        assert (!src.is_connected ());
         fail = true;
         src.connected.connect (()=>{
           fail = false;
