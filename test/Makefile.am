@@ -54,9 +54,42 @@ gflow_test_LDADD = \
 
 gflow_test_LDFLAGS = $(AM_LDFLAGS)
 
+bin_PROGRAMS = gtkflow_test
+
+gtkflow_test_sources =  \
+	gtkflow-test-app.vala
+
+gtkflow_test_CFLAGS= \
+	-g \
+	$(GLIB_CFLAGS) \
+	$(GTK_CFLAGS) \
+	-I$(top_builddir) \
+	-DTEST_DIR=\"$(builddir)\" \
+	$(NULL)
+
+gtkflow_test_LDADD = \
+	$(AM_LDADD) \
+	$(GLIB_LIBS) \
+	$(GTK_LIBS) \
+	../libgflow/libgflow-0.2.la \
+	../libgtkflow/libgtkflow-0.2.la \
+	$(NULL)
+
+gtkflow_test_SOURCES=$(gtkflow_test_sources:.vala=.c)
+
+gtkflow_valaflags = \
+	--vapidir=$(top_builddir)/libgtkflow \
+	--pkg gtkflow-0.2 \
+	--pkg gtk+-3.0
+
+$(gtkflow_test_sources:.vala=.c) : $(gtkflow_test_sources)
+	$(VALAC) $(AM_VALAFLAGS) $(gtkflow_valaflags) $^
+
 CLEANFILES = \
-  $(sources:.vala=.c)\
-  gflow_test
+	$(sources:.vala=.c) \
+	$(gtkflow_test_sources:.vala=.c)\
+	gflow_test \
+	gtkflow_test
 
 DISTCLEANFILES = 
 
