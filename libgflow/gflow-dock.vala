@@ -20,9 +20,6 @@
 *********************************************************************/
 
 namespace GFlow {
-    public errordomain DockError {
-      CANT_CONNECT
-    }
     /**
      * This class represents an endpoint of a node. These endpoints can be
      * connected in order to let them exchange data. The data contained

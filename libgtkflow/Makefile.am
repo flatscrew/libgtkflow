@@ -34,7 +34,6 @@ AM_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(VALA_CFLAGS) \
 	$(GTK_CFLAGS) \
-	-I$(top_builddir) \
 	$(NULL)
 
 # -Wall   # TODO: add this back when we can properly handle more libxml2/vala warnings
@@ -54,7 +53,7 @@ AM_VALAFLAGS += \
 	--vapidir=. \
 	--pkg glib-2.0 \
 	--pkg gtk+-3.0 \
-	--vapi $(top_builddir)/libgflow/gflow-0.2.vapi \
+	--pkg gflow-0.2 \
 	--includedir libgtkflow \
 	--vapi gtkflow-0.2.vapi \
 	--vapidir=$(top_builddir)/libgflow \
@@ -66,7 +65,6 @@ libgtkflow_0_2_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(VALA_LIBS) \
 	$(GTK_LIBS) \
-	$(top_builddir)/libgflow/libgflow-0.2.la \
 	$(NULL)
 
 libgtkflow_0_2_la_LDFLAGS = \

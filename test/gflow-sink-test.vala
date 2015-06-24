@@ -85,31 +85,5 @@ public class GFlowTest.SinkTest
       src.val = "text";
       assert (((int) s.val) == 10);
     });
-    Test.add_func ("/gflow/sink/connect", 
-    () => {
-      var src = new GFlow.SimpleSource (0);
-      var src1 = new GFlow.SimpleSource (true);
-      var s = new GFlow.SimpleSink (10);
-      assert (s.initial != null);
-      assert (s.val != null);
-      assert (s.val.holds (typeof (int)));
-      assert (((int) s.val) == 10);
-      assert (!s.is_connected ());
-      bool fail = true;
-      try { s.connect (src1); } catch { fail = false; }
-      if (fail) assert_not_reached ();
-      try {
-        assert (!src.is_connected ());
-        fail = true;
-        src.connected.connect (()=>{
-          fail = false;
-        });
-        s.connect (src);
-        if (fail)  assert_not_reached ();
-        src.val = 20;
-        assert (((int) src.val) == 20);
-        assert (((int) s.val) == 20);
-      } catch { assert_not_reached (); }
-    });
   }
 }

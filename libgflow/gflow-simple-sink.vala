@@ -97,28 +97,34 @@ namespace GFlow {
             disconnected (dock);
           }
         }
-        public new void connect (Dock dock) throws GLib.Error
-        {
-            GLib.message ("At Sink Connect");
-          if (dock is SimpleSource) {
-            GLib.message ("Dock is SimpleSource to Connect");
-            if (!val.holds (dock.val.type ())) {
-            GLib.message ("Incompatible source");
-              throw new DockError.CANT_CONNECT ("Can't connect. Dock is incompatible"); }
-          }
-            GLib.message ("Check if already connected Connecting Source..");
-          if (dock.is_connected_to (this)) return;
-          if (dock is Source) {
-            if (source != null) ((Dock) source).disconnect (this);
-            GLib.message ("Saving Source..");
-            _source = (Source) dock;
-            GLib.message ("Connecting Dock to this Sink..");
-            dock.connect (this);
-            _source.changed.connect (() =>{
-              val = _source.val;
-            });
-            connected (dock);
-          }
+
+        public new void connect (Dock dock) throws GLib.Error {
+            if (this.is_connected_to (dock)) return;
+            if (dock is Source) {
+                if (source != null) ((Dock) source).disconnect (this);
+                _source = (Source) dock;
+                val = _source.val;
+                if (!_source.valid)
+                    _valid = false;
+                changed();
+                dock.connect (this);
+                _source.changed.connect (() =>{
+                    val = _source.val;
+                });
+                connected (dock);
+            }
+        }
+
+        public new void disconnect_all() throws GLib.Error {
+            this.disconnect(this.source);
+        }
+
+        public Value? get_value() throws NodeError {
+            if (!this.valid) {
+                throw new NodeError.INVALID("This sink does not hold a valid value");
+            } else {
+                return _val;
+            }
         }
         // FIXME This oeverrides Dock.changed signals and set a value but this should not be the case
         // FIXME when change_value is callled it sets its value and send this signal
