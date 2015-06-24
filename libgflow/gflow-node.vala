@@ -79,7 +79,7 @@ namespace GFlow {
         public signal void source_removed (Source s);
 
         public abstract string name { get; set; }
-        public abstract void disconnect_all () throws GLib.Error;
+        public abstract void disconnect_all ();
         public abstract bool is_recursive (Node from, bool initial=false);
         public abstract Dock? get_dock (string name);
         public abstract bool has_dock(Dock d);

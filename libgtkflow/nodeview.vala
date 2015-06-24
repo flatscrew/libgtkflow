@@ -606,7 +606,7 @@ namespace GtkFlow {
                         continue;
                     }
                     Gdk.Point source_pos = {source_pos_x,source_pos_y};
-                    foreach(GFlow.Sink sink in n.gnode.get_sinks ()) { // FIXME: BUG: This will not work please review
+                    foreach(GFlow.Sink sink in source.sinks) {
                         // Don't draw the connection to a sink if we are dragging it
                         if (sink == this.drag_dock)
                             continue;

@@ -50,11 +50,14 @@ endif
 # library flags
 AM_VALAFLAGS += \
 	$(ERROR_VALAFLAGS) \
-	--vapidir=$(top_builddir)/libgflow \
+	--library=gtkflow-0.2 \
+	--vapidir=. \
 	--pkg glib-2.0 \
 	--pkg gtk+-3.0 \
-	--pkg gflow-0.2 \
-	--library=gtkflow-0.2 \
+	--vapi $(top_builddir)/libgflow/gflow-0.2.vapi \
+	--includedir libgtkflow \
+	--vapi gtkflow-0.2.vapi \
+	--vapidir=$(top_builddir)/libgflow \
 	-H gtkflow.h \
 	-C \
 	$(NULL)
@@ -126,7 +129,7 @@ AM_VALAFLAGS += \
 	--gir=GtkFlow-$(API_VERSION).gir
 
 INTROSPECTION_GIRS = GtkFlow-$(API_VERSION).gir
-INTROSPECTION_COMPILER_ARGS = --includedir=$(top_builddir)/libgflow -l $(libgtkflow_dlname)
+INTROSPECTION_COMPILER_ARGS = --includedir=. -l $(libgtkflow_dlname)
 
 GtkFlow-0.2.gir: libgtkflow-0.2.la
 

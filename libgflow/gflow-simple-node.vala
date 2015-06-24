@@ -115,14 +115,14 @@ namespace GFlow {
          * This method checks whether a connection from the given from-Node
          * to this Node would lead to a recursion
          */
-        public bool is_recursive(Node from, bool initial=true)
-          requires (from is SimpleNode)
-        {
-            if (!initial && this == ((SimpleNode)from))
+        public bool is_recursive(Node from, bool initial=true) {
+            if (!initial && this == from)
                 return true;
-            foreach (Sink sink in this.sinks) {
-                if (sink.node.is_recursive(from, false))
-                    return true;
+            foreach (Source source in this.get_sources()) {
+                foreach (Sink sink in source.sinks) {
+                    if (sink.node.is_recursive(from, false))
+                        return true;
+                }
             }
             return false;
         }
@@ -130,8 +130,7 @@ namespace GFlow {
         /**
          * Disconnect all connections from and to this node
          */
-        public void disconnect_all() throws GLib.Error
-        {
+        public void disconnect_all() {
             foreach (Source s in this.sources) {
                 s.disconnect_all();
             }
