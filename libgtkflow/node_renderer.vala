@@ -26,7 +26,7 @@ namespace GtkFlow {
         public int resize_handle_size {get; set; default=10;}
 
         public signal void size_changed();
-        public signal void child_redraw(Gtk.Widget child, Cairo.Context cr);
+        public signal void child_redraw(Gtk.Widget child);
 
         protected NodeRenderer () {}
 
@@ -336,7 +336,7 @@ namespace GtkFlow {
                 child_alloc.width = alloc.width - 2 * (int)border_width;
                 child_alloc.height = alloc.height - 2 * (int)border_width - y_offset;
                 child.size_allocate(child_alloc);
-                this.child_redraw(child, cr);
+                this.child_redraw(child);
 
             }
             // Draw resize handle

@@ -574,6 +574,7 @@ namespace GtkFlow {
             // Draw nodes
             this.nodes.reverse();
             foreach (Node n in this.nodes) {
+                n.current_cairo_ctx = cr;
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
                 n.node_renderer.draw_node(
@@ -587,6 +588,7 @@ namespace GtkFlow {
                     (int)n.border_width,
                     this.editable
                 );
+                n.current_cairo_ctx = null;
             }
             this.nodes.reverse();
             // Draw connectors

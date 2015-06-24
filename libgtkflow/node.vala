@@ -54,11 +54,18 @@ namespace GtkFlow {
             this.render();
         }
 
-        private void child_redraw_callback(Gtk.Widget w, Cairo.Context cr ) {
-            cr.save();
+        public Cairo.Context? current_cairo_ctx {get; set; default=null;}
+
+        private void child_redraw_callback(Gtk.Widget w) {
+            if (this.current_cairo_ctx == null) {
+                warning("Child Redraw: No context to draw on");
+                return;
+            }
+            Cairo.Context? cr = this.current_cairo_ctx;
             Gtk.Allocation node_alloc, child_alloc;
             this.get_allocation(out node_alloc);
             w.get_allocation(out child_alloc);
+            cr.save();
             cr.translate(node_alloc.x + child_alloc.x, node_alloc.y + child_alloc.y);
             w.draw(cr);
             cr.restore();
