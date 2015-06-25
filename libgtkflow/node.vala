@@ -90,6 +90,8 @@ namespace GtkFlow {
                 this.node_renderer.update_name_layout(this.gnode.name);
             });
             this.set_border_width(this.node_renderer.resize_handle_size);
+
+            this.show_all();
             this.render();
         }
 
