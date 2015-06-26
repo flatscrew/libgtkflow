@@ -157,7 +157,7 @@ class PrintNode(ExampleNode):
 
         self.set_name("Output")
 
-    def do_printing(self, dock, val):
+    def do_printing(self, dock, val=None):
         try:
             v = self.sink.get_value()
             self.childlabel.set_text(v)
