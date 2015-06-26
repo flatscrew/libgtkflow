@@ -113,14 +113,30 @@ namespace GFlow {
 
         /**
          * This method checks whether a connection from the given from-Node
-         * to this Node would lead to a recursion
+         * to this Node would lead to a recursion in the direction source -> sink
          */
-        public bool is_recursive(Node from, bool initial=true) {
+        public bool is_recursive_forward(Node from, bool initial=true) {
             if (!initial && this == from)
                 return true;
             foreach (Source source in this.get_sources()) {
                 foreach (Sink sink in source.sinks) {
-                    if (sink.node.is_recursive(from, false))
+                    if (sink.node.is_recursive_forward(from, false))
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * This method checks whether a connection from the given from-Node
+         * to this Node would lead to a recursion in the direction sink -> source
+         */
+        public bool is_recursive_backward(Node from, bool initial=true) {
+            if (!initial && this == from)
+                return true;
+            foreach (Sink sink in this.sinks) {
+                if (sink.source != null) {
+                    if (sink.source.node.is_recursive_backward(from, false))
                         return true;
                 }
             }

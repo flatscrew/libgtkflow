@@ -80,7 +80,8 @@ namespace GFlow {
 
         public abstract string name { get; set; }
         public abstract void disconnect_all ();
-        public abstract bool is_recursive (Node from, bool initial=false);
+        public abstract bool is_recursive_forward (Node from, bool initial=false);
+        public abstract bool is_recursive_backward (Node from, bool initial=false);
         public abstract Dock? get_dock (string name);
         public abstract bool has_dock(Dock d);
         public abstract unowned List<Source> get_sources ();

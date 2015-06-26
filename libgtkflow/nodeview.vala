@@ -500,9 +500,22 @@ namespace GtkFlow {
             if (!from.has_same_type(to))
                 return false;
             // Check if the target would lead to a recursion
-            if (   from.node.is_recursive(to.node)
-                || to.node.is_recursive(from.node))
-                return false;
+            if (to is GFlow.Source && from is GFlow.Sink)
+                if (from.node.is_recursive_forward(to.node) ||
+                       to.node.is_recursive_backward(from.node))
+                    return false;
+            if (to is GFlow.Sink && from is GFlow.Source)
+                if (to.node.is_recursive_forward(from.node) ||
+                       from.node.is_recursive_backward(to.node))
+                    return false;
+            if (to is GFlow.Sink && from is GFlow.Sink) {
+                GFlow.Source? s = (from as GFlow.Sink).source;
+                if (s == null)
+                    return false;
+                if (to.node.is_recursive_forward(s.node) ||
+                       s.node.is_recursive_backward(to.node))
+                    return false;
+            }
             // If the from from-target is a sink, check if the
             // to target is either a source which does not belong to the own node
             // or if the to target is another sink (this is valid as we can
