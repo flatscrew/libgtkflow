@@ -41,11 +41,10 @@ public class GtkFlowTest.NodeTest
     Test.add_func ("/gtkflow/node", 
     () => {
       var app = new GuiNodeTest ();
-      /*var nview = new GtkFlow.NodeView ();
+      var nview = new GtkFlow.NodeView ();
       var node = new GFlow.SimpleNode ();
-      var wnode = new GtkFlow.Node (node);
-      nview.add (node);
-      app.action_area.pack_end (nview);*/
+      //nview.add_node (node);
+      app.action_area.pack_end (nview);
       app.run ();
       assert (app.status);
     });
