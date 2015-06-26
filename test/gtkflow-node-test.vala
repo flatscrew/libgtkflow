@@ -19,11 +19,18 @@
 using GFlow;
 using GtkFlow;
 
-public class GtkFlowTest.GuiNodeTest : GtkFlowTest.App
+public class GtkFlowTest.GuiNodeTest : GtkFlowTest.TestApp
 {
   public GuiNodeTest ()
   {
+    base ();
     test_prefix = "/gtkflow/node";
+  }
+  public override int execute ()
+  {
+    GLib.message ("Executing Tests...");
+    window.destroy ();
+    return 0;
   }
 }
 
@@ -34,7 +41,13 @@ public class GtkFlowTest.NodeTest
     Test.add_func ("/gtkflow/node", 
     () => {
       var app = new GuiNodeTest ();
+      /*var nview = new GtkFlow.NodeView ();
+      var node = new GFlow.SimpleNode ();
+      var wnode = new GtkFlow.Node (node);
+      nview.add (node);
+      app.action_area.pack_end (nview);*/
       app.run ();
+      assert (app.status);
     });
   }
 }

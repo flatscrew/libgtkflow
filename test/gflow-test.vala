@@ -24,10 +24,12 @@ using GFlow;
 class GFlowTest.Main {
 	public static int main (string[] args) {
 		Test.init (ref args);
+		Gtk.init (ref args);
 		SourceTest.add_tests ();
 		SinkTest.add_tests ();
 		DockTest.add_tests ();
 		NodeTest.add_tests ();
+		GtkFlowTest.NodeTest.add_tests ();
 		Test.run ();
 		return 0;
 	}

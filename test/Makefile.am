@@ -11,7 +11,9 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
 	-g \
 	$(GLIB_CFLAGS) \
-	-I$(top_builddir) \
+	$(GTK_CFLAGS) \
+	-I$(top_builddir)/. \
+	-I$(top_builddir)/libgtkflow \
 	-DTEST_DIR=\"$(builddir)\" \
 	$(NULL)
 
@@ -27,6 +29,8 @@ sources = \
 	gflow-source-test.vala \
 	gflow-dock-test.vala \
 	gflow-node-test.vala \
+	gtkflow-test-app-class.vala \
+	gtkflow-node-test.vala \
 	$(NULL)
 
 $(sources:.vala=.c): $(sources)
@@ -37,6 +41,9 @@ gflow_test_SOURCES = $(sources:.vala=.c)
 AM_VALAFLAGS = \
 	--vapidir=$(top_builddir)/libgflow \
 	--pkg gflow-0.2 \
+	--vapidir=$(top_builddir)/libgtkflow \
+	--pkg gtkflow-0.2 \
+	--pkg gtk+-3.0 \
 	-C \
 	-g \
 	-X -DTEST_DIR=$(top_srcdir)/test \
@@ -49,47 +56,18 @@ endif
 gflow_test_LDADD = \
 	$(AM_LDADD) \
 	$(GLIB_LIBS) \
-	../libgflow/libgflow-0.2.la \
-	$(NULL)
-
-gflow_test_LDFLAGS = $(AM_LDFLAGS)
-
-bin_PROGRAMS = gtkflow_test
-
-gtkflow_test_sources =  \
-	gtkflow-test-app.vala
-
-gtkflow_test_CFLAGS= \
-	-g \
-	$(GLIB_CFLAGS) \
-	$(GTK_CFLAGS) \
-	-I$(top_builddir) \
-	-DTEST_DIR=\"$(builddir)\" \
-	$(NULL)
-
-gtkflow_test_LDADD = \
-	$(AM_LDADD) \
-	$(GLIB_LIBS) \
 	$(GTK_LIBS) \
 	../libgflow/libgflow-0.2.la \
 	../libgtkflow/libgtkflow-0.2.la \
 	$(NULL)
 
-gtkflow_test_SOURCES=$(gtkflow_test_sources:.vala=.c)
+gflow_test_LDFLAGS = $(AM_LDFLAGS)
 
-gtkflow_valaflags = \
-	--vapidir=$(top_builddir)/libgtkflow \
-	--pkg gtkflow-0.2 \
-	--pkg gtk+-3.0
-
-$(gtkflow_test_sources:.vala=.c) : $(gtkflow_test_sources)
-	$(VALAC) $(AM_VALAFLAGS) $(gtkflow_valaflags) $^
 
 CLEANFILES = \
 	$(sources:.vala=.c) \
-	$(gtkflow_test_sources:.vala=.c)\
-	gflow_test \
-	gtkflow_test
+	gtkflow_test_vala.stamp-t \
+	gflow_test
 
 DISTCLEANFILES = 
 

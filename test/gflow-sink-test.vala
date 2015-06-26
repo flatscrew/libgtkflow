@@ -56,7 +56,7 @@ public class GFlowTest.SinkTest
       assert (s.node == null);
       assert (s.source == null);
       assert (!s.is_connected ());
-      s.connect (src);
+      try { s.connect (src); } catch { assert_not_reached (); }
       assert (s.is_connected ());
     });
     Test.add_func ("/gflow/sink/source/changes", 

@@ -47,6 +47,7 @@ namespace GFlow {
           set {
             if (!_val.holds (value.type ())) return;
             _val = value;
+            changed ();
           }
         }
         public SimpleSource (GLib.Value initial) {
