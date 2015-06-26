@@ -106,7 +106,6 @@ namespace GtkFlow {
             if (this.nodes.index(n) == -1) {
                 this.nodes.insert(n,0);
                 n.node_view = this;
-                this.add(n as Gtk.Widget);
             }
             this.queue_draw();
             n.set_parent(this);
@@ -157,16 +156,6 @@ namespace GtkFlow {
             }
         }
 
-        public override void add(Gtk.Widget w) {
-            warning("You can only add GFlow.Nodes to GtkFlow.NodeViews. "
-                   +"Please use NodeView.add_node or NodeView.add_node_with_child");
-        }
-
-        public override void remove(Gtk.Widget w) {
-            warning("You can only remove GFlow.Nodes to GtkFlow.NodeViews. "
-                   +"Please use NodeView.remove_node");
-        }
-
         private Node? get_node_from_gflow_node(GFlow.Node gn) {
             foreach (Node n in this.nodes) {
                 if (n.gnode == gn) {
@@ -181,7 +170,6 @@ namespace GtkFlow {
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
                 gn.node_view = null;
-                this.remove(gn as Gtk.Widget);
             }
             this.queue_draw();
         }
@@ -290,6 +278,9 @@ namespace GtkFlow {
             }
             return false;
         }
+
+        //Empty remove implementation to avoid warning message
+        public override void remove(Gtk.Widget w) {}
 
         public override bool button_release_event(Gdk.EventButton e) {
             if (!this.editable)
