@@ -536,6 +536,16 @@ namespace GtkFlow {
             n.set_position(x,y);
         }
 
+        /**
+         * Returns the allocation of a node
+         */
+        public unowned Gtk.Allocation get_node_allocation(GFlow.Node gn) {
+            Gtk.Allocation alloc;
+            Node n = this.get_node_from_gflow_node(gn);
+            n.get_allocation(out alloc);
+            return alloc;
+        }
+
         public override bool draw(Cairo.Context cr) {
             Gtk.StyleContext sc = this.get_style_context();
             Gdk.RGBA bg = sc.get_background_color(Gtk.StateFlags.NORMAL);
