@@ -607,9 +607,11 @@ namespace GtkFlow {
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
                         cr.save();
-                        double r=0, g=0, b=0;
-                        this.hex2col(color_calculation(source.val),out r, out g, out b);
-                        cr.set_source_rgba(r,g,b,1.0);
+                        if (source != null && source.valid) {
+                            double r=0, g=0, b=0;
+                            this.hex2col(color_calculation(source.val),out r, out g, out b);
+                            cr.set_source_rgba(r,g,b,1.0);
+                        }
                         cr.move_to(source_pos.x, source_pos.y);
                         cr.rel_curve_to(w,0,0,h,w,h);
                         cr.stroke();
