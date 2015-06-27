@@ -161,7 +161,7 @@ class Calculator(object):
         create_printnode_button.connect("clicked", self.do_create_printnode)
         hbox.add(create_printnode_button)
 
-        self.sw.add(self.nv)
+        self.sw.add_with_viewport(self.nv)
         vbox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         vbox.pack_start(hbox, False, False, 0)
         vbox.pack_start(self.sw, True, True, 0)

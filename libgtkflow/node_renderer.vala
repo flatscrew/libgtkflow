@@ -35,33 +35,23 @@ namespace GtkFlow {
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
-                                       int scroll_x,
-                                       int scroll_y,
                                        int border_width,
                                        bool editable);
         public abstract GFlow.Dock? get_dock_on_position(Gdk.Point p,
                                                     List<DockRenderer> dock_renderers,
-                                                    int scroll_x,
-                                                    int scroll_y,
                                                     uint border_width,
                                                     Gtk.Allocation alloc );
         public abstract bool get_dock_position(GFlow.Dock d,
                                                     List<DockRenderer> dock_renderers,
-                                                    int scroll_x,
-                                                    int scroll_y,
                                                     int border_width,
                                                     Gtk.Allocation alloc,
                                                     out int x,
                                                     out int y);
         public abstract bool is_on_closebutton(Gdk.Point p,
                                                Gtk.Allocation alloc,
-                                               int scroll_x,
-                                               int scroll_y,
                                                uint border_width);
         public abstract bool is_on_resize_handle(Gdk.Point p,
                                                Gtk.Allocation alloc,
-                                               int scroll_x,
-                                               int scroll_y,
                                                uint border_width);
         public abstract uint get_min_width(List<DockRenderer> dock_renderers,
                                            List<Gtk.Widget> children,
@@ -144,16 +134,14 @@ namespace GtkFlow {
          */
         public override bool is_on_closebutton(Gdk.Point p,
                                                Gtk.Allocation alloc,
-                                               int scroll_x,
-                                               int scroll_y,
                                                uint border_width) {
             int x = p.x;
             int y = p.y;
 
             int x_left = alloc.x + alloc.width - delete_btn_size
-                                 - (int)border_width - scroll_x;
+                                 - (int)border_width;
             int x_right = x_left + delete_btn_size;
-            int y_top = alloc.y + (int)border_width - scroll_y;
+            int y_top = alloc.y + (int)border_width;
             int y_bot = y_top + delete_btn_size;
             return x > x_left && x < x_right && y > y_top && y < y_bot;
         }
@@ -163,15 +151,13 @@ namespace GtkFlow {
          */
         public override bool is_on_resize_handle(Gdk.Point p,
                                                  Gtk.Allocation alloc,
-                                                 int scroll_x,
-                                                 int scroll_y,
                                                  uint border_width) {
             int x = p.x;
             int y = p.y;
 
-            int x_right = alloc.x + alloc.width - scroll_x;
+            int x_right = alloc.x + alloc.width;
             int x_left = x_right - resize_handle_size;
-            int y_bot = alloc.y + alloc.height - scroll_y;
+            int y_bot = alloc.y + alloc.height;
             int y_top = y_bot - resize_handle_size;
             return x > x_left && x < x_right && y > y_top && y < y_bot;
         }
@@ -183,16 +169,12 @@ namespace GtkFlow {
          */
         public override bool get_dock_position(GFlow.Dock d,
                                                     List<DockRenderer> dock_renderers,
-                                                    int scroll_x,
-                                                    int scroll_y,
                                                     int border_width,
                                                     Gtk.Allocation alloc,
                                                     out int x,
                                                     out int y) {
             int i = 0;
             x = y = 0;
-            x -= scroll_x;
-            y -= scroll_y;
 
             uint title_offset = this.get_title_line_height();
 
@@ -225,8 +207,6 @@ namespace GtkFlow {
          */
         public override GFlow.Dock? get_dock_on_position(Gdk.Point p,
                                                     List<DockRenderer> dock_renderers,
-                                                    int scroll_x,
-                                                    int scroll_y,
                                                     uint border_width,
                                                     Gtk.Allocation alloc ) {
             int x = p.x;
@@ -242,18 +222,18 @@ namespace GtkFlow {
                 GFlow.Dock s = dock_renderer.get_dock();
                 mh = dock_renderer.get_min_height();
                 if (s is GFlow.Sink) {
-                    dock_x = alloc.x + (int)border_width - scroll_x;
+                    dock_x = alloc.x + (int)border_width;
                     dock_y = alloc.y + (int)border_width + (int)title_offset
-                             + i * mh - scroll_y;
+                             + i * mh;
                     if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                             && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                         return s;
                 } else if (s is GFlow.Source) {
                     dock_x = alloc.x + alloc.width
-                             - (int)border_width - (int)scroll_x
+                             - (int)border_width
                              - dock_renderer.dockpoint_height;
                     dock_y = alloc.y + (int)border_width + (int)title_offset
-                             + i * mh - (int)scroll_y;
+                             + i * mh;
                     if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                             && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                         return s;
@@ -271,13 +251,8 @@ namespace GtkFlow {
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
-                                       int scroll_x,
-                                       int scroll_y,
                                        int border_width,
                                        bool editable) {
-            alloc.x -= scroll_x;
-            alloc.y -= scroll_y;
-
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);

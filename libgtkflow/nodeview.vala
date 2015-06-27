@@ -24,7 +24,7 @@ namespace GtkFlow {
      * A Gtk Widget that shows nodes and their connections to the user
      * It also lets the user edit said connections.
      */
-    public class NodeView : Gtk.Container, Gtk.Scrollable {
+    public class NodeView : Gtk.Container {
         private List<Node> nodes = new List<Node>();
    
         // The node that is currently being dragged around
@@ -61,32 +61,6 @@ namespace GtkFlow {
          */
         public bool show_types {get; set; default=false;}
 
-        public Gtk.Adjustment _hadjustment = null;
-        public Gtk.Adjustment hadjustment {
-            get {
-                return this._hadjustment;
-            }
-            set {
-                this._hadjustment = value;
-                this._hadjustment.value_changed.connect(this.queue_draw);
-            }
-        }
-        public Gtk.Adjustment _vadjustment = null;
-        public Gtk.Adjustment vadjustment {
-            get {
-                return this._vadjustment;
-
-            }
-            set {
-                this._vadjustment = value;
-                this._vadjustment.value_changed.connect(this.queue_draw);
-            }
-        }
-        public Gtk.ScrollablePolicy hscroll_policy {get; set;
-                                                    default=Gtk.ScrollablePolicy.MINIMUM;}
-        public Gtk.ScrollablePolicy vscroll_policy {get; set;
-                                                    default=Gtk.ScrollablePolicy.MINIMUM;}
-
         /**
          * Determines whether the displayed Nodes can be edited by the user
          * e.g. alter their positions by dragging and dropping or drawing
@@ -96,8 +70,6 @@ namespace GtkFlow {
 
         public NodeView() {
             Object();
-            this.vadjustment = new Gtk.Adjustment(0, 0, 100, 50, 100, 100);
-            this.hadjustment = new Gtk.Adjustment(0, 0, 100, 50, 100, 100);
             this.set_size_request(100,100);
             this.notify["show-types"].connect(()=>{this.render_all();});
         }
@@ -176,8 +148,6 @@ namespace GtkFlow {
 
         private Node? get_node_on_position(double x,double y) {
             Gtk.Allocation alloc;
-            x += this.hadjustment.value;
-            y += this.vadjustment.value;
             foreach (Node n in this.nodes) {
                 n.get_allocation(out alloc);
                 if ( x >= alloc.x && y >= alloc.y &&
@@ -202,16 +172,12 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 bool cbp = n.node_renderer.is_on_closebutton(
                     pos, alloc,
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width
                 );
                 if (cbp)
                     this.close_button_pressed = true;
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width, alloc
                 );
                 if (targeted_dock != null) {
@@ -225,8 +191,6 @@ namespace GtkFlow {
                         srcnode.get_allocation(out src_alloc);
                         if (!srcnode.node_renderer.get_dock_position(
                                 s, srcnode.get_dock_renderers(),
-                                (int)this.hadjustment.value,
-                                (int)this.vadjustment.value,
                                 (int)srcnode.border_width, src_alloc,
                                 out startpos_x, out startpos_y )) {
                             warning("No dock on position. Aborting drag");
@@ -238,8 +202,6 @@ namespace GtkFlow {
                     } else {
                         if (!n.node_renderer.get_dock_position(
                                 this.drag_dock, n.get_dock_renderers(),
-                                (int)this.hadjustment.value,
-                                (int)this.vadjustment.value,
                                 (int)n.border_width, alloc,
                                 out startpos_x, out startpos_y )) {
                             warning("No dock on position. Aborting drag");
@@ -258,8 +220,6 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 bool on_resize = n.node_renderer.is_on_resize_handle(
                     pos, alloc,
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width
                 );
 
@@ -297,8 +257,6 @@ namespace GtkFlow {
                     n.get_allocation(out alloc);
                     bool cbp = n.node_renderer.is_on_closebutton(
                         pos, alloc,
-                        (int)this.hadjustment.value,
-                        (int)this.vadjustment.value,
                         n.border_width
                     );
                     if (cbp) {
@@ -388,8 +346,6 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 bool cbp = n.node_renderer.is_on_closebutton(
                     pos, alloc,
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width
                 );
                 if (!cbp)
@@ -397,8 +353,6 @@ namespace GtkFlow {
                 // Update cursor if we are on the resize area
                 bool on_resize = n.node_renderer.is_on_resize_handle(
                     pos, alloc,
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width
                 );
                 if (on_resize)
@@ -407,8 +361,6 @@ namespace GtkFlow {
                     this.get_window().set_cursor(null);
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     n.border_width, alloc
                 );
                 if (this.drag_dock == null && targeted_dock != this.hovered_dock) {
@@ -444,15 +396,13 @@ namespace GtkFlow {
 
             // Actually something
             if (this.drag_threshold_fulfilled ) {
+                Gtk.Allocation alloc;
                 if (this.drag_node != null) {
                     // Actually move the node
-                    Gtk.Allocation alloc;
                     this.drag_node.get_allocation(out alloc);
-                    alloc.x = (int)e.x - this.drag_diff_x;
-                    alloc.y = (int)e.y - this.drag_diff_y;
+                    alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x);
+                    alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y);
                     this.drag_node.size_allocate(alloc);
-                    this.recalculate_size();
-                    this.queue_draw();
                 }
                 if (this.drag_dock != null) {
                     // Manipulate the temporary connector
@@ -464,35 +414,48 @@ namespace GtkFlow {
                     else if (this.is_suitable_target(this.drag_dock, targeted_dock))
                         this.set_drop_dock(targeted_dock);
 
-                    this.queue_draw();
                 }
                 if (this.resize_node != null) {
                     // resize the node
-                    Gtk.Allocation alloc;
                     this.resize_node.get_allocation(out alloc);
                     alloc.width =  resize_start_x + (int)e.x - (int)this.drag_start_x;
                     alloc.height = resize_start_y + (int)e.y - (int)this.drag_start_y;
                     this.resize_node.size_allocate(alloc);
-                    this.queue_draw();
                 }
+                int minwidth = 0, minheight = 0, _ = 0;
+                this.get_preferred_width(out minwidth, out _);
+                this.get_preferred_height(out minheight, out _);
+                this.set_size_request(minwidth, minheight);
+                Gtk.Allocation nv_alloc;
+                this.get_allocation(out nv_alloc);
+                nv_alloc.width = minwidth;
+                nv_alloc.height = minheight;
+                this.size_allocate(nv_alloc);
+                this.queue_draw();
             }
             return false;
         }
 
-        private void recalculate_size() {
-            double x_min = 0, x_max = 0, y_min = 0, y_max = 0;
+        public new void get_preferred_width(out int minimum_width, out int natural_width) {
+            double x_min = 0, x_max = 0;
             Gtk.Allocation alloc;
             foreach (Node n in this.nodes) {
                 n.get_allocation(out alloc);
                 x_min = Math.fmin(x_min, alloc.x);
                 x_max = Math.fmax(x_max, alloc.x+alloc.width);
+            }
+            minimum_width = natural_width = (int)x_max - (int)x_min;
+        }
+
+        public new void get_preferred_height(out int minimum_height, out int natural_height) {
+            double y_min = 0, y_max = 0;
+            Gtk.Allocation alloc;
+            foreach (Node n in this.nodes) {
+                n.get_allocation(out alloc);
                 y_min = Math.fmin(y_min, alloc.y);
                 y_max = Math.fmax(y_max, alloc.y+alloc.height);
             }
-            this.hadjustment.lower = x_min;
-            this.hadjustment.upper = x_max;
-            this.vadjustment.lower = y_min;
-            this.vadjustment.upper = y_max;
+            minimum_height = natural_height = (int)y_max - (int)y_min;
         }
 
         /**
@@ -590,8 +553,6 @@ namespace GtkFlow {
                     alloc,
                     n.get_dock_renderers(),
                     n.get_childlist(),
-                    (int)this.hadjustment.value,
-                    (int)this.vadjustment.value,
                     (int)n.border_width,
                     this.editable
                 );
@@ -607,8 +568,6 @@ namespace GtkFlow {
                     if (!n.node_renderer.get_dock_position(
                             source,
                             n.get_dock_renderers(),
-                            (int)this.hadjustment.value,
-                            (int)this.vadjustment.value,
                             (int)n.border_width,
                             alloc, out source_pos_x, out source_pos_y)) {
                         warning("No dock on position. Ommiting connector");
@@ -625,8 +584,6 @@ namespace GtkFlow {
                         if (!sink_node.node_renderer.get_dock_position(
                                 sink,
                                 sink_node.get_dock_renderers(),
-                                (int)this.hadjustment.value,
-                                (int)this.vadjustment.value,
                                 (int)sink_node.border_width,
                                 alloc, out sink_pos_x, out sink_pos_y )) {
                             warning("No dock on position. Ommiting connector");
