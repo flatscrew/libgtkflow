@@ -8,7 +8,7 @@ from gi.repository import GtkFlow
 import sys
 
 class ExampleNode(GFlow.SimpleNode):
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         x = GFlow.SimpleNode.new()
         x.__class__ = cls
         return x
