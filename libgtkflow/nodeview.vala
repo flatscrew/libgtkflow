@@ -189,6 +189,9 @@ namespace GtkFlow {
         }
 
         public override bool button_press_event(Gdk.EventButton e) {
+            if (   e.type == Gdk.EventType.@2BUTTON_PRESS
+                || e.type == Gdk.EventType.@3BUTTON_PRESS)
+                return false;
             if (!this.editable)
                 return false;
             Node? n = this.get_node_on_position(e.x, e.y);
