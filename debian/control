@@ -1,0 +1,45 @@
+Source: libgtkflow
+Maintainer: Daniel Brendle <grindhold@skarphed.org>
+Section: web
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: libgtkflow
+Architecture: any 
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: drawing interactive flowgraphs for Gtk3
+ enables you to draw blender-node-editor-like flowgraphs inside Gtk3-based
+ applications
+
+Package: libgtkflow-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libgtkflow development files
+ contains haeder files and gobject introspection files for libgtkflow
+
+Package: libgtkflow-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libgtkflow debug symbols
+ contains debug symbols for libgtkflow
+
+Package: libgflow
+Architecture: any 
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: glib-based models for modeling data-flow
+ enables glib-based programs to model data flow through
+ several stations, so called nodes, via connection-elements
+ called docks.
+
+Package: libgflow-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libgflow development files
+ contains haeder files and gobject introspection files for libgflow
+
+Package: libgflow-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libgflow debug symbols
+ contains debug symbols for libgflow
