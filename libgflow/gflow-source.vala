@@ -22,17 +22,25 @@
 namespace GFlow {
     /**
      * The Source is a special Type of Dock that provides data.
-     * A Source could be used by multitude of Sinks as a source of data. // FIXME Is this correct?
+     * A Source may be used by multitude of Sinks as a source of data.
      */
     public interface Source : Object, Dock {
         public signal void updated ();
+        /*
+         * FIXME This should be read-only (when you get it from
+         * here this could be modified by user)
+         * FIXME May be the way to make sinks read-only is to
+         * return an owned copy of it to avoid writes on lists
+         */
         /**
-        * FIXME This should be read-only (when you get it from here this could be modified by user)
-        * FIXME May be the way to make sinks read-only is to return an owned copy of it to avoid writes on lists
          * Returns the sinks that this source is connected to
          */
         public abstract List<Sink> sinks { get; }
 
+        /**
+         * Disconnects the Source from all {@link Sink}s that it supplies
+         * with data.
+         */
         public virtual void disconnect_all () throws GLib.Error
         {
             foreach (Sink s in this.sinks)

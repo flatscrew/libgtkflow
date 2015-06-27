@@ -30,18 +30,36 @@ namespace GFlow {
         protected bool _valid = false;
 
         private string? _name = null;
+        /**
+         * This SimpleSource's displayname
+         */
         public string? name { 
             get { return this._name; }
             set { this._name = value; }
         }
+        /**
+         * This SimpleSource's typestring
+         */
         public string? _typename = null;
         public string? typename {
             get { return this._typename; }
             set { this._typename = value; }
         }
+        /**
+         * Indicates whether this Source should be rendered highlighted
+         */
         public bool highlight { get; set; }
+        /**
+         * Indicates whether this Source should be rendered active
+         */
         public bool active {get; set; default=false;}
+        /**
+         * A reference to the {@link Node} that this SimpleSource resides in
+         */
         public weak Node? node { get; set; }
+        /**
+         * The value that this SimpleSource holds
+         */
         public GLib.Value? val {
           get { return _val; }
           set {
@@ -50,16 +68,34 @@ namespace GFlow {
             changed ();
           }
         }
+        /**
+         * Creates a new SimpleSource. Supply an arbitrary {@link GLib.Value}. This
+         * initial value's type will determine this SimpleSource's type.
+         */
         public SimpleSource (GLib.Value initial) {
           _initial = initial;
           _val = _initial;
         }
+        /**
+         * The value that this SimpleSource was initialized with
+         */
         public GLib.Value? initial { get { return _initial; } }
+        /**
+         * If this value is true, the value of the SimpleSource is currently valid
+         */
         public bool valid { get { return _valid; } }
         // Source interface
         private List<Sink> _sinks = new List<Sink> ();
+        /**
+         * The {@link Sink}s that this SimpleSource is connected to
+         */
         public List<Sink> sinks { get { return _sinks; } }
 
+        /**
+         * Connects this SimpleSource to the given {@link Sink}. This will
+         * only succeed if both {@link Dock}s are of the same type. If this
+         * is not the case, an exception will be thrown
+         */
         protected void add_sink (Sink s) throws Error
         {
             if (this.val.type() != s.val.type()) {
@@ -75,6 +111,10 @@ namespace GFlow {
             }
             connected ((Dock) s);
         }
+
+        /**
+         * Destroys the connection between this SimpleSource and the given {@link Sink}
+         */
         protected void remove_sink (Sink s) throws GLib.Error
         {
             if (this._sinks.index(s) != -1)
@@ -83,7 +123,11 @@ namespace GFlow {
                 s.disconnect (this);
             this.disconnected(s);
         }
-        // FIXME This should not be set by users is a mutter of test to know if source should work
+
+        /**
+         * Manually set this node to be valid. Use this if you initialized the SimpleSource
+         * with a value that you really want to be it's first value.
+         */
         public new void set_valid() {
             this._valid = true;
         }
@@ -102,12 +146,19 @@ namespace GFlow {
             return this.sinks.length () > 0;
         }
 
+        /**
+         * Declare the value that this SimpleSource holds invalid. Subsequently
+         * All {@link Sink}s that are connected to this SimpleSource will be invalidated.
+         */
         public void invalidate () {
             _valid = false;
             foreach (Sink s in this.sinks)
                 s.invalidate();
         }
 
+        /**
+         * Disconnect from the given {@link Dock}
+         */
         public new void disconnect (Dock dock) throws GLib.Error
         {
           if (!this.is_connected_to (dock)) return;
@@ -116,6 +167,10 @@ namespace GFlow {
             if (sinks.length () == 0) disconnected (dock);
           }
         }
+
+        /**
+         * Connect to the given {@link Dock}
+         */
         public new void connect (Dock dock) throws GLib.Error
         {
           if (this.is_connected_to (dock)) return;
@@ -125,12 +180,17 @@ namespace GFlow {
             connected (dock);
           }
         }
+
+        /**
+         * Disconnect from any {@link Dock} that this SimplesSource is connected to
+         */
         public new void disconnect_all () throws GLib.Error {
             foreach (Sink s in this._sinks)
                 this.disconnect(s);
         }
+
         /**
-         * FIXME This could be removed and make connected Dock to lisen updated () signal
+         * Set the value of this SimpleSource
          */
         public void set_value (GLib.Value v) throws GLib.Error
         {

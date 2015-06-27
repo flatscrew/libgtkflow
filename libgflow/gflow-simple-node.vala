@@ -30,9 +30,13 @@ namespace GFlow {
         private List<Source> sources = new List<Source>();
         private List<Sink> sinks = new List<Sink>();
 
-        public string name { get; set; default="SimpleNode";}
         /**
-         * FIXME:*
+         * This SimpleNode's name
+         */
+        public string name { get; set; default="SimpleNode";}
+
+        /**
+         * Add the given {@link Source} to this SimpleNode
          */
         public void add_source(Source s) throws NodeError {
             if (s.node != null)
@@ -44,7 +48,7 @@ namespace GFlow {
             source_added (s);
         }
         /**
-         * FIXME:*
+         * Add the given {@link Sink} to this SimpleNode
          */
         public void add_sink (Sink s) throws NodeError {
             if (s.node != null)
@@ -56,6 +60,9 @@ namespace GFlow {
             sink_added (s);
         }
 
+        /**
+         * Remove the given {@link Source} from this SimpleNode
+         */
         public void remove_source(Source s) throws NodeError {
             if (this.sources.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this source");
@@ -64,6 +71,9 @@ namespace GFlow {
             source_removed (s);
         }
 
+        /**
+         * Remove the given {@link Sink} from this SimpleNode
+         */
         public void remove_sink(Sink s) throws NodeError {
             if (this.sinks.index(s) == -1)
                 throw new NodeError.NO_SUCH_DOCK("This node doesn't have this sink");
@@ -72,14 +82,23 @@ namespace GFlow {
             sink_removed (s);
         }
 
+        /**
+         * Returns true if the given {@link Sink} is one of this SimpleNode's Sinks.
+         */
         public bool has_sink(Sink s) {
             return this.sinks.index(s) != -1;
         }
 
+        /**
+         * Returns true if the given {@link Source} is one of this SimpleNode's Sources.
+         */
         public bool has_source(Source s) {
             return this.sources.index(s) != -1;
         }
 
+        /**
+         * Returns true if the given {@link Dock} is one of this SimpleNode's Docks.
+         */
         public bool has_dock(Dock d) {
             if (d is Source)
                 return this.has_source(d as Source);
@@ -87,6 +106,10 @@ namespace GFlow {
                 return this.has_sink(d as Sink);
         }
 
+        /**
+         * Searches this SimpleNode's {@link Dock}s for a Dock with the given name.
+         * If there is any, it will be returned. Else, null will be returned
+         */
         public Dock? get_dock (string name) {
             foreach (Sink s in this.sinks)
                 if (s.name == name)

@@ -35,15 +35,15 @@ namespace GFlow {
         /**
          * The string rendered as typehint for this dock.
          * If this string is "" and the show_type is set to true
-         * libgtkflow will attempt to determine the type of this
+         * libgflow will attempt to determine the type of this
          * dock and display it, but it produces nicer results to set
-         * them manually. // FIXME On setting this you should draw the label in GtkFlow
+         * them manually.
          */
         public abstract string? typename { get; set; }
 
         /**
          * Determines whether this dock is highlighted
-         * as to know if it is working or requires attention // FIXME
+         * this is usually triggered when the mouse hovers over it
          */
         public abstract bool highlight { get; set; }
 
@@ -59,8 +59,7 @@ namespace GFlow {
 
         /**
          * The value that is stored in this Dock
-         * FIXME Return NULL if invalid source or sink in use
-         * FIXME Consider that this value could be a stream not a fixed value
+         * TODO: Consider that this value could be a stream not a fixed value
          */
         public abstract GLib.Value? val { get; set; }
 
@@ -90,14 +89,26 @@ namespace GFlow {
         public signal void disconnected (Dock d);
 
         /**
-         * Triggers when something leads to this dock chaging in sources or sinks. // FIXME
+         * Triggers when the value of this dock changes
          */
         public signal void changed ();
 
+        /**
+         * Render this dock invalid. That means that entities that request to get
+         * the value will be provided with an invalid-Exception
+         */
         public abstract void invalidate ();
 
+        /**
+         * Implementations should return true if this dock has at least one
+         * connection to another dock
+         */
         public abstract bool is_connected ();
 
+        /**
+         * Implementations should return true if this dock is connected
+         * to the supplied dock
+         */
         public abstract bool is_connected_to (Dock dock);
 
         /**
@@ -113,7 +124,9 @@ namespace GFlow {
          */
         public abstract void disconnect_all () throws GLib.Error;
 
-        // FIXME: This could be changed to get_stypestring
+        /**
+         * Tries to resolve this {@link Dock.value}'s type to a displayable string
+         */
         public virtual string determine_typestring () {
             GLib.TypeQuery tq;
             this.val.get_gtype().query(out tq);

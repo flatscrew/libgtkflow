@@ -70,27 +70,86 @@ namespace GFlow {
     }
     /**
      * Represents an element that can generate, process or receive data
-     * This is done by adding Sources and Sinks to it. The inner logic of // FIXME;
+     * This is done by adding Sources and Sinks to it.
      */
     public interface Node : GLib.Object {
+        /**
+         * This signal is being triggered when a {@link Sink} is added to this Node
+         */
         public signal void sink_added (Sink s);
+        /**
+         * This signal is being triggered when a {@link Source} is added to this Node
+         */
         public signal void source_added (Source s);
+        /**
+         * This signal is being triggered when a {@link Sink} is removed from this Node
+         */
         public signal void sink_removed (Sink s);
+        /**
+         * This signal is being triggered when a {@link Source} is removed from this Node
+         */
         public signal void source_removed (Source s);
 
+        /**
+         * This node's name
+         */
         public abstract string name { get; set; }
+        /**
+         * Implementations should destroy all connections of this Node's {@link Sink}s
+         * and {@link Source}s when this method is executed
+         */
         public abstract void disconnect_all ();
+        /**
+         * Determines whether the given from-{@link Node} can be found if we
+         * recursively follow all nodes that are connected to this node's {@link Source}s
+         */
         public abstract bool is_recursive_forward (Node from, bool initial=false);
+        /**
+         * Determines whether the given from-{@link Node} can be found if we
+         * recursively follow all nodes that are connected to this node's {@link Sink}s
+         */
         public abstract bool is_recursive_backward (Node from, bool initial=false);
+        /**
+         * Implementations should return the {@link Dock} with the given name if they contain
+         * any. If not, return null.
+         */
         public abstract Dock? get_dock (string name);
+        /**
+         * Implementations should return true if the given {@link Dock} has been
+         * assigned to this node
+         */
         public abstract bool has_dock(Dock d);
+        /**
+         * Return a {@link GLib.List} of this Node's {@link Source}s
+         */
         public abstract unowned List<Source> get_sources ();
+        /**
+         * Return a {@link GLib.List} of this Node's {@link Sink}s
+         */
         public abstract unowned List<Sink> get_sinks ();
+        /**
+         * Assign a {@link Source} to this Node
+         */
         public abstract void add_source (Source source) throws NodeError;
+        /**
+         * Remove a {@link Source} from this Node
+         */
         public abstract void remove_source (Source source) throws NodeError;
+        /**
+         * Return true if the supplied {@link Source} is assigned to this Node
+         */
         public abstract bool has_source (Source s);
+        /**
+         * Assign a {@link Sink} to this Node
+         */
         public abstract void add_sink (Sink sink) throws NodeError;
+        /**
+         * Return true if the supplied {@link Sink} is assigned to this Node
+         */
         public abstract bool has_sink (Sink s);
+        /**
+         * Remove a {@link Sink} from this Node
+         */
         public abstract void remove_sink (Sink sink) throws NodeError;
     }
 }

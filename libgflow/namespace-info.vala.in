@@ -21,4 +21,9 @@
  *      Daniel Espinosa <esodan@gmail.com>
  */
 [CCode (gir_namespace = "GFlow", gir_version = "@API_VERSION@", cheader_filename = "libgflow/gflow.h")]
+/**
+ * Contains base classes to describe directed data flow through
+ * stations, so called {@link Node}s via data-exchange-points,
+ * so called {@link Dock}s.
+ */
 namespace GFlow {}
