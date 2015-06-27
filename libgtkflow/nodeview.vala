@@ -56,6 +56,10 @@ namespace GtkFlow {
         // The connector that is being used to draw a non-established connection
         private Gtk.Allocation? temp_connector = null;
 
+        public virtual signal string color_calculation(GLib.Value v) {
+            return "000000";
+        }
+
         /**
          * Determines whether docks should render type-indicators
          */
@@ -602,9 +606,14 @@ namespace GtkFlow {
                         Gdk.Point sink_pos = {sink_pos_x,sink_pos_y};
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
+                        cr.save();
+                        double r=0, g=0, b=0;
+                        this.hex2col(color_calculation(source.val),out r, out g, out b);
+                        cr.set_source_rgba(r,g,b,1.0);
                         cr.move_to(source_pos.x, source_pos.y);
                         cr.rel_curve_to(w,0,0,h,w,h);
                         cr.stroke();
+                        cr.restore();
                     }
                 }
             }
@@ -617,6 +626,17 @@ namespace GtkFlow {
                 cr.stroke();
             }
             return true;
+        }
+
+        private void hex2col(string hex, out double r, out double g, out double b) {
+            string hexdigits ="0123456789abcdef";
+            r = col_h2f(hexdigits.index_of_char(hex[0]) * 16 + hexdigits.index_of_char(hex[1]));
+            g = col_h2f(hexdigits.index_of_char(hex[2]) * 16 + hexdigits.index_of_char(hex[3]));
+            b = col_h2f(hexdigits.index_of_char(hex[4]) * 16 + hexdigits.index_of_char(hex[5]));
+        }
+
+        private double col_h2f(int col) {
+            return col/255.0f;
         }
 
         public override void realize() {

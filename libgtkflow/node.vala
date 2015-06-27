@@ -121,6 +121,7 @@ namespace GtkFlow {
             d.notify["typename"].connect(()=>{
                 dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
             });
+            d.changed.connect(()=>{this.render();});
             this.dock_renderers.append(dr);
             dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
             this.render();
