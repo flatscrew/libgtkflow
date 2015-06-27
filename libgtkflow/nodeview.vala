@@ -75,6 +75,10 @@ namespace GtkFlow {
         public NodeView() {
             Object();
             this.set_size_request(100,100);
+            this.draw.connect((cr)=>{ return this.do_draw(cr); });
+            this.motion_notify_event.connect((e)=>{ return this.do_motion_notify_event(e); });
+            this.button_press_event.connect((e)=>{ return this.do_button_press_event(e); });
+            this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
             this.notify["show-types"].connect(()=>{this.render_all();});
         }
 
@@ -162,7 +166,7 @@ namespace GtkFlow {
             return null;
         }
 
-        public override bool button_press_event(Gdk.EventButton e) {
+        private bool do_button_press_event(Gdk.EventButton e) {
             if (   e.type == Gdk.EventType.@2BUTTON_PRESS
                 || e.type == Gdk.EventType.@3BUTTON_PRESS)
                 return false;
@@ -249,7 +253,7 @@ namespace GtkFlow {
         //Empty remove implementation to avoid warning message
         public override void remove(Gtk.Widget w) {}
 
-        public override bool button_release_event(Gdk.EventButton e) {
+        private bool do_button_release_event(Gdk.EventButton e) {
             if (!this.editable)
                 return false;
             // Determine if this was a closebutton press
@@ -336,7 +340,7 @@ namespace GtkFlow {
             return resize_cursor;
         }
 
-        public override bool motion_notify_event(Gdk.EventMotion e) {
+        private bool do_motion_notify_event(Gdk.EventMotion e) {
             if (!this.editable)
                 return false;
             // Check if we are on a node. If yes, check if we are
@@ -550,7 +554,7 @@ namespace GtkFlow {
             return alloc;
         }
 
-        public override bool draw(Cairo.Context cr) {
+        private bool do_draw(Cairo.Context cr) {
             Gtk.StyleContext sc = this.get_style_context();
             Gdk.RGBA bg = sc.get_background_color(Gtk.StateFlags.NORMAL);
             cr.set_source_rgba(bg.red, bg.green, bg.blue, bg.alpha);
