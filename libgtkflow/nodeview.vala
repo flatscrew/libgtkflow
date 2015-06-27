@@ -56,12 +56,20 @@ namespace GtkFlow {
         // The connector that is being used to draw a non-established connection
         private Gtk.Allocation? temp_connector = null;
 
+        /**
+         * Connect to this signal if you wish to set custom colors for the
+         * connectors depending on what values they transport. Whenever
+         * the value of a connected {@link GFlow.Source} changes, this
+         * signal will be emitted. Return the color you desire as hex-string
+         * similar to those used in css without the preceding hash ('#').
+         * Example:  red would be "ff0000"
+         */
         public virtual signal string color_calculation(GLib.Value v) {
             return "000000";
         }
 
         /**
-         * Determines whether docks should render type-indicators
+         * Determines whether docks should be rendered with type-indicators
          */
         public bool show_types {get; set; default=false;}
 
@@ -72,6 +80,9 @@ namespace GtkFlow {
          */
         public bool editable {get; set; default=true;}
 
+        /**
+         * Creates a new empty {@link NodeView}
+         */
         public NodeView() {
             Object();
             this.set_size_request(100,100);
@@ -97,16 +108,27 @@ namespace GtkFlow {
             this.queue_draw();
         }
 
+        /**
+         * This methods adds a {@link GFlow.Node} to this NodeView
+         */
         public void add_node(GFlow.Node gn) {
             Node n = new Node(gn);
             this.add_common(n);
         }
 
+        /**
+         * This method adds a {@link GFlow.Node} to this nodeview and
+         * assigns an arbitrary {@link Gtk.Widget} as its child.
+         */
         public void add_with_child(GFlow.Node gn, Gtk.Widget child) {
             Node n = new Node.with_child(gn, child);
             this.add_common(n);
         }
 
+        /**
+         * This tells the NodeView to use another {@link NodeRenderer} than
+         * the DefaultNodeRenderer for the given {@link GFlow.Node}
+         */
         public void set_node_renderer(GFlow.Node gn, NodeRenderer nr) {
             Node n = this.get_node_from_gflow_node(gn);
             n.node_renderer = nr;
@@ -115,7 +137,7 @@ namespace GtkFlow {
 
         /**
          * Use this method to register childwidgets for custom node
-         * renderes to the node.
+         * renderes to the supplied {@link GFlow.Node}
          */
         public void register_child(GFlow.Node gn, Gtk.Widget child) {
             Node n = this.get_node_from_gflow_node(gn);
@@ -126,8 +148,8 @@ namespace GtkFlow {
         }
 
         /**
-         * Use this method to register childwidgets for custom node
-         * renderes to the node.
+         * Use this method to unregister childwidgets from the supplied
+         * {@link GFlow.Node}
          */
         public void unregister_child(GFlow.Node gn, Gtk.Widget child) {
             Node n = this.get_node_from_gflow_node(gn);
@@ -251,6 +273,10 @@ namespace GtkFlow {
         }
 
         //Empty remove implementation to avoid warning message
+        /**
+         * Empty default implementation. Do not use. To remove {@link GFlow.Node}s
+         * from a NodeView please use {@link NodeView.remove_node}
+         */
         public override void remove(Gtk.Widget w) {}
 
         private bool do_button_release_event(Gdk.EventButton e) {
@@ -444,6 +470,9 @@ namespace GtkFlow {
             return false;
         }
 
+        /**
+         * Calculates the NodeView's minimum and preferred widths
+         */
         public new void get_preferred_width(out int minimum_width, out int natural_width) {
             double x_min = 0, x_max = 0;
             Gtk.Allocation alloc;
@@ -455,6 +484,9 @@ namespace GtkFlow {
             minimum_width = natural_width = (int)x_max - (int)x_min;
         }
 
+        /**
+         * Calculates the NodeView's minimum and preferred heights
+         */
         public new void get_preferred_height(out int minimum_height, out int natural_height) {
             double y_min = 0, y_max = 0;
             Gtk.Allocation alloc;
@@ -537,7 +569,7 @@ namespace GtkFlow {
         }
 
         /**
-         * Manually set the position of the given node on this nodeview
+         * Manually set the position of the given {@link GFlow.Node} on this nodeview
          */
         public void set_node_position(GFlow.Node gn, int x, int y) {
             Node n = this.get_node_from_gflow_node(gn);
@@ -545,7 +577,7 @@ namespace GtkFlow {
         }
 
         /**
-         * Returns the allocation of a node
+         * Returns the allocation of the given {@link GFlow.Node}
          */
         public unowned Gtk.Allocation get_node_allocation(GFlow.Node gn) {
             Gtk.Allocation alloc;
@@ -645,6 +677,9 @@ namespace GtkFlow {
             return col/255.0f;
         }
 
+        /**
+         * Internal method to initialize this NodeView as a {@link Gtk.Widget}
+         */
         public override void realize() {
             Gtk.Allocation alloc;
             this.get_allocation(out alloc);

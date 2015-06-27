@@ -21,17 +21,48 @@
 
 namespace GtkFlow {
     public abstract class DockRenderer : GLib.Object {
+        /**
+         * Default value for the dock's dockpoint size.
+         * Used for both height and width
+         */
         public int dockpoint_height {get;set;default=16;}
+        /**
+         * Spacing between caption and dockpoint
+         */
         public int spacing_x {get; set; default=5;}
+        /**
+         * Vertical spacing between docks
+         */
         public int spacing_y {get; set; default=3;}
 
+        /**
+         * This signal is to be emitted whenever the size of this dock changes
+         */
         public signal void size_changed();
 
+        /**
+         * Draw this dockrenderer's {@link GFlow.Dock} on the given
+         * {@link Cairo.Context}
+         */
         public abstract void draw_dock(Cairo.Context cr, Gtk.StyleContext sc,
                                          int offset_x, int offset_y, int width);
+        /**
+         * Implementations should return this dock's minimal height
+         */
         public abstract int get_min_height();
+        /**
+         * Implementations should return this dock's minimal width
+         */
         public abstract int get_min_width();
+        /**
+         * Implementations should update the graphical representation of the
+         * dock's captionstring and typestring. If typestrings should be displayed,
+         * the parameter show_types will be true
+         */
         public abstract void update_name_layout(bool show_types);
+        /**
+         * Return the dock that belongs to this dockrenderer
+         */
         public abstract GFlow.Dock get_dock();
     }
 

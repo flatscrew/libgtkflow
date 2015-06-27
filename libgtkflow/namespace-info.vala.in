@@ -23,4 +23,8 @@
  *      Daniel Espinosa <esodan@gmail.com>
  */
 [CCode (gir_namespace = "GtkFlow", gir_version = "@API_VERSION@", cheader_filename = "gtkflow.h")]
+/**
+ * Contains a set of classes to render {@link GFlow.Node}s inside
+ * a Gtk3-based application
+ */
 namespace GtkFlow {}
