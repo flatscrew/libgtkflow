@@ -93,9 +93,14 @@ namespace GFlow {
             }
             _source = null;
             _valid = false;
+            dock.changed.disconnect (this.do_source_changed);
             changed();
             disconnected (dock);
           }
+        }
+
+        private void do_source_changed() {
+            val = _source.val;
         }
 
         public new void connect (Dock dock) throws GLib.Error {
@@ -108,9 +113,7 @@ namespace GFlow {
                     _valid = false;
                 changed();
                 dock.connect (this);
-                _source.changed.connect (() =>{
-                    val = _source.val;
-                });
+                _source.changed.connect (this.do_source_changed);
                 connected (dock);
             }
         }

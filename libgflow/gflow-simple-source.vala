@@ -141,9 +141,7 @@ namespace GFlow {
                 );
             this.val = v;
             this._valid = true;
-            foreach (Sink s in this.sinks)
-                s.val = v;
-            updated ();
+            changed ();
         }
     }
 }
