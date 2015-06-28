@@ -189,12 +189,6 @@ namespace GtkFlow {
             }
         }
 
-        public new void forall(Gtk.Callback c) {
-            foreach (Gtk.Widget child in this.childlist) {
-                c(child);
-            }
-        }
-
         public override void add(Gtk.Widget w) {
             w.set_parent(this);
             this.childlist.append(w);
@@ -210,10 +204,6 @@ namespace GtkFlow {
 
         public unowned List<weak Gtk.Widget> get_childlist() {
             return this.childlist;
-        }
-
-        public new List<weak Gtk.Widget> get_children() {
-            return this.childlist.copy();
         }
 
         public new void set_border_width(uint border_width) {

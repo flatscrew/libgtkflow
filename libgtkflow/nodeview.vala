@@ -326,7 +326,7 @@ namespace GtkFlow {
                             src.disconnect(this.drag_dock as GFlow.Sink);
                         }
                     }
-                } catch (GFlow.NodeError e) {
+                } catch (GLib.Error e) {
                     warning(e.message);
                 }
             }
