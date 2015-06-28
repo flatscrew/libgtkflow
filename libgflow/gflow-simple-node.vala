@@ -171,10 +171,18 @@ namespace GFlow {
          */
         public void disconnect_all() {
             foreach (Source s in this.sources) {
-                s.disconnect_all();
+                try {
+                    s.disconnect_all();
+                } catch (GLib.Error e) {
+                    warning("Could not disconnect source %s from node %s", s.name, this.name);
+                }
             }
             foreach (Sink s in this.sinks) {
-                s.disconnect_all();
+                try {
+                    s.disconnect_all();
+                } catch (GLib.Error e) {
+                    warning("Could not disconnect sink %s from node %s", s.name, this.name);
+                }
             }
         }
   }
