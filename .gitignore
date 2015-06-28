@@ -10,12 +10,7 @@
 
 # CMake related stuff
 
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-install_manifest.txt
 Makefile
-libgtkflow/dummy*
 doc/*
 
 # Compilation products
