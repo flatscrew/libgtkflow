@@ -28,8 +28,23 @@ public class GtkFlowTest.GuiNodeTest : GtkFlowTest.TestApp
   }
   public override int execute ()
   {
-    GLib.message ("Executing Tests...");
-    window.destroy ();
+    try {
+      GLib.message ("Executing Tests...");
+      var nview = new GtkFlow.NodeView ();
+      this.action_area.pack_end (nview);
+      var s1 = new GFlow.SimpleSink (true);
+      var src1 = new GFlow.SimpleSource (true);
+      var n1 = new GFlow.SimpleNode ();
+      n1.add_sink (s1);
+      var n2 = new GFlow.SimpleNode ();
+      n2.add_source (src1);
+      nview.add_node (n1);
+      nview.add_node (n2);
+      window.destroy ();
+    } catch (Error e) {
+      GLib.message ("ERROR: "+e.message);
+      assert_not_reached ();
+    }
     return 0;
   }
 }
@@ -41,10 +56,6 @@ public class GtkFlowTest.NodeTest
     Test.add_func ("/gtkflow/node", 
     () => {
       var app = new GuiNodeTest ();
-      var nview = new GtkFlow.NodeView ();
-      var node = new GFlow.SimpleNode ();
-      nview.add_node (node);
-      app.action_area.pack_end (nview);
       app.run ();
       assert (app.status);
     });
