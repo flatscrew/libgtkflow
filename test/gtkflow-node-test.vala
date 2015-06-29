@@ -43,7 +43,7 @@ public class GtkFlowTest.NodeTest
       var app = new GuiNodeTest ();
       var nview = new GtkFlow.NodeView ();
       var node = new GFlow.SimpleNode ();
-      //nview.add_node (node);
+      nview.add_node (node);
       app.action_area.pack_end (nview);
       app.run ();
       assert (app.status);
