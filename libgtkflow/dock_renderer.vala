@@ -125,6 +125,7 @@ namespace GtkFlow {
         public void draw_source(Cairo.Context cr, Gtk.StyleContext sc,
                                 int offset_x, int offset_y, int width) {
             sc.save();
+            sc.set_state(Gtk.StateFlags.NORMAL);
             if (this.d.is_connected())
                 sc.set_state(Gtk.StateFlags.CHECKED);
             if (this.d.highlight)
@@ -132,7 +133,10 @@ namespace GtkFlow {
             if (this.d.active)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
             sc.add_class(Gtk.STYLE_CLASS_RADIO);
-            sc.render_option(cr, offset_x+width-dockpoint_height,offset_y,dockpoint_height,dockpoint_height);
+            sc.render_background(cr, offset_x+width-dockpoint_height-0.5, offset_y-0.5,
+                                     dockpoint_height, dockpoint_height);
+            sc.render_option(cr, offset_x+width-dockpoint_height, offset_y,
+                                 dockpoint_height,dockpoint_height);
             sc.restore();
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);
@@ -149,6 +153,7 @@ namespace GtkFlow {
         public void draw_sink(Cairo.Context cr, Gtk.StyleContext sc,
                               int offset_x, int offset_y, int width) {
             sc.save();
+            sc.set_state(Gtk.StateFlags.NORMAL);
             if (this.d.is_connected())
                 sc.set_state(Gtk.StateFlags.CHECKED);
             if (this.d.highlight)
@@ -156,6 +161,8 @@ namespace GtkFlow {
             if (this.d.active)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.ACTIVE);
             sc.add_class(Gtk.STYLE_CLASS_RADIO);
+            sc.render_background(cr, offset_x-0.5, offset_y-0.5,
+                                     dockpoint_height, dockpoint_height);
             sc.render_option(cr, offset_x,offset_y,dockpoint_height,dockpoint_height);
             sc.restore();
             sc.save();
