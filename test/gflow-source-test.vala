@@ -95,5 +95,14 @@ public class GFlowTest.SourceTest
       assert (src.val.get_boolean ());
       assert (!src.is_connected ());
     });
+    Test.add_func ("/gflow/source/invalidate",
+    () => {
+      var src = new GFlow.SimpleSource(0);
+      assert (!src.valid);
+      src.set_valid();
+      assert (src.valid);
+      src.invalidate();
+      assert (!src.valid);
+    });
   }
 }
