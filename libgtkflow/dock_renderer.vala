@@ -81,13 +81,12 @@ namespace GtkFlow {
 
         public override void update_name_layout(bool show_types) {
             string labelstring;
+            string name = this.d.name ?? "";
+            string typename = this.d.typename ?? this.d.determine_typestring();
             if (show_types) {
-                labelstring = "<i>%s</i> : %s".printf(
-                    this.d.typename ?? this.d.determine_typestring(),
-                    this.d.name
-                );
+                labelstring = "<i>%s</i> : %s".printf( typename, name );
             } else {
-                labelstring = this.d.name;
+                labelstring = name;
             }
             this.layout.set_markup(labelstring, -1);
             this.size_changed();
