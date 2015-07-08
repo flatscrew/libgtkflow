@@ -128,10 +128,10 @@ namespace GFlow {
          * Tries to resolve this {@link Dock.value}'s type to a displayable string
          */
         public virtual string determine_typestring () {
-            GLib.TypeQuery tq;
-            this.val.get_gtype().query(out tq);
-            string s = this.val.type_name();
-            return s;
+            if (this.val != null)
+                return this.val.type().name();
+            else
+                return "";
         }
 
         /**
