@@ -77,6 +77,7 @@ namespace GtkFlow {
 
         public Node (GFlow.Node n) {
             this.gnode = n;
+            this.node_renderer = new DefaultNodeRenderer(this);
             foreach (GFlow.Dock d in this.gnode.get_sources())
                 this.register_dock(d);
             foreach (GFlow.Dock d in this.gnode.get_sinks())
@@ -85,14 +86,12 @@ namespace GtkFlow {
             this.gnode.sink_added.connect((s)=>{this.register_dock(s);});
             this.gnode.source_removed.connect((s)=>{this.unregister_dock(s);});
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
-            this.node_renderer = new DefaultNodeRenderer(this);
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
             });
             this.set_border_width(this.node_renderer.resize_handle_size);
 
             this.show_all();
-            this.render();
         }
 
         public void render() {
@@ -124,7 +123,8 @@ namespace GtkFlow {
             d.changed.connect(()=>{this.render();});
             this.dock_renderers.append(dr);
             dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
-            this.render();
+            if (this.get_realized())
+                this.render();
         }
 
         public DockRenderer? get_dock_renderer(GFlow.Dock d) {
@@ -143,17 +143,19 @@ namespace GtkFlow {
                 );
                 //m.free();
             }
-            this.render();
+            if (this.get_realized())
+                this.render();
         }
 
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
             this(n);
             this.add(c);
             this.show_all();
-            this.render();
         }
 
         public new void size_allocate(Gtk.Allocation alloc) {
+            if (!this.get_visible() && !this.is_toplevel())
+                return;
             int mw = (int)this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
                 (int)this.get_border_width()
@@ -192,7 +194,8 @@ namespace GtkFlow {
         public override void add(Gtk.Widget w) {
             w.set_parent(this);
             this.childlist.append(w);
-            this.render();
+            if (this.get_realized())
+                this.render();
         }
 
         public override void remove(Gtk.Widget w) {
@@ -213,7 +216,8 @@ namespace GtkFlow {
                 return;
             }
             base.set_border_width(border_width);
-            this.render();
+            if (this.get_realized())
+                this.render();
         }
 
         public override void realize() {
@@ -235,6 +239,7 @@ namespace GtkFlow {
             this.set_window(window);
             this.register_window(window);
             this.set_realized(true);
+            this.render();
         }
 
         /**
