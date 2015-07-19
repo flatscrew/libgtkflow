@@ -186,7 +186,8 @@ namespace GFlow {
          */
         public new void disconnect_all () throws GLib.Error {
             foreach (Sink s in this._sinks)
-                this.disconnect(s);
+                if (s != null)
+                    this.disconnect(s);
         }
 
         /**

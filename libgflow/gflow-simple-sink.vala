@@ -166,7 +166,8 @@ namespace GFlow {
          * Disconnect from any {@link Dock} that this SimpleSink is connected to
          */
         public new void disconnect_all() throws GLib.Error {
-            this.disconnect(this.source);
+            if (this.source != null)
+                this.disconnect(this.source);
         }
 
         /**
