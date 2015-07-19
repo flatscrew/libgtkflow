@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 
 # Set up subdirectories to traverse
-SUBDIRS = libgflow libgtkflow test examples
+SUBDIRS = libgflow libgtkflow test examples po
 
 if ENABLE_DOCS
 SUBDIRS += docs
@@ -37,7 +37,6 @@ INTLTOOL_FILES = intltool-extract.in \
 
 EXTRA_DIST = $(gtkflowdoc_DATA) \
 	autogen.sh \
-	vapi \
 	config.rpath \
 	$(INTLTOOL_FILES)
 
