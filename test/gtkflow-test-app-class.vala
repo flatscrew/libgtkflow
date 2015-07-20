@@ -55,6 +55,7 @@ public abstract class GtkFlowTest.TestApp : GLib.Object
   public void run ()
   {
     window.show_all ();
+    Timeout.add(1000,()=>{brun.clicked(); return false;});
     Gtk.main ();
   }
   public abstract int execute ();
