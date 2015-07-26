@@ -167,13 +167,19 @@ namespace GtkFlow {
             return null;
         }
 
-        private void remove_node(GFlow.Node n) {
+        /**
+         * Remove a {@link GFlow.Node}  from this NodeView
+         */
+        public void remove_node(GFlow.Node n) {
+            n.disconnect_all();
             Node gn = this.get_node_from_gflow_node(n);
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
                 gn.node_view = null;
+                assert (gn is Gtk.Widget);
+                (gn as Gtk.Widget).destroy();
+                this.queue_draw();
             }
-            this.queue_draw();
         }
 
         private Node? get_node_on_position(double x,double y) {
@@ -294,11 +300,7 @@ namespace GtkFlow {
                         n.border_width
                     );
                     if (cbp) {
-                        n.gnode.disconnect_all();
                         this.remove_node(n.gnode);
-                        assert (n is Gtk.Widget);
-                        (n as Gtk.Widget).destroy();
-                        this.queue_draw();
                         this.close_button_pressed = false;
                         return true;
                     }
