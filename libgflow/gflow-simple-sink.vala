@@ -21,7 +21,7 @@
 
 namespace GFlow {
     /**
-     * A simple implementation of {@link GtkFlow.Sink}.
+     * A simple implementation of {@link GFlow.Sink}.
      */
     public class SimpleSink : Object, Dock, Sink {
         // Dock interface

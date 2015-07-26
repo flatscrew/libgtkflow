@@ -120,12 +120,12 @@ namespace GFlow {
          */
         public abstract void disconnect (Dock dock) throws GLib.Error;
         /**
-         * Disconnect this {@link Dock} from all {@link Docks}s it is connected to
+         * Disconnect this {@link Dock} from all {@link Dock}s it is connected to
          */
         public abstract void disconnect_all () throws GLib.Error;
 
         /**
-         * Tries to resolve this {@link Dock.value}'s type to a displayable string
+         * Tries to resolve this Dock's value-type to a displayable string
          */
         public virtual string determine_typestring () {
             if (this.val != null)

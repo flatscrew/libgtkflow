@@ -21,7 +21,7 @@
 
 namespace GFlow {
     /**
-     * A simple implementation of {@link GtkFlow.Source}.
+     * A simple implementation of {@link GFlow.Source}.
      */
     public class SimpleSource : Object, Dock, Source {
         // Dock interface
