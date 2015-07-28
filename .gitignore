@@ -25,6 +25,8 @@ GtkFlow-*.gir
 
 #     Autotools part
 
+docs/valadoc/devhelp/devhelp
+docs/valadoc/gtk-doc/gtk-doc
 libgtkflow/.libs/
 libgtkflow/gtkflow-0.2.vapi
 ChangeLog

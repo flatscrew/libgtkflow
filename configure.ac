@@ -278,6 +278,9 @@ libgtkflow/Makefile
 libgtkflow/gtkflow-0.2.pc
 libgtkflow/namespace-info.vala
 docs/Makefile
+docs/valadoc/Makefile
+docs/valadoc/gtk-doc/Makefile
+docs/valadoc/devhelp/Makefile
 po/Makefile.in
 test/Makefile
 test/tests-config.vala

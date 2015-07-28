@@ -1,0 +1,10 @@
+
+SUBDIRS=
+
+if ENABLE_GTK_DOCS
+SUBDIRS+=gtk-doc
+endif
+
+if ENABLE_DEVHELP_DOCS
+SUBDIRS+=devhelp
+endif
