@@ -35,8 +35,8 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
 	-g \
 	$(GLIB_CFLAGS) \
+    $(GOBJECT_CFLAGS) \
 	$(VALA_CFLAGS) \
-	$(GTK_CFLAGS) \
 	$(NULL)
 
 # -Wall   # TODO: add this back when we can properly handle more libxml2/vala warnings
@@ -64,8 +64,8 @@ AM_VALAFLAGS += \
 
 libgflow_0_2_la_LIBADD = \
 	$(GLIB_LIBS) \
+    $(GOBJECT_LIBS) \
 	$(VALA_LIBS) \
-	$(GTK_LIBS) \
 	$(NULL)
 
 libgflow_0_2_la_LDFLAGS = \

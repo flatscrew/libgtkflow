@@ -31,7 +31,6 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS = \
 	-g \
-	$(GLIB_CFLAGS) \
 	$(VALA_CFLAGS) \
 	$(GTK_CFLAGS) \
 	-I$(top_builddir) \
@@ -64,6 +63,7 @@ libgtkflow_0_2_la_LIBADD = \
 	$(VALA_LIBS) \
 	$(GTK_LIBS) \
 	$(top_builddir)/libgflow/libgflow-0.2.la \
+    -lm \
 	$(NULL)
 
 libgtkflow_0_2_la_LDFLAGS = \
