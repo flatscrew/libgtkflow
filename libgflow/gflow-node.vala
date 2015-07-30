@@ -25,11 +25,6 @@
 namespace GFlow {
     public errordomain NodeError {
         /**
-         * Throw when the user tries to connect a sink to a source that
-         * Delivers a different type
-         */
-        INCOMPATIBLE_SOURCETYPE,
-        /**
          * Throw when the user tries to connect a source to a sink that
          * Delivers a different type
          */
@@ -39,15 +34,6 @@ namespace GFlow {
          * to a sink
          */
         INCOMPATIBLE_VALUE,
-        /**
-         * Throw then the user tries to get a value from a sink that
-         * is currently not connected to any source
-         */
-        NO_SOURCE,
-        /**
-         * Throw when there is no Dock available on this position
-         */
-        NO_DOCK_ON_POSITION,
         /**
          * Throw when the user tries to add a dock to a node
          * That already contains a dock
