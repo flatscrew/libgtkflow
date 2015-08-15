@@ -26,7 +26,7 @@ class AddNode(ExampleNode):
         if len(self.summands) == 0:
             return
         summand = self.summands[len(self.summands)-1]
-        summand.disconnect_all()
+        summand.unlink_all()
         self.remove_sink(summand)
         self.summands.remove(summand)
         self.do_calculations(None)
