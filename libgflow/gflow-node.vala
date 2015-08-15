@@ -84,7 +84,7 @@ namespace GFlow {
          * Implementations should destroy all connections of this Node's {@link Sink}s
          * and {@link Source}s when this method is executed
          */
-        public abstract void disconnect_all ();
+        public abstract void unlink_all ();
         /**
          * Determines whether the given from-{@link Node} can be found if we
          * recursively follow all nodes that are connected to this node's {@link Source}s

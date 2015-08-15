@@ -125,7 +125,7 @@ namespace GtkFlow {
                                 int offset_x, int offset_y, int width) {
             sc.save();
             sc.set_state(Gtk.StateFlags.NORMAL);
-            if (this.d.is_connected())
+            if (this.d.is_linked())
                 sc.set_state(Gtk.StateFlags.CHECKED);
             if (this.d.highlight)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.PRELIGHT);
@@ -153,7 +153,7 @@ namespace GtkFlow {
                               int offset_x, int offset_y, int width) {
             sc.save();
             sc.set_state(Gtk.StateFlags.NORMAL);
-            if (this.d.is_connected())
+            if (this.d.is_linked())
                 sc.set_state(Gtk.StateFlags.CHECKED);
             if (this.d.highlight)
                 sc.set_state(sc.get_state() | Gtk.StateFlags.PRELIGHT);

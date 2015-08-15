@@ -169,19 +169,19 @@ namespace GFlow {
         /**
          * Disconnect all connections from and to this node
          */
-        public void disconnect_all() {
+        public void unlink_all() {
             foreach (Source s in this.sources) {
                 try {
-                    s.disconnect_all();
+                    s.unlink_all();
                 } catch (GLib.Error e) {
-                    warning("Could not disconnect source %s from node %s", s.name, this.name);
+                    warning("Could not unlink source %s from node %s", s.name, this.name);
                 }
             }
             foreach (Sink s in this.sinks) {
                 try {
-                    s.disconnect_all();
+                    s.unlink_all();
                 } catch (GLib.Error e) {
-                    warning("Could not disconnect sink %s from node %s", s.name, this.name);
+                    warning("Could not unlink sink %s from node %s", s.name, this.name);
                 }
             }
         }

@@ -41,10 +41,10 @@ namespace GFlow {
          * Disconnects the Source from all {@link Sink}s that it supplies
          * with data.
          */
-        public virtual void disconnect_all () throws GLib.Error
+        public virtual void unlink_all () throws GLib.Error
         {
             foreach (Sink s in this.sinks)
-                this.disconnect (s);
+                this.unlink (s);
         }
     }
 }

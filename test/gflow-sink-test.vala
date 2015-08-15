@@ -37,7 +37,7 @@ public class GFlowTest.SinkTest
       assert (!s.active);
       assert (s.node == null);
       assert (s.source == null);
-      assert (!s.is_connected ());
+      assert (!s.is_linked ());
     });
     Test.add_func ("/gflow/sink/source", 
     () => {
@@ -55,9 +55,9 @@ public class GFlowTest.SinkTest
       assert (!s.active);
       assert (s.node == null);
       assert (s.source == null);
-      assert (!s.is_connected ());
-      try { s.connect (src); } catch { assert_not_reached (); }
-      assert (s.is_connected ());
+      assert (!s.is_linked ());
+      try { s.link (src); } catch { assert_not_reached (); }
+      assert (s.is_linked ());
     });
     Test.add_func ("/gflow/sink/source/changes", 
     () => {
@@ -75,9 +75,9 @@ public class GFlowTest.SinkTest
       assert (!s.active);
       assert (s.node == null);
       assert (s.source == null);
-      assert (!s.is_connected ());
-      try { s.connect (src); } catch { assert_not_reached (); }
-      assert (s.is_connected ());
+      assert (!s.is_linked ());
+      try { s.link (src); } catch { assert_not_reached (); }
+      assert (s.is_linked ());
       src.val = 10;
       assert (((int) src.val) == 10);
       assert (s.val != null);

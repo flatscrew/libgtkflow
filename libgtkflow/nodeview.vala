@@ -171,7 +171,7 @@ namespace GtkFlow {
          * Remove a {@link GFlow.Node}  from this NodeView
          */
         public void remove_node(GFlow.Node n) {
-            n.disconnect_all();
+            n.unlink_all();
             Node gn = this.get_node_from_gflow_node(n);
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
@@ -220,7 +220,7 @@ namespace GtkFlow {
                     this.drag_dock = targeted_dock;
                     this.drag_dock.active = true;
                     int startpos_x = 0, startpos_y = 0;
-                    if (this.drag_dock is GFlow.Sink && this.drag_dock.is_connected()){
+                    if (this.drag_dock is GFlow.Sink && this.drag_dock.is_linked()){
                         GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         Gtk.Allocation src_alloc;
@@ -310,22 +310,22 @@ namespace GtkFlow {
             if (this.drag_dock != null) {
                 try {
                     if (this.drag_dock is GFlow.Source && this.drop_dock is GFlow.Sink) {
-                        (this.drag_dock as GFlow.Source).connect(this.drop_dock as GFlow.Sink);
+                        (this.drag_dock as GFlow.Source).link(this.drop_dock as GFlow.Sink);
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Source) {
-                        (this.drop_dock as GFlow.Source).connect(this.drag_dock as GFlow.Sink);
+                        (this.drop_dock as GFlow.Source).link(this.drag_dock as GFlow.Sink);
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Sink) {
                         GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.disconnect(this.drag_dock as GFlow.Sink);
-                            src.connect(this.drop_dock as GFlow.Sink);
+                            src.unlink(this.drag_dock as GFlow.Sink);
+                            src.link(this.drop_dock as GFlow.Sink);
                         }
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock == null) {
                         GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
                         if (src != null) {
-                            src.disconnect(this.drag_dock as GFlow.Sink);
+                            src.unlink(this.drag_dock as GFlow.Sink);
                         }
                     }
                 } catch (GLib.Error e) {

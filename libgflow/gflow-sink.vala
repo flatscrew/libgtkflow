@@ -28,7 +28,7 @@ namespace GFlow {
         /**
          * The Source that this Sink gets its data from.
          *
-         * User {@link Dock.connect} to change {@link GFlow.Source}.
+         * User {@link Dock.link} to change {@link GFlow.Source}.
          */
         public abstract weak Source? source { get; }
     }

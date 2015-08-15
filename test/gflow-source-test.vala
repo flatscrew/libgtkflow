@@ -44,13 +44,13 @@ public class GFlowTest.SourceTest
       assert (src.val != null);
       assert (src.val.holds (typeof (int)));
       assert (src.val.get_int () == 1);
-      assert (!src.is_connected ());
+      assert (!src.is_linked ());
       src.val.set_int (10);
       assert (src.val.get_int () == 10);
       src.val = 0.10;
       assert (src.val.get_int () == 10);
     });
-    Test.add_func ("/gflow/source/connect", 
+    Test.add_func ("/gflow/source/link", 
     () => {
       var src = new GFlow.SimpleSource (0);
       var s = new GFlow.SimpleSink (true);
@@ -60,23 +60,23 @@ public class GFlowTest.SourceTest
       assert (src.val != null);
       assert (src.val.holds (typeof (int)));
       assert (((int) src.val) == 0);
-      assert (!src.is_connected ());
+      assert (!src.is_linked ());
       bool fail = true;
-      try { src.connect (s); } catch { fail = false; }
+      try { src.link (s); } catch { fail = false; }
       if (fail) assert_not_reached ();
       try {
-        assert (!s1.is_connected ());
+        assert (!s1.is_linked ());
         fail = true;
-        s1.connected.connect (()=>{
+        s1.linked.connect (()=>{
           fail = false;
         });
-        src.connect (s1);
+        src.link (s1);
         if (fail)  assert_not_reached ();
         fail = true;
-        s2.connected.connect (()=>{
+        s2.linked.connect (()=>{
           fail = false;
         });
-        src.connect (s2);
+        src.link (s2);
         if (fail)  assert_not_reached ();
         src.val = 20;
         assert (((int) src.val) == 20);
@@ -93,7 +93,7 @@ public class GFlowTest.SourceTest
       assert (!src.val.get_boolean ());
       src.update ();
       assert (src.val.get_boolean ());
-      assert (!src.is_connected ());
+      assert (!src.is_linked ());
     });
     Test.add_func ("/gflow/source/invalidate",
     () => {

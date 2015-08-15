@@ -80,13 +80,13 @@ namespace GFlow {
          * This signal is being triggered, when there is a connection being established
          * from or to this Dock.
          */
-        public signal void connected (Dock d);
+        public signal void linked (Dock d);
 
         /**
          * This signal is being triggered, when there is a connection being established
          * from or to this Dock.
          */
-        public signal void disconnected (Dock d);
+        public signal void unlinked (Dock d);
 
         /**
          * Triggers when the value of this dock changes
@@ -103,26 +103,26 @@ namespace GFlow {
          * Implementations should return true if this dock has at least one
          * connection to another dock
          */
-        public abstract bool is_connected ();
+        public abstract bool is_linked ();
 
         /**
          * Implementations should return true if this dock is connected
          * to the supplied dock
          */
-        public abstract bool is_connected_to (Dock dock);
+        public abstract bool is_linked_to (Dock dock);
 
         /**
          * Connect this {@link Dock} to other {@link Dock}
          */
-        public abstract void connect (Dock dock) throws GLib.Error;
+        public abstract void link (Dock dock) throws GLib.Error;
         /**
          * Disconnect this {@link Dock} from other {@link Dock}
          */
-        public abstract void disconnect (Dock dock) throws GLib.Error;
+        public abstract void unlink (Dock dock) throws GLib.Error;
         /**
          * Disconnect this {@link Dock} from all {@link Dock}s it is connected to
          */
-        public abstract void disconnect_all () throws GLib.Error;
+        public abstract void unlink_all () throws GLib.Error;
 
         /**
          * Tries to resolve this Dock's value-type to a displayable string

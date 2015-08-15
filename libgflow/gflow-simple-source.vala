@@ -109,7 +109,7 @@ namespace GFlow {
             if (this.valid) {
                 s.val = this.val;
             }
-            connected ((Dock) s);
+            linked ((Dock) s);
         }
 
         /**
@@ -119,9 +119,9 @@ namespace GFlow {
         {
             if (this._sinks.index(s) != -1)
                 this._sinks.remove(s);
-            if (s.is_connected_to(this))
-                s.disconnect (this);
-            this.disconnected(s);
+            if (s.is_linked_to(this))
+                s.unlink (this);
+            this.unlinked(s);
         }
 
         /**
@@ -134,7 +134,7 @@ namespace GFlow {
         /**
          * Returns true if this Source is connected to the given Sink
          */
-        public bool is_connected_to (Dock dock) {
+        public bool is_linked_to (Dock dock) {
             if (!(dock is Sink)) return false;
             return this._sinks.index((Sink) dock) != -1;
         }
@@ -142,7 +142,7 @@ namespace GFlow {
         /**
          * Returns true if this Source is connected to one or more Sinks
          */
-        public bool is_connected () {
+        public bool is_linked () {
             return this.sinks.length () > 0;
         }
 
@@ -159,35 +159,35 @@ namespace GFlow {
         /**
          * Disconnect from the given {@link Dock}
          */
-        public new void disconnect (Dock dock) throws GLib.Error
+        public new void unlink (Dock dock) throws GLib.Error
         {
-          if (!this.is_connected_to (dock)) return;
+          if (!this.is_linked_to (dock)) return;
           if (dock is Sink) {
             remove_sink ((Sink) dock);
-            if (sinks.length () == 0) disconnected (dock);
+            if (sinks.length () == 0) unlinked (dock);
           }
         }
 
         /**
          * Connect to the given {@link Dock}
          */
-        public new void connect (Dock dock) throws GLib.Error
+        public new void link (Dock dock) throws GLib.Error
         {
-          if (this.is_connected_to (dock)) return;
+          if (this.is_linked_to (dock)) return;
           if (dock is Sink) {
             add_sink ((Sink) dock);
-            dock.connect (this);
-            connected (dock);
+            dock.link (this);
+            linked (dock);
           }
         }
 
         /**
          * Disconnect from any {@link Dock} that this SimplesSource is connected to
          */
-        public new void disconnect_all () throws GLib.Error {
+        public new void unlink_all () throws GLib.Error {
             foreach (Sink s in this._sinks)
                 if (s != null)
-                    this.disconnect(s);
+                    this.unlink(s);
         }
 
         /**
