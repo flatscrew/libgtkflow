@@ -172,8 +172,8 @@ namespace GFlow {
          */
         public new void link (Dock dock) throws GLib.Error
         {
-          if (this.is_linked_to (dock)) return;
           if (dock is Sink) {
+            if (this.is_linked_to (dock)) return;
             add_sink ((Sink) dock);
             dock.link (this);
             linked (dock);
