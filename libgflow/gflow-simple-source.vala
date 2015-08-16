@@ -109,7 +109,6 @@ namespace GFlow {
             if (this.valid) {
                 s.val = this.val;
             }
-            linked ((Dock) s);
         }
 
         /**
