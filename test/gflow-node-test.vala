@@ -1,4 +1,3 @@
-/* -*- Mode: vala; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*-  */
 /* GFlowTest
  *
  * Copyright (C) 2015 Daniel Espinosa <esodan@gmail.com>
@@ -18,12 +17,90 @@
  */
 using GFlow;
 
-public class GFlowTest.NodeTest
-{
-  public static void add_tests ()
-  {
-    Test.add_func ("/gflow/node", 
-    () => {
-    });
-  }
+public class GFlowTest.NodeTest {
+    public static void add_tests () {
+        Test.add_func ("/gflow/node/sink",
+        () => {
+            try {
+                Value initial = Value(typeof(int));
+                initial.set_int (1);
+                var s = new GFlow.SimpleSink (initial);
+                var n = new GFlow.SimpleNode ();
+                assert (n.has_sink(s) == false);
+                n.add_sink(s);
+                assert (n.has_sink(s) == true);
+                n.remove_sink(s);
+                assert (n.has_sink(s) == false);
+            } catch (GFlow.NodeError e) {
+                assert (false);
+            }
+        });
+        Test.add_func ("/gflow/node/source",
+        () => {
+            try {
+                Value initial = Value(typeof(int));
+                initial.set_int (1);
+                var s = new GFlow.SimpleSource (initial);
+                var n = new GFlow.SimpleNode ();
+                assert (n.has_source(s) == false);
+                n.add_source(s);
+                assert (n.has_source(s) == true);
+                n.remove_source(s);
+                assert (n.has_source(s) == false);
+            } catch (GFlow.NodeError e) {
+                assert (false);
+            }
+        });
+        Test.add_func ("/gflow/node/dock",
+        () => {
+            try {
+                Value si_initial = Value(typeof(int));
+                si_initial.set_int (1);
+                var si = new GFlow.SimpleSink (si_initial);
+                Value so_initial = Value(typeof(int));
+                so_initial.set_int (1);
+                var so = new GFlow.SimpleSource (so_initial);
+
+                var n = new GFlow.SimpleNode ();
+                assert (n.has_dock(si) == false);
+                assert (n.has_dock(so) == false);
+                n.add_source(so);
+                n.add_sink(si);
+                assert (n.has_dock(si) == true);
+                assert (n.has_dock(so) == true);
+                n.remove_source(so);
+                n.remove_sink(si);
+                assert (n.has_dock(si) == false);
+                assert (n.has_dock(so) == false);
+            } catch (GFlow.NodeError e) {
+                assert (false);
+            }
+        });
+        Test.add_func ("/gflow/node/get_dock",
+        () => {
+            try {
+                Value si_initial = Value(typeof(int));
+                si_initial.set_int (1);
+                var si = new GFlow.SimpleSink (si_initial);
+                si.name = "foo";
+                Value so_initial = Value(typeof(int));
+                so_initial.set_int (1);
+                var so = new GFlow.SimpleSource (so_initial);
+                so.name = "bar";
+                var n = new GFlow.SimpleNode();
+                assert(n.get_dock("foo") == null);
+                assert(n.get_dock("bar") == null);
+                n.add_sink(si);
+                n.add_source(so);
+                assert(n.get_dock("foo") == si);
+                assert(n.get_dock("bar") == so);
+                n.remove_source(so);
+                n.remove_sink(si);
+                assert(n.get_dock("foo") == null);
+                assert(n.get_dock("bar") == null);
+            } catch (GFlow.NodeError e) {
+                assert (false);
+            }
+        });
+    }
 }
