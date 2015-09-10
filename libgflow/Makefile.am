@@ -69,6 +69,7 @@ libgflow_0_2_la_LIBADD = \
 	$(NULL)
 
 libgflow_0_2_la_LDFLAGS = \
+    -Wl,--as-needed \
 	-version-info "$(LT_CURRENT)":"$(LT_REVISION)":"$(LT_AGE)"
 
 $(sources:.vala=.c): $(sources)
