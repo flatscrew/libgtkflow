@@ -2,7 +2,6 @@
 CLEANFILES=
 
 VALADOC_FLAGS = \
-    --driver $(VALAC_VERSION) \
     --force \
     --package-version=$(PACKAGE_VERSION) \
     --pkg glib-2.0 \
