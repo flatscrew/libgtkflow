@@ -1,20 +1,20 @@
 dnl vapigen.m4
+dnl 2014 Daniel Espinosa <esodan@gmail.com>
 dnl
-dnl Copyright 2014 Daniel Espinosa
+dnl This library is free software: you can redistribute it and/or
+dnl modify it under the terms of the GNU Lesser General Public License
+dnl as published by the Free Software Foundation, either
+dnl version 3 of the License, or (at your option) any later
+dnl version.
 dnl
-dnl This library is free software; you can redistribute it and/or
-dnl modify it under the terms of the GNU Lesser General Public
-dnl License as published by the Free Software Foundation; either
-dnl version 2.1 of the License, or (at your option) any later version.
-dnl
-dnl This library is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl Lesser General Public License for more details.
+dnl This library is distributed in the hope that it will be
+dnl useful, but WITHOUT ANY WARRANTY; without even the implied
+dnl warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+dnl PURPOSE. See the GNU Lesser General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU Lesser General Public
-dnl License along with this library; if not, write to the Free Software
-dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+dnl License along with this library.
+dnl If not, see http://www.gnu.org/licenses/.
 
 # VALAC_CHECK([VERSION], [API_VERSION])
 # --------------------------------------
