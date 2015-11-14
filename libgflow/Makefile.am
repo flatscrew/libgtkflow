@@ -55,7 +55,6 @@ AM_VALAFLAGS += \
 	--library=gflow-0.2 \
 	--vapidir=. \
 	--pkg glib-2.0 \
-	--pkg gtk+-3.0 \
 	--includedir libgflow \
 	--vapi gflow-0.2.vapi \
 	-H gflow.h \
