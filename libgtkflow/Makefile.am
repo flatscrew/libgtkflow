@@ -49,11 +49,13 @@ endif
 # library flags
 AM_VALAFLAGS += \
 	$(ERROR_VALAFLAGS) \
+	--library=gtkflow-0.2 \
 	--vapidir=$(top_builddir)/libgflow \
 	--pkg glib-2.0 \
 	--pkg gtk+-3.0 \
 	--pkg gflow-0.2 \
-	--library=gtkflow-0.2 \
+	--includedir libgtkflow \
+	--vapi gtkflow-0.2.vapi \
 	-H gtkflow.h \
 	-C \
 	$(NULL)
