@@ -20,7 +20,7 @@
 # If not, see http://www.gnu.org/licenses/.
 *********************************************************************/
 
-[CCode (gir_namespace = "GtkFlow", gir_version = "@API_VERSION@", cheader_filename = "gtkflow.h")]
+[CCode (gir_namespace = "GtkFlow", gir_version = "@API_VERSION@", cheader_filename = "libgtkflow/gtkflow.h")]
 /**
  * Contains a set of classes to render {@link GFlow.Node}s inside
  * a Gtk3-based application
