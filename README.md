@@ -4,6 +4,10 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
+![LibGtkFlow](https://i.imgur.com/N10yBKP.png)
+
+This is libgtkflow running inside firefox via broadway ↑
+
 ![GtkFlowWindows](https://i.imgur.com/lna1nfB.png)
 
 GtkFlow runs unter that strange M$-operating-system, too ↑
