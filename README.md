@@ -5,6 +5,7 @@ Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
 ![GtkFlowWindows](https://i.imgur.com/lna1nfB.png)
+
 GtkFlow runs unter that strange M$-operating-system, too ↑
 
 ![GtkFlowRes](https://i.imgur.com/RL6Fl3R.png)
@@ -61,13 +62,13 @@ Make sure you get the following Dependencies:
 
   * libgtk-3-dev
   * gobject-introspection
-  * cmake
+  * GNU Autotools
   * vala
 
 Then do the following:
 
 ```
-$ cmake .
+$ ./autogen.sh
 $ sudo make install
 ```
 
