@@ -601,7 +601,6 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 n.node_renderer.draw_node(
                     cr,
-                    n.get_style_context(),
                     alloc,
                     n.get_dock_renderers(),
                     n.get_childlist(),

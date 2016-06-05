@@ -52,7 +52,6 @@ namespace GtkFlow {
          * the node on the given {@link Cairo.Context}
          */
         public abstract void draw_node(Cairo.Context cr,
-                                       Gtk.StyleContext sc,
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
@@ -297,17 +296,24 @@ namespace GtkFlow {
         }
 
         /**
+         * Returns a Gtk.StyleContext matching a given selector
+         */
+        private Gtk.StyleContext get_style() {
+            var b = new Gtk.Button();
+            return b.get_style_context();
+        }
+
+        /**
          * Draw this node on the given cairo context
          */
         public override void draw_node(Cairo.Context cr,
-                                       Gtk.StyleContext sc,
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
                                        bool editable) {
+            var sc = this.get_style();
             sc.save();
-            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);
             sc.render_frame(cr, alloc.x, alloc.y, alloc.width, alloc.height);
             sc.restore();
