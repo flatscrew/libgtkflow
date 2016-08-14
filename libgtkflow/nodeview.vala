@@ -600,6 +600,7 @@ namespace GtkFlow {
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
                 n.node_renderer.draw_node(
+                    this,
                     cr,
                     alloc,
                     n.get_dock_renderers(),
@@ -706,4 +707,34 @@ namespace GtkFlow {
             window.set_background_pattern(null);
         }
     }
+    
+    /*
+     * Foreign drawing helper functions
+     */
+
+    /**
+     * Get StyleContext
+    private extern Gtk.StyleContext get_style(Gtk.StyleContext parent, char selector);
+     */
+
+    /**
+     * Create Context for Path
+    private extern Gtk.StyleContext create_context_for_path(Gtk.WidgetPath path, Gtk.StyleContext context);
+     */
+
+    /**
+     * Draw radiobutton
+     */
+    private extern void draw_radio(Gtk.Widget widget,
+                                   Cairo.Context cr,
+                                   int* x,
+                                   int* y,
+                                   Gtk.StateFlags state,
+                                   int* width,
+                                   int* height);
+
+    /**
+     * Append element
+    private extern void append_element(Gtk.WidgetPath path, string selector);
+     */
 }

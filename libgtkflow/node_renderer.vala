@@ -51,7 +51,8 @@ namespace GtkFlow {
          * Implementations should draw the graphical representation of
          * the node on the given {@link Cairo.Context}
          */
-        public abstract void draw_node(Cairo.Context cr,
+        public abstract void draw_node(Gtk.Widget w,
+                                       Cairo.Context cr,
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
@@ -306,7 +307,7 @@ namespace GtkFlow {
         /**
          * Draw this node on the given cairo context
          */
-        public override void draw_node(Cairo.Context cr,
+        public override void draw_node(Gtk.Widget w, Cairo.Context cr,
                                        Gtk.Allocation alloc,
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
@@ -353,10 +354,10 @@ namespace GtkFlow {
 
             foreach (DockRenderer dock_renderer in dock_renderers) {
                 if (dock_renderer.get_dock() is GFlow.Sink) {
-                    dock_renderer.draw_dock(cr, sc, alloc.x + (int)border_width,
+                    dock_renderer.draw_dock(w, cr, sc, alloc.x + (int)border_width,
                                 alloc.y+y_offset + (int) border_width, alloc.width);
                 } else if (dock_renderer.get_dock() is GFlow.Source) {
-                    dock_renderer.draw_dock(cr, sc, alloc.x-(int)border_width,
+                    dock_renderer.draw_dock(w, cr, sc, alloc.x-(int)border_width,
                                   alloc.y+y_offset + (int) border_width, alloc.width);
                 }
                 y_offset += dock_renderer.get_min_height();
