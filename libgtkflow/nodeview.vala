@@ -81,6 +81,15 @@ namespace GtkFlow {
         public bool editable {get; set; default=true;}
 
         /**
+         * If this property is set to true, the nodeview will not perform
+         * any check wheter newly created connections will result in cycles
+         * in the graph. It's completely up to the application programmer
+         * to make sure that the logic inside the nodes he uses avoids
+         * endlessly backpropagated loops
+         */
+        public bool allow_recursion {get; set; default=false;}
+
+        /**
          * Creates a new empty {@link NodeView}
          */
         public NodeView() {
@@ -508,21 +517,29 @@ namespace GtkFlow {
             if (!from.has_same_type(to))
                 return false;
             // Check if the target would lead to a recursion
-            if (to is GFlow.Source && from is GFlow.Sink)
-                if (from.node.is_recursive_forward(to.node) ||
-                       to.node.is_recursive_backward(from.node))
-                    return false;
-            if (to is GFlow.Sink && from is GFlow.Source)
-                if (to.node.is_recursive_forward(from.node) ||
-                       from.node.is_recursive_backward(to.node))
-                    return false;
+            // If yes, return the value of allow_recursion. If this
+            // value is set to true, it's completely fine to have
+            // a recursive graph
+            if (to is GFlow.Source && from is GFlow.Sink) {
+                if (!this.allow_recursion)
+                    if (from.node.is_recursive_forward(to.node) ||
+                           to.node.is_recursive_backward(from.node))
+                        return false;
+            }
+            if (to is GFlow.Sink && from is GFlow.Source) {
+                if (!this.allow_recursion)
+                    if (to.node.is_recursive_forward(from.node) ||
+                           from.node.is_recursive_backward(to.node))
+                        return false;
+            }
             if (to is GFlow.Sink && from is GFlow.Sink) {
                 GFlow.Source? s = (from as GFlow.Sink).source;
                 if (s == null)
                     return false;
-                if (to.node.is_recursive_forward(s.node) ||
-                       s.node.is_recursive_backward(to.node))
-                    return false;
+                if (!this.allow_recursion)
+                    if (to.node.is_recursive_forward(s.node) ||
+                           s.node.is_recursive_backward(to.node))
+                        return false;
             }
             // If the from from-target is a sink, check if the
             // to target is either a source which does not belong to the own node
@@ -532,14 +549,14 @@ namespace GtkFlow {
                     && ((to is GFlow.Sink
                     && to != from)
                     || (to is GFlow.Source
-                    && !to.node.has_dock(from)))) {
+                    && (!to.node.has_dock(from) || this.allow_recursion)))) {
                 return true;
             }
             // Check if the from-target is a source. if yes, make sure the
             // to-target is a sink and it does not belong to the own node
             else if (from is GFlow.Source
                     && to is GFlow.Sink
-                    && !to.node.has_dock(from)) {
+                    && (!to.node.has_dock(from) || this.allow_recursion)) {
                 return true;
             }
             return false;
