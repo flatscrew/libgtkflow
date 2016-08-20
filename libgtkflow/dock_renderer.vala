@@ -112,7 +112,6 @@ namespace GtkFlow {
 
         public override void draw_dock(Gtk.Widget w, Cairo.Context cr, Gtk.StyleContext sc,
                                        int offset_x, int offset_y, int width) {
-            var rb = new Gtk.RadioButton(null);
             if (d is GFlow.Sink)
                 draw_sink(w, cr, sc, offset_x, offset_y, width);
             if (d is GFlow.Source)
@@ -134,11 +133,10 @@ namespace GtkFlow {
             
             int option_height=16;
             int option_width=16;
-            int option_x=offset_x+width-dockpoint_height;
+            int option_x=offset_x+width-dockpoint_height-4;
             int option_y=offset_y;
-            draw_radio(w, cr, &option_x, &option_y,
+            draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
-            stdout.printf("x:%i y:%i w:%i h:%i\n", option_x, option_y, option_width, option_height);
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);
             Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
@@ -162,9 +160,9 @@ namespace GtkFlow {
                 flags |= Gtk.StateFlags.ACTIVE;
             int option_height=16;
             int option_width=16;
-            int option_x=offset_x;
+            int option_x=offset_x-4;
             int option_y=offset_y;
-            draw_radio(w, cr, &option_x, &option_y, 
+            draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
             sc.save();
             sc.add_class(Gtk.STYLE_CLASS_BUTTON);

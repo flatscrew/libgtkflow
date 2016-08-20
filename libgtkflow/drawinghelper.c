@@ -121,7 +121,6 @@ gtk_flow_draw_radio (GtkWidget     *widget,
             gint          *width,
             gint          *height)
 {
-  printf("drawing ohai\n");
   GtkStyleContext *button_context;
   GtkStyleContext *check_context;
   gint contents_x, contents_y, contents_width, contents_height;
@@ -143,7 +142,6 @@ gtk_flow_draw_radio (GtkWidget     *widget,
 
   g_object_unref (check_context);
   g_object_unref (button_context);
-  printf("drawing bye\n");
 }
 
 void
