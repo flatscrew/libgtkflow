@@ -16,7 +16,8 @@ sources = \
 	node.vala \
 	nodeview.vala \
 	node_renderer.vala \
-	dock_renderer.vala
+	dock_renderer.vala \
+	drawinghelper.c
 
 
 ### General Compilation flags
