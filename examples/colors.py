@@ -179,7 +179,7 @@ class Calculator(object):
             elif value < 0:
                 return "000000"
             else:
-                return "%02x0000"%(value/100 * 255,)
+                return "%02x0000"%(int(value/100 * 255),)
         print (type (value))
         return "000000"
 
