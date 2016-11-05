@@ -50,6 +50,7 @@ Specific:
   * Writing a UI for [Beehive](https://github.com/muesli/beehive)
   * Replacement for the UI in [Gnuradio](http://gnuradio.org)
   * Matching monitors / inputs / outputs in [Pavucontrol](http://freedesktop.org/software/pulseaudio/pavucontrol/)
+  * Writing a UI for [GEGL](http://gegl.org)
 
 Unspecific:
 
