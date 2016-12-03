@@ -30,13 +30,12 @@ gobject = dependency('gobject-2.0')
 gtk = dependency('gtk+-3.0')
 math = meson.get_compiler('c').find_library('m', required: true)
 
+g_ir_compiler = find_program('g-ir-compiler')
+
 subdir('libgflow')
 subdir('libgtkflow')
 
 #TODO: testing
-
-g_ir_compiler = find_program('g-ir-compiler')
-#TODO: girfiles
 
 valadoc = find_program('valadoc')
 #TODO: documentation
