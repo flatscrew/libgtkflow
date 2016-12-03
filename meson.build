@@ -34,8 +34,7 @@ g_ir_compiler = find_program('g-ir-compiler')
 
 subdir('libgflow')
 subdir('libgtkflow')
-
-#TODO: testing
+subdir('test')
 
 valadoc = find_program('valadoc')
 #TODO: documentation
