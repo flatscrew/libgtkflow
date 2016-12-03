@@ -28,3 +28,10 @@ install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.gir',
 
 install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
              install_dir: get_option('datadir') + '/vala/vapi')
+
+pkgconfig.generate(libraries: [gflow, gtkflow],
+                   version: api,
+                   name: 'gtkflow',
+                   filebase: 'gtkflow-' + api,
+                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + api],
+                   description: 'A library to create flowgraphs in GTK+')

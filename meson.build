@@ -39,6 +39,4 @@ subdir('test')
 valadoc = find_program('valadoc')
 #TODO: documentation
 
-#TODO: pkgconfig
-
 #TODO: manual installations

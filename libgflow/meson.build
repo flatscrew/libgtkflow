@@ -29,3 +29,10 @@ install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.gir',
 
 install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.vapi',
              install_dir: get_option('datadir') + '/vala/vapi')
+
+pkgconfig.generate(libraries: gflow,
+                   version: api,
+                   name: 'gflow',
+                   filebase: 'gflow-' + api,
+                   requires: ['glib-2.0', 'gobject-2.0'],
+                   description: 'Flow Node Library')
