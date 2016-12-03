@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 
+void append_element (GtkWidgetPath *path, const char *selector);
+
 void
 query_size (GtkStyleContext *context,
             gint            *width,
