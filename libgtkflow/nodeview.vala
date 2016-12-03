@@ -723,6 +723,13 @@ namespace GtkFlow {
             this.set_realized(true);
             window.set_background_pattern(null);
         }
+
+        /**
+         * Internal method so that GtkInspector can see child widgets
+         */
+        public override void forall_internal (bool include_internal, Gtk.Callback cb) {
+            nodes.foreach (n => cb (n));
+        }
     }
     
     /**
