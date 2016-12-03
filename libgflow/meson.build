@@ -16,14 +16,13 @@ gflow = library('gflow-'+api,
 
 gflow_inc = include_directories('.')
 
+# TODO: figure out how specify gir as input
 custom_target('gflow-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', '@INPUT@'],
-              input: meson.current_build_dir() + '/gflow-' + api + '.gir',
+              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/gflow-' + api + '.gir'],
               output: 'gflow-' + api + '.typelib',
               depends: gflow,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
 install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.gir',
-             install_dir: get_option('datadir') + '/gir-1.0',
-             dependencies: gflow)
+             install_dir: get_option('datadir') + '/gir-1.0')
