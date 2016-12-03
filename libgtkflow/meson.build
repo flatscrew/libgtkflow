@@ -25,3 +25,6 @@ custom_target('gtkflow-typelib',
 
 install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.gir',
              install_dir: get_option('datadir') + '/gir-1.0')
+
+install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
+             install_dir: get_option('datadir') + '/vala/vapi')
