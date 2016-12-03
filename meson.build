@@ -28,45 +28,15 @@ pkgconfig = import('pkgconfig')
 glib = dependency('glib-2.0')
 gobject = dependency('gobject-2.0')
 gtk = dependency('gtk+-3.0')
-
-gflow_lib_source = [
-    'libgflow/gflow-dock.vala',
-    'libgflow/gflow-node.vala',
-    'libgflow/gflow-simple-node.vala',
-    'libgflow/gflow-simple-sink.vala',
-    'libgflow/gflow-simple-source.vala',
-    'libgflow/gflow-sink.vala',
-    'libgflow/gflow-source.vala',
-]
-
-gtkflow_lib_source = [
-    'libgtkflow/dock_renderer.vala',
-    'libgtkflow/node_renderer.vala',
-    'libgtkflow/node.vala',
-    'libgtkflow/nodeview.vala',
-]
-
-gflow_lib = library('gflow-'+api, gflow_lib_source,
-                    dependencies: [glib, gobject],
-                    vala_args: ['--gir=../GFlow-'+api+'.gir', '-H', 'gflow-'+api+'/gflow.h'],
-                    install: true)
-
-#TODO: gtkflow must find gflow headers
-gtkflow_lib = library('gtkflow-'+api, gtkflow_lib_source,
-                    dependencies: [glib, gobject, gtk],
-                    vala_args: ['--gir=../GtkFlow-'+api+'.gir', '-H', 'gtkflow-'+api+'/gtkflow.h',
-                                '-X','-Igflow-0.2'],
-                    link_with: gflow_lib,
-                    install: true)
-
-#TODO: testing
+math = meson.get_compiler('c').find_library('m', required: true)
 
 g_ir_compiler = find_program('g-ir-compiler')
-#TODO: girfiles
+
+subdir('libgflow')
+subdir('libgtkflow')
+subdir('test')
 
 valadoc = find_program('valadoc')
 #TODO: documentation
-
-#TODO: pkgconfig
 
 #TODO: manual installations

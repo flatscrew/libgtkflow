@@ -88,3 +88,6 @@ po/stamp-it
 stamp-h1
 test/Makefile.in
 
+# meson build dir
+
+build/
