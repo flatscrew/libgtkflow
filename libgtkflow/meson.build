@@ -29,7 +29,11 @@ install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.gir',
 install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
              install_dir: get_option('datadir') + '/vala/vapi')
 
+install_headers(meson.current_build_dir () + '/gtkflow-' + api + '.h',
+                subdir: 'gtkflow-' + api)
+
 pkgconfig.generate(libraries: [gflow, gtkflow],
+                   subdirs: 'gtkflow-' + api,
                    version: api,
                    name: 'gtkflow',
                    filebase: 'gtkflow-' + api,
