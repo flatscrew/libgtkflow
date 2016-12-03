@@ -86,9 +86,12 @@ namespace GtkFlow {
             this.gnode.sink_added.connect((s)=>{this.register_dock(s);});
             this.gnode.source_removed.connect((s)=>{this.unregister_dock(s);});
             this.gnode.sink_removed.connect((s)=>{this.unregister_dock(s);});
+
+            this.node_renderer.update_name_layout(this.gnode.name);
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
             });
+
             this.set_border_width(this.node_renderer.resize_handle_size);
 
             this.show_all();
