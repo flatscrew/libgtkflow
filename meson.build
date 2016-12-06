@@ -36,7 +36,4 @@ subdir('libgflow')
 subdir('libgtkflow')
 subdir('test')
 
-valadoc = find_program('valadoc')
-#TODO: documentation
-
 #TODO: manual installations

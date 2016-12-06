@@ -40,3 +40,16 @@ pkgconfig.generate(libraries: gflow,
                    filebase: 'gflow-' + api,
                    requires: ['glib-2.0', 'gobject-2.0'],
                    description: 'Flow Node Library')
+
+if get_option('enable_valadoc')
+    valadoc = find_program('valadoc')
+    custom_target('gflow_apidocs',
+                   input: src,
+                   command: [valadoc, '-o', 'devhelp/gflow-'+api, '--doclet', 'devhelp', '@INPUT@',
+                   '--force'],
+                   output: 'devhelp',
+    )
+    install_subdir(meson.current_build_dir()+'/devhelp/gflow-'+api+'/gflow-'+api, install_dir: get_option('datadir')+'/devhelp/books')
+endif
+
+

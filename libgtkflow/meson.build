@@ -39,3 +39,15 @@ pkgconfig.generate(libraries: [gflow, gtkflow],
                    filebase: 'gtkflow-' + api,
                    requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + api],
                    description: 'A library to create flowgraphs in GTK+')
+
+if get_option('enable_valadoc')
+    valadoc = find_program('valadoc')
+    custom_target('gtkflow_apidocs',
+                   input: src,
+                   command: [valadoc, '-o', 'devhelp/gtkflow-'+api, '--doclet', 'devhelp', '@INPUT@',
+                   '--force'],
+                   output: 'devhelp',
+    )
+    install_subdir(meson.current_build_dir()+'/devhelp/gtkflow-'+api+'/gtkflow-'+api, install_dir: get_option('datadir')+'/devhelp/books')
+endif
+
