@@ -43,13 +43,13 @@ pkgconfig.generate(libraries: gflow,
 
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
-    custom_target('gflow_apidocs',
+    gflow_docs = custom_target('gflow_apidocs',
                    input: src,
                    command: [valadoc, '-o', 'devhelp/gflow-'+api, '--doclet', 'devhelp', '@INPUT@',
                    '--force'],
                    output: 'devhelp',
     )
-    install_subdir(meson.current_build_dir()+'/devhelp/gflow-'+api+'/gflow-'+api, install_dir: get_option('datadir')+'/devhelp/books')
+    install_subdir( meson.current_build_dir()+'/../devhelp/gflow-'+api+'/gflow-'+api, install_dir: get_option('datadir')+'/devhelp/books', depends:[gflow_docs])
 endif
 
 

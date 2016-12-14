@@ -35,5 +35,3 @@ g_ir_compiler = find_program('g-ir-compiler')
 subdir('libgflow')
 subdir('libgtkflow')
 subdir('test')
-
-#TODO: manual installations
