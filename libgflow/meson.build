@@ -32,6 +32,7 @@ install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.vapi',
 
 install_headers(meson.current_build_dir () + '/gflow-' + api + '.h',
                 subdir: 'gflow-' + api)
+install_data(sources:[meson.current_source_dir()+'/gflow-'+api+'.deps'], install_dir:get_option('datadir') + '/vala/vapi')
 
 pkgconfig.generate(libraries: gflow,
                    subdirs: 'gflow-' + api,
@@ -51,5 +52,3 @@ if get_option('enable_valadoc')
     )
     install_subdir( meson.current_build_dir()+'/../devhelp/gflow-'+api+'/gflow-'+api, install_dir: get_option('datadir')+'/devhelp/books', depends:[gflow_docs])
 endif
-
-

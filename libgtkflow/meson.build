@@ -31,6 +31,7 @@ install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
 
 install_headers(meson.current_build_dir () + '/gtkflow-' + api + '.h',
                 subdir: 'gtkflow-' + api)
+install_data(sources:[meson.current_source_dir()+'/gtkflow-'+api+'.deps'], install_dir:get_option('datadir') + '/vala/vapi')
 
 pkgconfig.generate(libraries: [gflow, gtkflow],
                    subdirs: 'gtkflow-' + api,
@@ -52,4 +53,3 @@ if get_option('enable_valadoc')
     )
     install_subdir(meson.current_build_dir()+'/../devhelp/gtkflow-'+api+'/gtkflow-'+api, install_dir: get_option('datadir')+'/devhelp/books', depends:[gtkflow_docs])
 endif
-
