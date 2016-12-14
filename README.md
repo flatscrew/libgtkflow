@@ -72,14 +72,20 @@ Make sure you get the following Dependencies:
 
   * libgtk-3-dev
   * gobject-introspection
-  * GNU Autotools
+  * meson
   * vala
+  * (valadoc)
 
 Then do the following:
 
 ```
-$ ./autogen.sh
-$ sudo make install
+$ git clone https://github.com/grindhold/libgtkflow
+$ cd libgtkflow
+$ mkdir build
+$ cd build
+$ meson ..
+$ ninja
+# sudo ninja install
 ```
 
 Examples
@@ -95,6 +101,10 @@ Note: If you installed the library in /usr/local, you have to export the followi
 environment variables for the examples to work:
 
 ```
-$ export LD_LIBRARY_PATH=/usr/local/lib 
-$ export GI_TYPELIB_PATH=/usr/local/lib/girepository-1.0/
+$ export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
+$ export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0/
 ```
+
+Please be aware that on other architectures than amd64 you will have to change the
+multiarch string ```x86_64-linux-gnu``` to something else that makes sense on your
+machine.
