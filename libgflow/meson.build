@@ -11,20 +11,21 @@ src = files([
 gflow = library('gflow-'+api,
                 src,
                 dependencies: [glib, gobject],
-                vala_gir: 'gflow-' + api + '.gir',
+                vala_gir: 'GFlow-' + api + '.gir',
                 install: true)
 
 gflow_inc = include_directories('.')
 
 # TODO: figure out how specify gir as input
 custom_target('gflow-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/gflow-' + api + '.gir'],
+              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GFlow-' + api + '.gir',
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgflow-'+ api +'.so'],
               output: 'GFlow-' + api + '.typelib',
               depends: gflow,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.gir',
+install_data(sources: meson.current_build_dir() + '/GFlow-' + api + '.gir',
              install_dir: get_option('datadir') + '/gir-1.0')
 
 install_data(sources: meson.current_build_dir() + '/gflow-' + api + '.vapi',

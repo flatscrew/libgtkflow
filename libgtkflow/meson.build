@@ -11,19 +11,20 @@ gtkflow = library('gtkflow-'+api,
                   dependencies: [glib, gobject, gtk, math],
                   link_with: gflow,
                   include_directories: gflow_inc,
-                  vala_gir: 'gtkflow-' + api + '.gir',
+                  vala_gir: 'GtkFlow-' + api + '.gir',
                   install: true)
 
 gtkflow_inc = include_directories('.')
 
 custom_target('gtkflow-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/gtkflow-' + api + '.gir'],
+              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow-' + api + '.gir',
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow-'+ api +'.so'],
               output: 'GtkFlow-' + api + '.typelib',
               depends: gtkflow,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.gir',
+install_data(sources: meson.current_build_dir() + '/GtkFlow-' + api + '.gir',
              install_dir: get_option('datadir') + '/gir-1.0')
 
 install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
