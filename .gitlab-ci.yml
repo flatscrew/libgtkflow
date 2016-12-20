@@ -8,13 +8,14 @@ build:
   stage: build
   # instead of calling g++ directly you can also use some build toolkit like make
   # install the necessary build tools when needed
-  # before_script: 
-  #   - apt update && apt -y install make autoconf 
+  before_script: 
+    - apt update && apt -y install meson valac libgtk-3-dev 
   script: 
-    - g++ helloworld.cpp -o mybinary
+    - mkdir build && cd build && meson .. && ninja
   artifacts:
     paths:
-      - mybinary
+      - libgtkflow.so
+      - libgflow.so
   # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
   # cache:
   #   paths:
@@ -24,4 +25,4 @@ build:
 test:
   stage: test
   script:
-    - ./runmytests.sh
+    - cd build/test && ./test
