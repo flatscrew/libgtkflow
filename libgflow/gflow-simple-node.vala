@@ -36,6 +36,11 @@ namespace GFlow {
         public string name { get; set; default="SimpleNode";}
 
         /**
+         * This SimpleNode's name
+         */
+        public bool deletable { get; set; default=true;}
+
+        /**
          * Add the given {@link Source} to this SimpleNode
          */
         public void add_source(Source s) throws NodeError {

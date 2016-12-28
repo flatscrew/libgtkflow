@@ -215,7 +215,7 @@ namespace GtkFlow {
             if (n != null) {
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
-                bool cbp = n.node_renderer.is_on_closebutton(
+                bool cbp = n.gnode.deletable && n.node_renderer.is_on_closebutton(
                     pos, alloc,
                     n.border_width
                 );
@@ -623,7 +623,8 @@ namespace GtkFlow {
                     n.get_dock_renderers(),
                     n.get_childlist(),
                     (int)n.border_width,
-                    this.editable
+                    this.editable,
+                    n.gnode.deletable
                 );
                 n.current_cairo_ctx = null;
             }

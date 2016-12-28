@@ -57,7 +57,8 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       bool editable);
+                                       bool editable,
+                                       bool deletable);
         /**
          * Implementations should calculate whether there is a dock
          * on this node specified by the {@link Gdk.Point} p . If so,
@@ -350,7 +351,8 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       bool editable) {
+                                       bool editable,
+                                       bool deletable) {
             var sc = this.get_style();
             sc.save();
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);
@@ -371,7 +373,7 @@ namespace GtkFlow {
                 cr.restore();
                 sc.restore();
             }
-            if (editable) {
+            if (editable && deletable) {
                 Gtk.IconTheme it = Gtk.IconTheme.get_default();
                 try {
                     cr.save();
