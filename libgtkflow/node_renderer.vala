@@ -234,20 +234,38 @@ namespace GtkFlow {
             foreach(DockRenderer dock_renderer in dock_renderers) {
                 GFlow.Dock s = dock_renderer.get_dock();
                 if (s == d) {
-                    if (s is GFlow.Sink) {
-                        x += alloc.x + border_width
-                                     + dock_renderer.dockpoint_height/2;
-                        y += alloc.y + border_width + (int)title_offset
-                                  + dock_renderer.dockpoint_height/2 + i
-                                  * dock_renderer.get_min_height();
-                        return true;
-                    } else if (s is GFlow.Source) {
-                        x += alloc.x - border_width
-                                  + alloc.width - dock_renderer.dockpoint_height/2;
-                        y += alloc.y + border_width + (int)title_offset
-                                  + dock_renderer.dockpoint_height/2 + i
-                                  * dock_renderer.get_min_height();
-                        return true;
+                    if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                        if (s is GFlow.Sink) {
+                            x += alloc.x + border_width
+                                         + dock_renderer.dockpoint_height/2;
+                            y += alloc.y + border_width + (int)title_offset
+                                      + dock_renderer.dockpoint_height/2 + i
+                                      * dock_renderer.get_min_height();
+                            return true;
+                        } else if (s is GFlow.Source) {
+                            x += alloc.x - border_width
+                                      + alloc.width - dock_renderer.dockpoint_height/2;
+                            y += alloc.y + border_width + (int)title_offset
+                                      + dock_renderer.dockpoint_height/2 + i
+                                      * dock_renderer.get_min_height();
+                            return true;
+                        }
+                    } else {
+                        if (s is GFlow.Sink) {
+                            x += alloc.x - border_width
+                                      + alloc.width - dock_renderer.dockpoint_height/2;
+                            y += alloc.y + border_width + (int)title_offset
+                                      + dock_renderer.dockpoint_height/2 + i
+                                      * dock_renderer.get_min_height();
+                            return true;
+                        } else if (s is GFlow.Source) {
+                            x += alloc.x + border_width
+                                         + dock_renderer.dockpoint_height/2;
+                            y += alloc.y + border_width + (int)title_offset
+                                      + dock_renderer.dockpoint_height/2 + i
+                                      * dock_renderer.get_min_height();
+                            return true;
+                        }
                     }
                 }
                 i++;
@@ -274,22 +292,42 @@ namespace GtkFlow {
             foreach (DockRenderer dock_renderer in dock_renderers) {
                 GFlow.Dock s = dock_renderer.get_dock();
                 mh = dock_renderer.get_min_height();
-                if (s is GFlow.Sink) {
-                    dock_x = alloc.x + (int)border_width;
-                    dock_y = alloc.y + (int)border_width + (int)title_offset
-                             + i * mh;
-                    if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
-                            && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
-                        return s;
-                } else if (s is GFlow.Source) {
-                    dock_x = alloc.x + alloc.width
-                             - (int)border_width
-                             - dock_renderer.dockpoint_height;
-                    dock_y = alloc.y + (int)border_width + (int)title_offset
-                             + i * mh;
-                    if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
-                            && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
-                        return s;
+                if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                    if (s is GFlow.Sink) {
+                        dock_x = alloc.x + (int)border_width;
+                        dock_y = alloc.y + (int)border_width + (int)title_offset
+                                 + i * mh;
+                        if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                                && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
+                            return s;
+                    } else if (s is GFlow.Source) {
+                        dock_x = alloc.x + alloc.width
+                                 - (int)border_width
+                                 - dock_renderer.dockpoint_height;
+                        dock_y = alloc.y + (int)border_width + (int)title_offset
+                                 + i * mh;
+                        if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                                && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
+                            return s;
+                    }
+                } else {
+                    if (s is GFlow.Sink) {
+                        dock_x = alloc.x + alloc.width
+                                 - (int)border_width
+                                 - dock_renderer.dockpoint_height;
+                        dock_y = alloc.y + (int)border_width + (int)title_offset
+                                 + i * mh;
+                        if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                                && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
+                            return s;
+                    } else if (s is GFlow.Source) {
+                        dock_x = alloc.x + (int)border_width;
+                        dock_y = alloc.y + (int)border_width + (int)title_offset
+                                 + i * mh;
+                        if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
+                                && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
+                            return s;
+                    }
                 }
                 i++;
             }
