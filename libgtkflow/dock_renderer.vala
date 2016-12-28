@@ -182,6 +182,34 @@ namespace GtkFlow {
         }
 
         /**
+         * Draw the given source onto a cairo context for right-to-left-scriptures
+         */
+        public void draw_sink_rtl(Gtk.Widget w, Cairo.Context cr, Gtk.StyleContext sc,
+                                int offset_x, int offset_y, int width) {
+            Gtk.StateFlags flags = Gtk.StateFlags.NORMAL;
+            if (this.d.is_linked())
+                flags = Gtk.StateFlags.CHECKED;
+            if (this.d.highlight)
+                flags |= Gtk.StateFlags.PRELIGHT;
+            if (this.d.active)
+                flags |= Gtk.StateFlags.ACTIVE;
+
+            int option_height=16;
+            int option_width=16;
+            int option_x=offset_x+width-dockpoint_height-24;
+            int option_y=offset_y;
+            draw_radio(w, cr, option_x, option_y,
+                       flags, &option_height, &option_width);
+            sc.save();
+            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
+            cr.move_to(offset_x + width - this.get_min_width() - 24, offset_y);
+            Pango.cairo_show_layout(cr, this.layout);
+            sc.restore();
+        }
+
+        /**
          * Draw the given sink onto a cairo context
          */
         public void draw_sink(Gtk.Widget w, Cairo.Context cr, Gtk.StyleContext sc,
@@ -204,6 +232,33 @@ namespace GtkFlow {
             Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
             cr.move_to(offset_x+dockpoint_height+spacing_x, offset_y);
+            Pango.cairo_show_layout(cr, this.layout);
+            sc.restore();
+        }
+
+        /**
+         * Draw the given sink onto a cairo context for right-to-left-scriptures
+         */
+        public void draw_source_rtl(Gtk.Widget w, Cairo.Context cr, Gtk.StyleContext sc,
+                              int offset_x, int offset_y, int width) {
+            Gtk.StateFlags flags = Gtk.StateFlags.NORMAL;
+            if (this.d.is_linked())
+                flags = Gtk.StateFlags.CHECKED;
+            if (this.d.highlight)
+                flags |= Gtk.StateFlags.PRELIGHT;
+            if (this.d.active)
+                flags |= Gtk.StateFlags.ACTIVE;
+            int option_height=16;
+            int option_width=16;
+            int option_x=offset_x + 16;
+            int option_y=offset_y;
+            draw_radio(w, cr, option_x, option_y,
+                       flags, &option_height, &option_width);
+            sc.save();
+            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
+            cr.move_to(offset_x+dockpoint_height+spacing_x+20, offset_y);
             Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
