@@ -193,11 +193,20 @@ namespace GtkFlow {
             int x = p.x;
             int y = p.y;
 
-            int x_left = alloc.x + alloc.width - delete_btn_size
-                                 - (int)border_width;
-            int x_right = x_left + delete_btn_size;
-            int y_top = alloc.y + (int)border_width;
-            int y_bot = y_top + delete_btn_size;
+            int x_left, x_right, y_top, y_bot;
+
+            if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                x_left = alloc.x + alloc.width - delete_btn_size
+                                     - (int)border_width;
+                x_right = x_left + delete_btn_size;
+                y_top = alloc.y + (int)border_width;
+                y_bot = y_top + delete_btn_size;
+            } else {
+                x_left = alloc.x + (int)border_width;
+                x_right = x_left + delete_btn_size;
+                y_top = alloc.y + (int)border_width;
+                y_bot = y_top + delete_btn_size;
+            }
             return x > x_left && x < x_right && y > y_top && y < y_bot;
         }
 
@@ -210,10 +219,19 @@ namespace GtkFlow {
             int x = p.x;
             int y = p.y;
 
-            int x_right = alloc.x + alloc.width;
-            int x_left = x_right - resize_handle_size;
-            int y_bot = alloc.y + alloc.height;
-            int y_top = y_bot - resize_handle_size;
+            int x_right, x_left, y_bot, y_top;
+
+            if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                x_right = alloc.x + alloc.width;
+                x_left = x_right - resize_handle_size;
+                y_bot = alloc.y + alloc.height;
+                y_top = y_bot - resize_handle_size;
+            } else {
+                x_left = alloc.x;
+                x_right = x_left + resize_handle_size;
+                y_bot = alloc.y + alloc.height;
+                y_top = y_bot - resize_handle_size;
+            }
             return x > x_left && x < x_right && y > y_top && y < y_bot;
         }
 
@@ -369,8 +387,13 @@ namespace GtkFlow {
                 sc.add_class(Gtk.STYLE_CLASS_BUTTON);
                 Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
                 cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
-                cr.move_to(alloc.x + border_width,
-                           alloc.y + (int) border_width + y_offset);
+                if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                    cr.move_to(alloc.x + alloc.width - border_width,
+                               alloc.y + (int) border_width + y_offset);
+                } else {
+                    cr.move_to(alloc.x + 2*border_width + delete_btn_size,
+                               alloc.y + (int) border_width + y_offset);
+                }
                 Pango.cairo_show_layout(cr, this.layout);
                 cr.restore();
                 sc.restore();
@@ -380,11 +403,19 @@ namespace GtkFlow {
                 try {
                     cr.save();
                     Gdk.Pixbuf icon_pix = it.load_icon("edit-delete", delete_btn_size, 0);
-                    Gdk.cairo_set_source_pixbuf(
-                        cr, icon_pix,
-                        alloc.x+alloc.width-delete_btn_size-border_width,
-                        alloc.y+border_width
-                    );
+                    if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                        Gdk.cairo_set_source_pixbuf(
+                            cr, icon_pix,
+                            alloc.x+alloc.width-delete_btn_size-border_width,
+                            alloc.y+border_width
+                        );
+                    } else {
+                        Gdk.cairo_set_source_pixbuf(
+                            cr, icon_pix,
+                            alloc.x+border_width,
+                            alloc.y+border_width
+                        );
+                    }
                     cr.paint();
                 } catch (GLib.Error e) {
                     warning("Could not load close-node-icon 'edit-delete'");
@@ -421,12 +452,21 @@ namespace GtkFlow {
                 sc.save();
                 cr.save();
                 cr.set_source_rgba(0.5,0.5,0.5,0.5);
-                cr.move_to(alloc.x + alloc.width,
-                           alloc.y + alloc.height);
-                cr.line_to(alloc.x + alloc.width - resize_handle_size,
-                           alloc.y + alloc.height);
-                cr.line_to(alloc.x + alloc.width,
-                           alloc.y + alloc.height - resize_handle_size);
+                if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                    cr.move_to(alloc.x + alloc.width,
+                               alloc.y + alloc.height);
+                    cr.line_to(alloc.x + alloc.width - resize_handle_size,
+                               alloc.y + alloc.height);
+                    cr.line_to(alloc.x + alloc.width,
+                               alloc.y + alloc.height - resize_handle_size);
+                } else {
+                    cr.move_to(alloc.x,
+                               alloc.y + alloc.height);
+                    cr.line_to(alloc.x + resize_handle_size,
+                               alloc.y + alloc.height);
+                    cr.line_to(alloc.x,
+                               alloc.y + alloc.height - resize_handle_size);
+                }
                 cr.fill();
                 cr.stroke();
                 cr.restore();

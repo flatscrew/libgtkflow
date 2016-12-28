@@ -271,8 +271,13 @@ namespace GtkFlow {
                 if (on_resize && this.resize_node == null) {
                     this.resize_node = n;
                     this.resize_node.get_allocation(out alloc);
-                    this.resize_start_x = alloc.width;
-                    this.resize_start_y = alloc.height;
+                    if ((this.get_style_context().get_state() & Gtk.StateFlags.DIR_LTR) > 0) {
+                        this.resize_start_x = alloc.width;
+                        this.resize_start_y = alloc.height;
+                    } else {
+                        this.resize_start_x = 0;
+                        this.resize_start_y = alloc.height;
+                    }
                 } else if (this.resize_node == null && this.drag_node == null) {
                     this.drag_node = n;
                     this.drag_node.get_allocation(out alloc);
@@ -369,10 +374,17 @@ namespace GtkFlow {
         private Gdk.Cursor resize_cursor = null;
         private Gdk.Cursor? get_resize_cursor() {
             if (resize_cursor == null && this.get_realized()) {
-                resize_cursor = new Gdk.Cursor.for_display(
-                    this.get_window().get_display(),
-                    Gdk.CursorType.BOTTOM_RIGHT_CORNER
-                );
+                if ((this.get_style_context().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                    resize_cursor = new Gdk.Cursor.for_display(
+                        this.get_window().get_display(),
+                        Gdk.CursorType.BOTTOM_RIGHT_CORNER
+                    );
+                } else {
+                    resize_cursor = new Gdk.Cursor.for_display(
+                        this.get_window().get_display(),
+                        Gdk.CursorType.BOTTOM_LEFT_CORNER
+                    );
+                }
             }
             return resize_cursor;
         }
@@ -463,8 +475,15 @@ namespace GtkFlow {
                 if (this.resize_node != null) {
                     // resize the node
                     this.resize_node.get_allocation(out alloc);
-                    alloc.width =  resize_start_x + (int)e.x - (int)this.drag_start_x;
-                    alloc.height = resize_start_y + (int)e.y - (int)this.drag_start_y;
+                    if ((this.get_style_context().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
+                        alloc.width =  resize_start_x + (int)e.x - (int)this.drag_start_x;
+                        alloc.height = resize_start_y + (int)e.y - (int)this.drag_start_y;
+                    } else {
+                        //FIXME: far from perfect. strange behaviour when resizing
+                        alloc.x = (int)e.x;
+                        alloc.width = alloc.width + ((int)this.drag_start_x - (int)e.x);
+                        alloc.height = resize_start_y + (int)e.y - (int)this.drag_start_y;
+                    }
                     this.resize_node.size_allocate(alloc);
                 }
                 int minwidth = 0, minheight = 0, _ = 0;
