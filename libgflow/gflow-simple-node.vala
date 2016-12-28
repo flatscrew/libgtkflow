@@ -36,7 +36,7 @@ namespace GFlow {
         public string name { get; set; default="SimpleNode";}
 
         /**
-         * This SimpleNode's name
+         * Determines wheter the node can be deleted by the user
          */
         public bool deletable { get; set; default=true;}
 
