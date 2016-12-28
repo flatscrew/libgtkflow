@@ -58,7 +58,8 @@ namespace GtkFlow {
                                        List<Gtk.Widget> children,
                                        int border_width,
                                        bool editable,
-                                       bool deletable);
+                                       bool deletable,
+                                       bool resizable);
         /**
          * Implementations should calculate whether there is a dock
          * on this node specified by the {@link Gdk.Point} p . If so,
@@ -352,7 +353,8 @@ namespace GtkFlow {
                                        List<Gtk.Widget> children,
                                        int border_width,
                                        bool editable,
-                                       bool deletable) {
+                                       bool deletable,
+                                       bool resizable) {
             var sc = this.get_style();
             sc.save();
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);
@@ -415,19 +417,21 @@ namespace GtkFlow {
 
             }
             // Draw resize handle
-            sc.save();
-            cr.save();
-            cr.set_source_rgba(0.5,0.5,0.5,0.5);
-            cr.move_to(alloc.x + alloc.width,
-                       alloc.y + alloc.height);
-            cr.line_to(alloc.x + alloc.width - resize_handle_size,
-                       alloc.y + alloc.height);
-            cr.line_to(alloc.x + alloc.width,
-                       alloc.y + alloc.height - resize_handle_size);
-            cr.fill();
-            cr.stroke();
-            cr.restore();
-            sc.restore();
+            if (resizable) {
+                sc.save();
+                cr.save();
+                cr.set_source_rgba(0.5,0.5,0.5,0.5);
+                cr.move_to(alloc.x + alloc.width,
+                           alloc.y + alloc.height);
+                cr.line_to(alloc.x + alloc.width - resize_handle_size,
+                           alloc.y + alloc.height);
+                cr.line_to(alloc.x + alloc.width,
+                           alloc.y + alloc.height - resize_handle_size);
+                cr.fill();
+                cr.stroke();
+                cr.restore();
+                sc.restore();
+            }
         }
     }
 }

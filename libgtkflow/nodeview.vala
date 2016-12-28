@@ -263,7 +263,7 @@ namespace GtkFlow {
             if (n != null) {
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
-                bool on_resize = n.node_renderer.is_on_resize_handle(
+                bool on_resize = n.gnode.resizable && n.node_renderer.is_on_resize_handle(
                     pos, alloc,
                     n.border_width
                 );
@@ -396,7 +396,7 @@ namespace GtkFlow {
                 if (!cbp)
                     this.close_button_pressed = false;
                 // Update cursor if we are on the resize area
-                bool on_resize = n.node_renderer.is_on_resize_handle(
+                bool on_resize = n.gnode.resizable && n.node_renderer.is_on_resize_handle(
                     pos, alloc,
                     n.border_width
                 );
@@ -624,7 +624,8 @@ namespace GtkFlow {
                     n.get_childlist(),
                     (int)n.border_width,
                     this.editable,
-                    n.gnode.deletable
+                    n.gnode.deletable,
+                    n.gnode.resizable
                 );
                 n.current_cairo_ctx = null;
             }

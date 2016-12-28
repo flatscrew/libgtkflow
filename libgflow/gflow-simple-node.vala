@@ -41,6 +41,11 @@ namespace GFlow {
         public bool deletable { get; set; default=true;}
 
         /**
+         * Determines wheter the node can resized by the user
+         */
+        public bool resizable { get; set; default=true;}
+
+        /**
          * Add the given {@link Source} to this SimpleNode
          */
         public void add_source(Source s) throws NodeError {

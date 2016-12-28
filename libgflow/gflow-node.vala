@@ -86,6 +86,11 @@ namespace GFlow {
          */
         public abstract bool deletable { get; set; default=true;}
         /**
+         * Determines wheter the user be allowed to remove the node. Otherwise
+         * the node can only be removed programmatically
+         */
+        public abstract bool resizable { get; set; default=true;}
+        /**
          * Implementations should destroy all connections of this Node's {@link Sink}s
          * and {@link Source}s when this method is executed
          */
