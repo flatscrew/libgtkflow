@@ -388,7 +388,7 @@ namespace GtkFlow {
                 Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
                 cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
                 if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
-                    cr.move_to(alloc.x + alloc.width - border_width,
+                    cr.move_to(alloc.x + border_width,
                                alloc.y + (int) border_width + y_offset);
                 } else {
                     cr.move_to(alloc.x + 2*border_width + delete_btn_size,
