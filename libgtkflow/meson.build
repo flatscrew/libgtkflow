@@ -6,7 +6,7 @@ src = files([
     'drawinghelper.c'
 ])
 
-gtkflow = library('gtkflow-'+api,
+gtkflow = library('gtkflow-' + api,
                   src,
                   dependencies: [glib, gobject, gtk, math],
                   link_with: gflow,

@@ -8,7 +8,7 @@ src = files([
     'gflow-source.vala',
 ])
 
-gflow = library('gflow-'+api,
+gflow = library('gflow-' + api,
                 src,
                 dependencies: [glib, gobject],
                 vala_gir: 'GFlow-' + api + '.gir',
