@@ -32,7 +32,8 @@ install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
 
 install_headers(meson.current_build_dir () + '/gtkflow-' + api + '.h',
                 subdir: 'gtkflow-' + api)
-install_data(sources:[meson.current_source_dir()+'/gtkflow-'+api+'.deps'], install_dir:get_option('datadir') + '/vala/vapi')
+install_data(sources: [meson.current_source_dir() + '/gtkflow-' + api + '.deps'],
+             install_dir: get_option('datadir') + '/vala/vapi')
 
 pkgconfig.generate(libraries: [gflow, gtkflow],
                    subdirs: 'gtkflow-' + api,
@@ -45,12 +46,13 @@ pkgconfig.generate(libraries: [gflow, gtkflow],
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
     gtkflow_docs = custom_target('gtkflow_apidocs',
-                   depends: gflow,
-                   input: src,
-                   command: [valadoc, '-o', 'devhelp/gtkflow-'+api, '--doclet', 'devhelp', '@INPUT@',
-                   '--pkg','gtk+-3.0', '--vapidir='+meson.current_build_dir()+'/../libgflow/', '--pkg', 'gflow-'+api,
-                   '--force'],
-                   output: 'devhelp',
-    )
-    install_subdir(meson.current_build_dir()+'/../devhelp/gtkflow-'+api+'/gtkflow-'+api, install_dir: get_option('datadir')+'/devhelp/books', depends:[gtkflow_docs])
+                                 depends: gflow,
+                                 input: src,
+                                 command: [valadoc, '-o', 'devhelp/gtkflow-' + api, '--doclet', 'devhelp', '@INPUT@',
+                                 '--pkg', 'gtk+-3.0', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + api,
+                                 '--force'],
+                                 output: 'devhelp')
+    install_subdir(meson.current_build_dir() + '/../devhelp/gtkflow-' + api + '/gtkflow-' + api,
+                   install_dir: get_option('datadir') + '/devhelp/books',
+                   depends: [gtkflow_docs])
 endif
