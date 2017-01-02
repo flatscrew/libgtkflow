@@ -24,13 +24,19 @@ custom_target('gtkflow-typelib',
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-install_data(sources: meson.current_build_dir() + '/GtkFlow-' + api + '.gir',
+girfilename = meson.current_build_dir() + '/GtkFlow-' + api + '.gir'
+run_command('touch', girfilename)
+install_data(sources: girfilename,
              install_dir: get_option('datadir') + '/gir-1.0')
 
-install_data(sources: meson.current_build_dir() + '/gtkflow-' + api + '.vapi',
+vapifilename = meson.current_build_dir() + '/gtkflow-' + api + '.vapi'
+run_command('touch', vapifilename)
+install_data(sources: vapifilename,
              install_dir: get_option('datadir') + '/vala/vapi')
 
-install_headers(meson.current_build_dir () + '/gtkflow-' + api + '.h',
+headerfilename = meson.current_build_dir () + '/gtkflow-' + api + '.h'
+run_command('touch', headerfilename)
+install_headers(headerfilename,
                 subdir: 'gtkflow-' + api)
 install_data(sources:[meson.current_source_dir()+'/gtkflow-'+api+'.deps'], install_dir:get_option('datadir') + '/vala/vapi')
 
