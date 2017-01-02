@@ -8,7 +8,7 @@ src = files([
     'gflow-source.vala',
 ])
 
-gflow = library('gflow-'+api,
+gflow = library('gflow-' + api,
                 src,
                 dependencies: [glib, gobject],
                 vala_gir: 'GFlow-' + api + '.gir',
@@ -39,7 +39,9 @@ headerfilename = meson.current_build_dir () + '/gflow-' + api + '.h'
 run_command('touch', headerfilename)
 install_headers(headerfilename,
                 subdir: 'gflow-' + api)
-install_data(sources:[meson.current_source_dir()+'/gflow-'+api+'.deps'], install_dir:get_option('datadir') + '/vala/vapi')
+
+install_data(sources: [meson.current_source_dir() + '/gflow-' + api + '.deps'],
+             install_dir: get_option('datadir') + '/vala/vapi')
 
 pkgconfig.generate(libraries: gflow,
                    subdirs: 'gflow-' + api,
@@ -52,10 +54,10 @@ pkgconfig.generate(libraries: gflow,
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
     gflow_docs = custom_target('gflow_apidocs',
-                   input: src,
-                   command: [valadoc, '-o', 'devhelp/gflow-'+api, '--doclet', 'devhelp', '@INPUT@',
-                   '--force'],
-                   output: 'devhelp',
-    )
-    install_subdir( meson.current_build_dir()+'/../devhelp/gflow-'+api+'/gflow-'+api, install_dir: get_option('datadir')+'/devhelp/books', depends:[gflow_docs])
+                               input: src,
+                               command: [valadoc, '-o', 'devhelp/gflow-' + api, '--doclet', 'devhelp', '@INPUT@', '--force'],
+                               output: 'devhelp')
+    install_subdir(meson.current_build_dir() + '/../devhelp/gflow-' + api + '/gflow-' + api,
+                   install_dir: get_option('datadir') + '/devhelp/books',
+                   depends: [gflow_docs])
 endif
