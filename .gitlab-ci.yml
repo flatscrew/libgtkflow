@@ -25,4 +25,4 @@ build:
 test:
   stage: test
   script:
-    - cd build/test && xvfb ./test
+    - cd build/test && xvfb ./gflow_test
