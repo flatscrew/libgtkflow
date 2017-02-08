@@ -25,4 +25,4 @@ build:
 test:
   stage: test
   script:
-    - xvfb ./gflow_test
+    - xvfb-run ./gflow_test
