@@ -9,7 +9,7 @@ build:
   # instead of calling g++ directly you can also use some build toolkit like make
   # install the necessary build tools when needed
   before_script: 
-    - sudo apt update && sudo apt -y install meson valac libgtk-3-dev gobject-introspection xvfb valadoc
+    - sudo apt update && sudo apt -y install meson valac libgtk-3-dev gobject-introspection xvfb valadoc libgirepository1.0-dev
   script: 
     - mkdir build && cd build && meson .. && ninja
   artifacts:
