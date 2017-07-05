@@ -74,6 +74,7 @@ namespace GtkFlow {
         private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
 
         private List<weak Gtk.Widget> childlist = new List<Gtk.Widget>();
+        private HashTable<weak Gtk.Widget, ulong> childlist_alloc_handles = new HashTable<weak Gtk.Widget, ulong>(direct_hash, direct_equal);
 
         public Node (GFlow.Node n) {
             this.gnode = n;
@@ -156,6 +157,13 @@ namespace GtkFlow {
             this.show_all();
         }
 
+        public void on_child_size_allocate(Gtk.Allocation _) {
+            Gtk.Allocation alloc;
+            this.get_allocation(out alloc);
+            this.size_allocate(alloc);
+            this.node_view.queue_draw();
+        }
+
         public new void size_allocate(Gtk.Allocation alloc) {
             if (!this.get_visible() && !this.is_toplevel())
                 return;
@@ -197,12 +205,17 @@ namespace GtkFlow {
         public override void add(Gtk.Widget w) {
             w.set_parent(this);
             this.childlist.append(w);
+            ulong handle = w.size_allocate.connect(this.on_child_size_allocate);
+            this.childlist_alloc_handles.set(w, handle);
             if (this.get_realized())
                 this.render();
         }
 
         public override void remove(Gtk.Widget w) {
             w.unparent();
+            ulong handle = this.childlist_alloc_handles.get(w);
+            w.disconnect(handle);
+            this.childlist_alloc_handles.remove(w);
             this.childlist.remove_link(
                 this.childlist.find_custom(w, (x,y)=>{return (int)(x!=y);})
             );
