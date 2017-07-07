@@ -486,18 +486,27 @@ namespace GtkFlow {
                     }
                     this.resize_node.size_allocate(alloc);
                 }
-                int minwidth = 0, minheight = 0, _ = 0;
-                this.get_preferred_width(out minwidth, out _);
-                this.get_preferred_height(out minheight, out _);
-                this.set_size_request(minwidth, minheight);
-                Gtk.Allocation nv_alloc;
-                this.get_allocation(out nv_alloc);
-                nv_alloc.width = minwidth;
-                nv_alloc.height = minheight;
-                this.size_allocate(nv_alloc);
+                this.allocate_minimum();
                 this.queue_draw();
             }
             return false;
+        }
+
+        /**
+         * Allocates the minimum size needed to draw the
+         * contained nodes at their respective positions
+         * with their respective sizes to this NodeView
+         */
+        private void allocate_minimum() {
+            int minwidth = 0, minheight = 0, _ = 0;
+            this.get_preferred_width(out minwidth, out _);
+            this.get_preferred_height(out minheight, out _);
+            this.set_size_request(minwidth, minheight);
+            Gtk.Allocation nv_alloc;
+            this.get_allocation(out nv_alloc);
+            nv_alloc.width = minwidth;
+            nv_alloc.height = minheight;
+            this.size_allocate(nv_alloc);
         }
 
         /**
