@@ -177,6 +177,34 @@ namespace GFlow {
         }
 
         /**
+         * Gets all neighbor nodes that this node is connected to
+         */
+        public List<Node> get_neighbors() {
+            var result = new List<Node>();
+            foreach (Source source in this.get_sources()) {
+                foreach (Sink sink in source.sinks) {
+                    if (sink.node != null && result.index(sink.node) == -1)
+                        result.append(sink.node);
+                }
+            }
+            foreach (Sink sink in this.get_sinks()) {
+                if (sink.source != null) {
+                    if (sink.source.node != null && result.index(sink.source.node) == -1)
+                        result.append(sink.source.node);
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Returns true if the given node is directly connected
+         * to this node
+         */
+        public bool is_neighbor(Node n) {
+            return this.get_neighbors().index(n) != -1;
+        }
+
+        /**
          * Disconnect all connections from and to this node
          */
         public void unlink_all() {

@@ -167,13 +167,21 @@ namespace GtkFlow {
             }
         }
 
-        private Node? get_node_from_gflow_node(GFlow.Node gn) {
+        internal Node? get_node_from_gflow_node(GFlow.Node gn) {
             foreach (Node n in this.nodes) {
                 if (n.gnode == gn) {
                     return n;
                 }
             }
             return null;
+        }
+
+        /**
+         * Autolayout this graph
+         */
+        public void layout(Layout l) {
+            var passnodes = this.nodes.copy();
+            l.arrange(passnodes);
         }
 
         /**
@@ -621,6 +629,8 @@ namespace GtkFlow {
         public void set_node_position(GFlow.Node gn, int x, int y) {
             Node n = this.get_node_from_gflow_node(gn);
             n.set_position(x,y);
+            this.allocate_minimum();
+            this.queue_draw();
         }
 
         /**

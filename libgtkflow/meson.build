@@ -3,6 +3,7 @@ src = files([
     'node_renderer.vala',
     'node.vala',
     'nodeview.vala',
+    'layout.vala',
     'drawinghelper.c'
 ])
 

@@ -124,6 +124,14 @@ namespace GFlow {
          */
         public abstract unowned List<Sink> get_sinks ();
         /**
+         * Returns the Nodes that this Node is connected to
+         */
+        public abstract List<Node> get_neighbors();
+        /**
+         * Returns true if the given node is directly connected to this node
+         */
+        public abstract bool is_neighbor(Node n);
+        /**
          * Assign a {@link Source} to this Node
          */
         public abstract void add_source (Source source) throws NodeError;
