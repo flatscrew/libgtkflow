@@ -64,19 +64,19 @@ namespace GtkFlow {
                     alloc.y += forces[from].y;
                     this.node_view.set_node_position(from.gnode, alloc.x, alloc.y);
                 }
-                int min_x = 0;
-                int min_y = 0;
-                foreach (Node node in nodes) {
-                    var alloc = this.node_view.get_node_allocation(node.gnode);
-                    min_x = int.min(alloc.x, min_x);
-                    min_y = int.min(alloc.y, min_y);
-                }
-                foreach (Node node in nodes) {
-                    var alloc = this.node_view.get_node_allocation(node.gnode);
-                    alloc.x += min_x.abs();
-                    alloc.y += min_y.abs();
-                    this.node_view.set_node_position(node.gnode, alloc.x, alloc.y);
-                }
+            }
+            int min_x = 0;
+            int min_y = 0;
+            foreach (Node node in nodes) {
+                var alloc = this.node_view.get_node_allocation(node.gnode);
+                min_x = int.min(alloc.x, min_x);
+                min_y = int.min(alloc.y, min_y);
+            }
+            foreach (Node node in nodes) {
+                var alloc = this.node_view.get_node_allocation(node.gnode);
+                alloc.x += min_x.abs();
+                alloc.y += min_y.abs();
+                this.node_view.set_node_position(node.gnode, alloc.x, alloc.y);
             }
         }
 
