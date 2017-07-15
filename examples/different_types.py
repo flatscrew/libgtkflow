@@ -25,6 +25,7 @@ class ConcatNode(ExampleNode):
         self.result = GFlow.SimpleSource.new("")
         self.result.set_name("output")
         self.add_source(self.result)
+        self.result.set_value(None)
 
         self.string_a.connect("changed", self.do_concatenation)
         self.string_b.connect("changed", self.do_concatenation)
@@ -32,15 +33,8 @@ class ConcatNode(ExampleNode):
 
 
     def do_concatenation(self, dock, val=None):
-        val_a = val_b = ""
-        try:
-            val_a = self.string_a.get_value()
-        except:
-            pass
-        try:
-            val_b = self.string_b.get_value()
-        except:
-            pass
+        val_a = self.string_a.get_value(0) or ""
+        val_b = self.string_b.get_value(0) or ""
         self.result.set_value(val_a+val_b)
 
 class ConversionNode(ExampleNode):
@@ -52,16 +46,17 @@ class ConversionNode(ExampleNode):
         self.source = GFlow.SimpleSource.new("")
         self.source.set_name("output")
         self.add_source(self.source)
+        self.source.set_value(None)
 
         self.sink.connect("changed", self.do_conversion)
         self.set_name("Number2String")
 
     def do_conversion(self, dock, val=None):
-        try:
-            v = self.sink.get_value()
+        v = self.sink.get_value(0)
+        if v is not None:
             self.source.set_value(str(v))
-        except:
-            self.source.invalidate()
+        else:
+            self.source.set_value(None)
 
 class StringNode(ExampleNode):
     def __init__(self):
@@ -69,7 +64,6 @@ class StringNode(ExampleNode):
         
         self.source = GFlow.SimpleSource.new("")
         self.source.set_name("output")
-        self.source.set_valid()
         self.add_source(self.source)
 
         self.entry = Gtk.Entry()
@@ -93,6 +87,7 @@ class OperationNode(ExampleNode):
         self.result = GFlow.SimpleSource.new(float(0))
         self.result.set_name("result")
         self.add_source(self.result)
+        self.result.set_value(None)
 
         operations = ["+", "-", "*", "/"]
         self.combobox = Gtk.ComboBoxText()
@@ -110,11 +105,10 @@ class OperationNode(ExampleNode):
     def do_calculations(self, dock, val=None):
         op = self.combobox.get_active_text() 
         
-        try:
-            val_a = self.summand_a.get_value()
-            val_b = self.summand_b.get_value()
-        except:
-            self.result.invalidate()
+        val_a = self.summand_a.get_value(0)
+        val_b = self.summand_b.get_value(0)
+        if val_a is None or val_b is None:
+            self.result.set_value(None)
             return
     
         if op == "+":
@@ -126,13 +120,12 @@ class OperationNode(ExampleNode):
         elif op == "/":
             self.result.set_value(val_a/val_b)
         else:
-            self.result.invalidate()
+            self.result.set_value(None)
 
 class NumberNode(ExampleNode):
     def __init__(self, number=0):
         self.number = GFlow.SimpleSource.new(float(number))
         self.number.set_name("output")
-        self.number.set_valid()
         self.add_source(self.number)
         
         adjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
@@ -158,10 +151,10 @@ class PrintNode(ExampleNode):
         self.set_name("Output")
 
     def do_printing(self, dock, val=None):
-        try:
-            v = self.sink.get_value()
+        v = self.sink.get_value(0)
+        if v is not None:
             self.childlabel.set_text(v)
-        except:
+        else:
             self.childlabel.set_text("")
         
 class TypesExampleApplication(object):
