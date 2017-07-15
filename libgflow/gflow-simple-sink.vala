@@ -198,7 +198,7 @@ namespace GFlow {
         /**
          * Retrieve the {@link GLib.Value} that this SimpleSource currently holds.
          */
-        public Value? get_value(uint index) throws NodeError {
+        public Value? get_value(uint index=0) throws NodeError {
             if (this.val.length() > index)
                 return this.val.nth_data(index);
             else
