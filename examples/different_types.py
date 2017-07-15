@@ -61,7 +61,7 @@ class ConversionNode(ExampleNode):
 class StringNode(ExampleNode):
     def __init__(self):
         ExampleNode.__init__(self)
-        
+
         self.source = GFlow.SimpleSource.new("")
         self.source.set_name("output")
         self.add_source(self.source)
@@ -76,14 +76,13 @@ class StringNode(ExampleNode):
 
 class OperationNode(ExampleNode):
     def __init__(self):
-       
         self.summand_a = GFlow.SimpleSink.new(float(0))
         self.summand_b = GFlow.SimpleSink.new(float(0))
         self.summand_a.set_name("operand A")
         self.summand_b.set_name("operand B")
         self.add_sink(self.summand_a)
-        self.add_sink(self.summand_b)    
-    
+        self.add_sink(self.summand_b)
+
         self.result = GFlow.SimpleSource.new(float(0))
         self.result.set_name("result")
         self.add_source(self.result)
@@ -100,17 +99,17 @@ class OperationNode(ExampleNode):
         self.summand_b.connect("changed", self.do_calculations)
 
         self.set_name("Operation")
-    
+
 
     def do_calculations(self, dock, val=None):
-        op = self.combobox.get_active_text() 
-        
+        op = self.combobox.get_active_text()
+
         val_a = self.summand_a.get_value(0)
         val_b = self.summand_b.get_value(0)
         if val_a is None or val_b is None:
             self.result.set_value(None)
             return
-    
+
         if op == "+":
             self.result.set_value(val_a+val_b)
         elif op == "-":
@@ -127,7 +126,7 @@ class NumberNode(ExampleNode):
         self.number = GFlow.SimpleSource.new(float(number))
         self.number.set_name("output")
         self.add_source(self.number)
-        
+
         adjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
         self.spinbutton = Gtk.SpinButton()
         self.spinbutton.set_adjustment(adjustment)
@@ -156,7 +155,7 @@ class PrintNode(ExampleNode):
             self.childlabel.set_text(v)
         else:
             self.childlabel.set_text("")
-        
+
 class TypesExampleApplication(object):
     def __init__(self):
         w = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
@@ -183,13 +182,22 @@ class TypesExampleApplication(object):
         create_conversionnode_button.connect("clicked", self.do_create_conversionnode)
         hbox.add(create_conversionnode_button)
 
+        hbox.add(Gtk.Separator())
+        show_types_button = Gtk.Button("Show Types")
+        show_types_button.connect("clicked", self.do_show_types)
+        hbox.add(show_types_button)
+        hide_types_button = Gtk.Button("Hide Types")
+        hide_types_button.connect("clicked", self.do_hide_types)
+        hbox.add(hide_types_button)
+
+
         vbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         vbox.pack_start(hbox, False, False, 0)
         vbox.pack_start(self.nv, True, True, 0)
- 
+
         w.add(vbox)
         w.add(self.nv)
-        w.show_all()       
+        w.show_all()
         w.connect("destroy", self.do_quit)
         Gtk.main()
 
@@ -199,11 +207,9 @@ class TypesExampleApplication(object):
     def do_create_numbernode(self, widget=None, data=None):
         n = NumberNode()
         self.nv.add_with_child(n, n.spinbutton)
-        self.nv.set_show_types(False)
     def do_create_printnode(self, widget=None, data=None):
         n = PrintNode()
         self.nv.add_with_child(n, n.childlabel)
-        self.nv.set_show_types(True)
     def do_create_concatnode(self, widget=None, data=None):
         n = ConcatNode()
         self.nv.add_node(n)
@@ -212,6 +218,12 @@ class TypesExampleApplication(object):
         self.nv.add_with_child(n, n.entry)
     def do_create_conversionnode(self, widget=None, data=None):
         self.nv.add_node(ConversionNode())
+
+    def do_show_types(self, widget=None, data=None):
+        self.nv.set_show_types(True)
+    def do_hide_types(self, widget=None, data=None):
+        self.nv.set_show_types(False)
+
     def do_quit(self, widget=None, data=None):
         Gtk.main_quit()
         sys.exit(0)
