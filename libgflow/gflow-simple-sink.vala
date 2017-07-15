@@ -103,7 +103,7 @@ namespace GFlow {
         {
             if (this.initial.type() != s.initial.type()) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
-                    "Can't connect. Sink has type %s while Sink has type %s".printf(
+                    "Can't connect. Source has type %s while Sink has type %s".printf(
                         s.val.type().name(), this.initial.type().name()
                     )
                 );
