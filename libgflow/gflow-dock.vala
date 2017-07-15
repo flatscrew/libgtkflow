@@ -65,12 +65,6 @@ namespace GFlow {
         public abstract GLib.Value? initial { get; }
 
         /**
-         * This variable is true if the dock currently
-         * holds a valid value
-         */
-        public abstract bool valid { get; }
-
-        /**
          * This signal is being triggered, when there is a connection being established
          * from or to this Dock.
          */
@@ -86,12 +80,6 @@ namespace GFlow {
          * Triggers when the value of this dock changes
          */
         public signal void changed ();
-
-        /**
-         * Render this dock invalid. That means that entities that request to get
-         * the value will be provided with an invalid-Exception
-         */
-        public abstract void invalidate ();
 
         /**
          * Implementations should return true if this dock has at least one

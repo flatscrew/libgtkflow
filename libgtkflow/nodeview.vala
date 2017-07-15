@@ -702,7 +702,7 @@ namespace GtkFlow {
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
                         cr.save();
-                        if (source != null && source.valid) {
+                        if (source != null && source.val != null) {
                             double r=0, g=0, b=0;
                             this.hex2col(color_calculation(source.val),out r, out g, out b);
                             cr.set_source_rgba(r,g,b,1.0);

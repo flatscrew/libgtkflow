@@ -29,7 +29,6 @@ public class GFlowTest.SinkTest
       var s = new GFlow.SimpleSink (initial);
       assert (s.initial != null);
       assert (s.val.length() == 0);
-      assert (!s.valid);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -44,7 +43,6 @@ public class GFlowTest.SinkTest
       var src = new GFlow.SimpleSource (initial);
       assert (s.initial != null);
       assert (s.val.length() == 0);
-      assert (!s.valid);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -61,7 +59,6 @@ public class GFlowTest.SinkTest
       var src = new GFlow.SimpleSource (initial);
       assert (s.initial != null);
       assert (s.val.length() == 0);
-      assert (!s.valid);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);

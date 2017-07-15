@@ -27,7 +27,6 @@ namespace GFlow {
         // Dock interface
         protected HashTable<Source, weak GLib.Value?> _val;
         protected GLib.Value? _initial = null;
-        protected bool _valid = false;
 
         private string? _name = null;
         /**
@@ -61,10 +60,7 @@ namespace GFlow {
          * The value that this SimpleSink was initialized with
          */
         public GLib.Value? initial { get { return _initial; } }
-        /**
-         * If this value is true, the value of the SimpleSource is currently valid
-         */
-        public bool valid { get { return _valid; } }
+
         // Sink Interface
         private List<Source> _sources = new List<Source> ();
         /**
@@ -95,7 +91,7 @@ namespace GFlow {
          */
         protected void add_source (Source s) throws Error
         {
-            if (this.initial.type() != s.val.type()) {
+            if (this.initial.type() != s.initial.type()) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Sink has type %s while Sink has type %s".printf(
                         s.val.type().name(), this.initial.type().name()
@@ -114,6 +110,8 @@ namespace GFlow {
         {
             if (this._sources.index(s) != -1)
                 this._sources.remove(s);
+            if (this._val.contains(s))
+                this._val.remove(s);
             if (s.is_linked_to(this))
                 s.unlink (this);
             this.unlinked(s);
@@ -142,22 +140,13 @@ namespace GFlow {
         }
 
         /**
-         * Declare the value that this SimpleSink holds invalid. Any call to
-         * {@link SimpleSink.get_value} will result in a exception until this
-         * SimpleSink's {@link Source} supplies a new valid value
-         */
-        public void invalidate () {
-            this._valid = false;
-            this.changed ();
-        }
-
-        /**
          * Disconnect from the given {@link Dock}
          */
         public new void unlink (Dock dock) throws GLib.Error {
           if (!this.is_linked_to (dock)) return;
           if (dock is Source) {
             this.remove_source((Source) dock);
+            this.do_source_changed();
             dock.changed.disconnect (this.do_source_changed);
             changed();
             if (_sources.length () == 0) unlinked (dock);
@@ -197,7 +186,6 @@ namespace GFlow {
 
         /**
          * Retrieve the {@link GLib.Value} that this SimpleSource currently holds.
-         * If the value is invalid, an exception will be thrown.
          */
         public Value? get_value(uint index) throws NodeError {
             if (this.val.length() > index)

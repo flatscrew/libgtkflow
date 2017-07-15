@@ -63,7 +63,7 @@ namespace GFlow {
         public GLib.Value? val {
           get { return _val; }
           set {
-            if (!_val.holds (value.type ())) return;
+            if (value != null && !_initial.holds (value.type ())) return;
             _val = value;
             changed ();
           }
@@ -80,10 +80,7 @@ namespace GFlow {
          * The value that this SimpleSource was initialized with
          */
         public GLib.Value? initial { get { return _initial; } }
-        /**
-         * If this value is true, the value of the SimpleSource is currently valid
-         */
-        public bool valid { get { return _valid; } }
+
         // Source interface
         private List<Sink> _sinks = new List<Sink> ();
         /**
@@ -98,7 +95,7 @@ namespace GFlow {
          */
         protected void add_sink (Sink s) throws Error
         {
-            if (this.val.type() != s.initial.type()) {
+            if (this.initial.type() != s.initial.type()) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Sink has type %s while Source has type %s".printf(
                         s.initial.type().name(), this.val.type().name()
@@ -106,11 +103,7 @@ namespace GFlow {
                 );
             }
             this._sinks.append (s);
-            if (this.valid) {
-                //TODO: check wheter triggering signal isnt better
-                this.changed();
-                //s.initial = this.val;
-            }
+            this.changed();
         }
 
         /**
@@ -126,13 +119,6 @@ namespace GFlow {
         }
 
         /**
-         * Manually set this node to be valid. Use this if you initialized the SimpleSource
-         * with a value that you really want to be it's first value.
-         */
-        public new void set_valid() {
-            this._valid = true;
-        }
-        /**
          * Returns true if this Source is connected to the given Sink
          */
         public bool is_linked_to (Dock dock) {
@@ -145,16 +131,6 @@ namespace GFlow {
          */
         public bool is_linked () {
             return this.sinks.length () > 0;
-        }
-
-        /**
-         * Declare the value that this SimpleSource holds invalid. Subsequently
-         * All {@link Sink}s that are connected to this SimpleSource will be invalidated.
-         */
-        public void invalidate () {
-            _valid = false;
-            foreach (Sink s in this.sinks)
-                s.invalidate();
         }
 
         /**
@@ -194,16 +170,14 @@ namespace GFlow {
         /**
          * Set the value of this SimpleSource
          */
-        public void set_value (GLib.Value v) throws GLib.Error
+        public void set_value (GLib.Value? v) throws GLib.Error
         {
-            if (this.val.type() != v.type())
+            if (v != null && this.initial.type() != v.type())
                 throw new NodeError.INCOMPATIBLE_VALUE(
                     "Cannot set a %s value to this %s Source".printf(
                         v.type().name(),this.val.type().name())
                 );
             this.val = v;
-            this._valid = true;
-            changed ();
         }
     }
 }
