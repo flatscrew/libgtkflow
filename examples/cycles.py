@@ -45,8 +45,8 @@ class CountNode(ExampleNode):
         self.enable.set_name("enable")
         self.clock.set_name("clock")
         self.add_sink(self.enable)
-        self.add_sink(self.clock)    
-    
+        self.add_sink(self.clock)
+
         self.result = GFlow.SimpleSource.new(float(0))
         self.counted = GFlow.SimpleSource.new(float(0))
         self.result.set_name("result")
@@ -60,13 +60,10 @@ class CountNode(ExampleNode):
         self.set_name("Counter")
 
     def do_calculations(self, dock, val=None):
-        try:
-            enable = self.enable.get_value()
-            if enable != 1.0:
-                return
-        except:
+        enable = self.enable.get_value(0)
+        if enable != 1.0:
             return
-        
+
         if self.counter < self.target:
             self.counter += 1.0
             self.counted.set_value(self.counter)
@@ -84,11 +81,11 @@ class PrintNode(ExampleNode):
         self.set_name("Output")
 
     def do_printing(self, dock):
-        try:
-            n = self.number.get_value()
+        n = self.number.get_value(0)
+        if n is not None:
             print (n)
             self.childlabel.set_text(str(n))
-        except GLib.Error as e:
+        else:
             self.childlabel.set_text("")
 
 class CountDemo(object):
@@ -116,7 +113,7 @@ class CountDemo(object):
  
         w.add(vbox)
         w.add(self.nv)
-        w.show_all()       
+        w.show_all()
         w.connect("destroy", self.do_quit)
         Gtk.main()
 
