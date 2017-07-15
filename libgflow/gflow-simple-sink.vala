@@ -85,7 +85,6 @@ namespace GFlow {
             _val = value;
             this._valid = true;
             // FIXME: This properly is read-only then may let implementators to define how "Change a Value"
-            changed ();
           }*/
         }
 
@@ -169,6 +168,7 @@ namespace GFlow {
             foreach (Source s in this._sources) {
                 this._val.@set(s, s.val);
             }
+            changed ();
         }
 
         /**
@@ -199,12 +199,11 @@ namespace GFlow {
          * Retrieve the {@link GLib.Value} that this SimpleSource currently holds.
          * If the value is invalid, an exception will be thrown.
          */
-        public Value? get_value() throws NodeError {
-            if (!this.valid) {
-                throw new NodeError.INVALID("This sink does not hold a valid value");
-            } else {
-                return _val;
-            }
+        public Value? get_value(uint index) throws NodeError {
+            if (this.val.length() > index)
+                return this.val.nth_data(index);
+            else
+                return null;
         }
     }
 }

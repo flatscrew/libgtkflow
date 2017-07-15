@@ -42,8 +42,8 @@ class OperationNode(CalculatorNode):
         op = self.combobox.get_active_text() 
         
         try:
-            val_a = self.summand_a.get_value()
-            val_b = self.summand_b.get_value()
+            val_a = self.summand_a.get_value(0)
+            val_b = self.summand_b.get_value(0)
         except:
             self.result.invalidate()
             return
@@ -90,8 +90,7 @@ class PrintNode(CalculatorNode):
 
     def do_printing(self, dock):
         try:
-            n = self.number.get_value()
-            print (n)
+            n = self.number.get_value(0)
             self.childlabel.set_text(str(n))
         except GLib.Error as e:
             self.childlabel.set_text("")
