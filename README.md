@@ -4,6 +4,10 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
+![GtkFlowMultisink](https://i.imgur.com/4E53t0n.png)
+
+We now have Sinks that can receive data from multiple sources!
+
 ![GtkFlowColor](https://i.imgur.com/ZEOFKW6.png)
 
 A more recent screenshot showing off libgtkflow with Gtk > 3.20. It looks
