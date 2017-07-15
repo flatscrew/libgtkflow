@@ -44,6 +44,16 @@ namespace GFlow {
             get { return this._typename; }
             set { this._typename = value; }
         }
+
+        /**
+         * Defines how many sources can be connected to this sink
+         *
+         * Setting this variable to a lower value than the current
+         * amount of connected sources will have no further effects
+         * than not allowing more connections.
+         */
+        public uint max_sources {get; set; default=1;}
+
         /**
          * Indicates whether this Sink should be rendered highlighted
          */
@@ -165,9 +175,10 @@ namespace GFlow {
          */
         public new void link (Dock dock) throws GLib.Error {
             if (this.is_linked_to (dock)) return;
+            if (this._sources.length()+1 > this.max_sources && this.sources.length() > 0) {
+                this.unlink(this.sources.nth_data(this.sources.length()-1));
+            }
             if (dock is Source) {
-                // TODO: add optional link count maximum
-                //if (source != null) ((Dock) source).unlink (this);  
                 add_source((Source) dock);
                 changed();
                 dock.link (this);
