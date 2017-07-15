@@ -43,7 +43,7 @@ Motivation
 
 I love Flowgraphs in other programs and i want to have them in my favourite
 UI-toolkit Gtk. I ran into some programs which implemented similar functionality
-but they all didn't feel or even lokk very Gtk-like/GNOMEy.
+but they all didn't feel or even look very Gtk-like/GNOMEy.
 
 Possible Usages
 ---------------
