@@ -25,17 +25,16 @@ namespace GFlow {
      * A Source may be used by multitude of Sinks as a source of data.
      */
     public interface Source : Object, Dock {
-        public signal void updated ();
-        /*
-         * FIXME This should be read-only (when you get it from
-         * here this could be modified by user)
-         * FIXME May be the way to make sinks read-only is to
-         * return an owned copy of it to avoid writes on lists
-         */
         /**
          * Returns the sinks that this source is connected to
          */
         public abstract List<Sink> sinks { get; }
+
+        /**
+         * The value that is stored in this Dock
+         * TODO: Consider that this value could be a stream not a fixed value
+         */
+        public abstract GLib.Value? val { get; set; }
 
         /**
          * Disconnects the Source from all {@link Sink}s that it supplies

@@ -238,7 +238,7 @@ namespace GtkFlow {
                     this.drag_dock.active = true;
                     int startpos_x = 0, startpos_y = 0;
                     if (this.drag_dock is GFlow.Sink && this.drag_dock.is_linked()){
-                        GFlow.Source s = (this.drag_dock as GFlow.Sink).source;
+                        GFlow.Source s = (this.drag_dock as GFlow.Sink).sources.last().nth_data(0);
                         Node srcnode = this.get_node_from_gflow_node(s.node);
                         Gtk.Allocation src_alloc;
                         srcnode.get_allocation(out src_alloc);
@@ -338,14 +338,14 @@ namespace GtkFlow {
                         (this.drop_dock as GFlow.Source).link(this.drag_dock as GFlow.Sink);
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock is GFlow.Sink) {
-                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
+                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).sources.last().nth_data(0);
                         if (src != null) {
                             src.unlink(this.drag_dock as GFlow.Sink);
                             src.link(this.drop_dock as GFlow.Sink);
                         }
                     }
                     else if (this.drag_dock is GFlow.Sink && this.drop_dock == null) {
-                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).source;
+                        GFlow.Source? src = (this.drag_dock as GFlow.Sink).sources.last().nth_data(0);
                         if (src != null) {
                             src.unlink(this.drag_dock as GFlow.Sink);
                         }
@@ -569,7 +569,7 @@ namespace GtkFlow {
                         return false;
             }
             if (to is GFlow.Sink && from is GFlow.Sink) {
-                GFlow.Source? s = (from as GFlow.Sink).source;
+                GFlow.Source? s = (from as GFlow.Sink).sources.last().nth_data(0);
                 if (s == null)
                     return false;
                 if (!this.allow_recursion)

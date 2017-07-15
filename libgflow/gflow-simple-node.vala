@@ -168,8 +168,8 @@ namespace GFlow {
             if (!initial && this == from)
                 return true;
             foreach (Sink sink in this.sinks) {
-                if (sink.source != null) {
-                    if (sink.source.node.is_recursive_backward(from, false))
+                foreach (Source source in sink.sources) {
+                    if (source.node.is_recursive_backward(from, false))
                         return true;
                 }
             }
@@ -188,9 +188,9 @@ namespace GFlow {
                 }
             }
             foreach (Sink sink in this.get_sinks()) {
-                if (sink.source != null) {
-                    if (sink.source.node != null && result.index(sink.source.node) == -1)
-                        result.append(sink.source.node);
+                foreach (Source source in sink.sources) {
+                    if (source.node != null && result.index(source.node) == -1)
+                        result.append(source.node);
                 }
             }
             return result;

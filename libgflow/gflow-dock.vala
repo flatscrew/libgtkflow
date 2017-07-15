@@ -58,12 +58,6 @@ namespace GFlow {
         public abstract weak Node? node { get; set; }
 
         /**
-         * The value that is stored in this Dock
-         * TODO: Consider that this value could be a stream not a fixed value
-         */
-        public abstract GLib.Value? val { get; set; }
-
-        /**
          * The initial value that has been set to this dock
          * The dock will be set to this value when it is rendered
          * invalid
@@ -128,8 +122,8 @@ namespace GFlow {
          * Tries to resolve this Dock's value-type to a displayable string
          */
         public virtual string determine_typestring () {
-            if (this.val != null)
-                return this.val.type().name();
+            if (this.initial != null)
+                return this.initial.type().name();
             else
                 return "";
         }
@@ -139,7 +133,7 @@ namespace GFlow {
          * same type
          */
         public virtual bool has_same_type (Dock other) {
-            return this.val.type_name() == other.val.type_name();
+            return this.initial.type_name() == other.initial.type_name();
         }
     }
 }

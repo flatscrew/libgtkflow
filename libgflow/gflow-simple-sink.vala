@@ -25,7 +25,7 @@ namespace GFlow {
      */
     public class SimpleSink : Object, Dock, Sink {
         // Dock interface
-        protected GLib.Value? _val = null;
+        protected HashTable<Source, weak GLib.Value?> _val;
         protected GLib.Value? _initial = null;
         protected bool _valid = false;
 
@@ -66,43 +66,72 @@ namespace GFlow {
          */
         public bool valid { get { return _valid; } }
         // Sink Interface
-        protected weak Source? _source;
+        private List<Source> _sources = new List<Source> ();
         /**
-         * The {@link Source} that this SimpleSink is currently connected to
+         * The {@link Source}s that this SimpleSink is currently connected to
          */
-        public weak Source? source {
-            get{
-                return this._source;
-            }
-        }
+        public List<Source> sources { get { return _sources; } }
+
         /**
          * The value that this SimpleSink holds
          */
-        public GLib.Value? val {
-          get {
-            return _val;
+        public List<weak GLib.Value?> val {
+          public owned get {
+            var ret = _val.get_values();
+            return ret;
           }
-          set {
+          /*set {
             if (!_val.holds (value.type ())) return;
             _val = value;
             this._valid = true;
             // FIXME: This properly is read-only then may let implementators to define how "Change a Value"
             changed ();
-          }
+          }*/
         }
 
+        /**
+         * Connects this SimpleSink to the given {@link Source}. This will
+         * only succeed if both {@link Dock}s are of the same type. If this
+         * is not the case, an exception will be thrown
+         */
+        protected void add_source (Source s) throws Error
+        {
+            if (this.initial.type() != s.val.type()) {
+                throw new NodeError.INCOMPATIBLE_SINKTYPE(
+                    "Can't connect. Sink has type %s while Sink has type %s".printf(
+                        s.val.type().name(), this.initial.type().name()
+                    )
+                );
+            }
+            this._sources.append (s);
+            s.changed.connect (this.do_source_changed);
+            this._val.@set(s, s.val);
+        }
+
+        /**
+         * Destroys the connection between this SimpleSink and the given {@link Source}
+         */
+        protected void remove_source (Source s) throws GLib.Error
+        {
+            if (this._sources.index(s) != -1)
+                this._sources.remove(s);
+            if (s.is_linked_to(this))
+                s.unlink (this);
+            this.unlinked(s);
+        }
         /**
          * Creates a new SimpleSink with the given initial {@link GLib.Value}
          */
         public SimpleSink (GLib.Value? initial) {
-          _val = _initial = initial;
+          _val = new HashTable<Source, weak GLib.Value?>(direct_hash, direct_equal);
+          _initial = initial;
         }
 
         /**
-         * Returns true if this sink is connected to a source
+         * Returns true if this sink is connected to at least one source
          */
         public bool is_linked() {
-            return this.source != null;
+            return this.sources.length() > 0;
         }
 
         /**
@@ -110,7 +139,7 @@ namespace GFlow {
          */
         public bool is_linked_to (Dock dock) { // FIXME Use more logic to know Source type, value or name
             if (!(dock is Source)) return false;
-            return this.source ==  ((Source) dock);
+            return this._sources.index((Source) dock) != -1;
         }
 
         /**
@@ -129,19 +158,17 @@ namespace GFlow {
         public new void unlink (Dock dock) throws GLib.Error {
           if (!this.is_linked_to (dock)) return;
           if (dock is Source) {
-            if (source != null) {
-              source.unlink (this);
-            }
-            _source = null;
-            _valid = false;
+            this.remove_source((Source) dock);
             dock.changed.disconnect (this.do_source_changed);
             changed();
-            unlinked (dock);
+            if (_sources.length () == 0) unlinked (dock);
           }
         }
 
         private void do_source_changed() {
-            val = _source.val;
+            foreach (Source s in this._sources) {
+                this._val.@set(s, s.val);
+            }
         }
 
         /**
@@ -150,14 +177,11 @@ namespace GFlow {
         public new void link (Dock dock) throws GLib.Error {
             if (this.is_linked_to (dock)) return;
             if (dock is Source) {
-                if (source != null) ((Dock) source).unlink (this);
-                _source = (Source) dock;
-                val = _source.val;
-                if (!_source.valid)
-                    _valid = false;
+                // TODO: add optional link count maximum
+                //if (source != null) ((Dock) source).unlink (this);  
+                add_source((Source) dock);
                 changed();
                 dock.link (this);
-                _source.changed.connect (this.do_source_changed);
                 linked (dock);
             }
         }
@@ -166,8 +190,9 @@ namespace GFlow {
          * Disconnect from any {@link Dock} that this SimpleSink is connected to
          */
         public new void unlink_all() throws GLib.Error {
-            if (this.source != null)
-                this.unlink(this.source);
+            foreach (Source s in this._sources)
+                if (s != null)
+                    this.unlink(s);
         }
 
         /**

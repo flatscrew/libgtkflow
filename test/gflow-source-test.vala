@@ -80,8 +80,8 @@ public class GFlowTest.SourceTest
         if (fail)  assert_not_reached ();
         src.val = 20;
         assert (((int) src.val) == 20);
-        assert (((int) s1.val) == 20);
-        assert (((int) s2.val) == 20);
+        assert (((int) s1.val.nth_data(0)) == 20);
+        assert (((int) s2.val.nth_data(0)) == 20);
       } catch { assert_not_reached (); }
     });
     Test.add_func ("/gflow/source/derived", 

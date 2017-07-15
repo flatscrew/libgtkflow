@@ -98,16 +98,18 @@ namespace GFlow {
          */
         protected void add_sink (Sink s) throws Error
         {
-            if (this.val.type() != s.val.type()) {
+            if (this.val.type() != s.initial.type()) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Sink has type %s while Source has type %s".printf(
-                        s.val.type().name(), this.val.type().name()
+                        s.initial.type().name(), this.val.type().name()
                     )
                 );
             }
             this._sinks.append (s);
             if (this.valid) {
-                s.val = this.val;
+                //TODO: check wheter triggering signal isnt better
+                this.changed();
+                //s.initial = this.val;
             }
         }
 

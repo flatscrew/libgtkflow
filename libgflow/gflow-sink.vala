@@ -26,10 +26,18 @@ namespace GFlow {
      */
     public interface Sink : Object, Dock {
         /**
-         * The Source that this Sink gets its data from.
-         *
-         * User {@link Dock.link} to change {@link GFlow.Source}.
+         * Returns the sinks that this source is connected to
          */
-        public abstract weak Source? source { get; }
+        public abstract List<Source> sources { get; }
+
+        /**
+         * Disconnects the Sink from all {@link Source}s that supply
+         * it with data.
+         */
+        public virtual void unlink_all () throws GLib.Error
+        {
+            foreach (Source s in this.sources)
+                this.unlink (s);
+        }
     }
 }
