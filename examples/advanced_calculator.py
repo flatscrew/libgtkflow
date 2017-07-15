@@ -20,11 +20,12 @@ class OperationNode(CalculatorNode):
         self.summand_a.set_name("operand A")
         self.summand_b.set_name("operand B")
         self.add_sink(self.summand_a)
-        self.add_sink(self.summand_b)    
-    
+        self.add_sink(self.summand_b)
+
         self.result = GFlow.SimpleSource.new(float(0))
         self.result.set_name("result")
         self.add_source(self.result)
+        self.result.set_value(None)
 
         operations = ["+", "-", "*", "/"]
         self.combobox = Gtk.ComboBoxText()
@@ -40,14 +41,13 @@ class OperationNode(CalculatorNode):
 
     def do_calculations(self, dock, val=None):
         op = self.combobox.get_active_text() 
-        
-        try:
-            val_a = self.summand_a.get_value(0)
-            val_b = self.summand_b.get_value(0)
-        except:
-            self.result.invalidate()
+
+        val_a = self.summand_a.get_value(0)
+        val_b = self.summand_b.get_value(0)
+        if val_a is None or val_b is None:
+            self.result.set_value(None)
             return
-    
+
         if op == "+":
             self.result.set_value(val_a+val_b)
         elif op == "-":
@@ -57,14 +57,14 @@ class OperationNode(CalculatorNode):
         elif op == "/":
             self.result.set_value(val_a/val_b)
         else:
-            self.result.invalidate()
+            self.result.set_value(None)
 
 class NumberNode(CalculatorNode):
     def __init__(self, number=0):
         self.number = GFlow.SimpleSource.new(float(number))
         self.number.set_name("output")
         self.add_source(self.number)
-        
+
         adjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
         self.spinbutton = Gtk.SpinButton()
         self.spinbutton.set_adjustment(adjustment)
@@ -89,10 +89,10 @@ class PrintNode(CalculatorNode):
         self.set_name("Output")
 
     def do_printing(self, dock):
-        try:
-            n = self.number.get_value(0)
+        n = self.number.get_value(0)
+        if n is not None:
             self.childlabel.set_text(str(n))
-        except GLib.Error as e:
+        else:
             self.childlabel.set_text("")
 
 class Calculator(object):
@@ -117,7 +117,7 @@ class Calculator(object):
  
         w.add(vbox)
         w.add(self.nv)
-        w.show_all()       
+        w.show_all()
         w.connect("destroy", self.do_quit)
         Gtk.main()
 
