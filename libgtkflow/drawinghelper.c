@@ -150,6 +150,8 @@ void
 append_element (GtkWidgetPath *path,
                 const char    *selector)
 {
+  // >>>> gtk-3.18 fix
+  /*
   static const struct {
     const char    *name;
     GtkStateFlags  state_flag;
@@ -166,7 +168,7 @@ append_element (GtkWidgetPath *path,
     { "link",          GTK_STATE_FLAG_LINK },
     { "visited",       GTK_STATE_FLAG_VISITED },
     { "checked",       GTK_STATE_FLAG_CHECKED },
-    { "drop(active)",  GTK_STATE_FLAG_DROP_ACTIVE }
+    { "drop(active)",  GTK_STATE_FLAG_ACTIVE } // changed for compatibility with gtk 3.18
   };
   const char *next;
   char *name;
@@ -192,7 +194,7 @@ append_element (GtkWidgetPath *path,
     }
   else
     {
-      /* Omit type, we're using name */
+      // Omit type, we're using name
       gtk_widget_path_append_type (path, G_TYPE_NONE);
       gtk_widget_path_iter_set_object_name (path, -1, name);
     }
@@ -240,4 +242,6 @@ append_element (GtkWidgetPath *path,
 
       g_free (name);
     }
+  */
+  // <<<< gtk-3.18 fix
 }
