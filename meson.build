@@ -29,7 +29,7 @@ pkgconfig = import('pkgconfig')
 
 glib = dependency('glib-2.0')
 gobject = dependency('gobject-2.0')
-gtk = dependency('gtk+-3.0')
+gtk = dependency('gtk+-3.0', version: '>=3.20.0')
 math = meson.get_compiler('c').find_library('m', required: true)
 
 g_ir_compiler = find_program('g-ir-compiler')
