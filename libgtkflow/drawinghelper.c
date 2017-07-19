@@ -147,6 +147,28 @@ gtk_flow_draw_radio (GtkWidget     *widget,
 }
 
 void
+gtk_flow_draw_rubberband (GtkWidget *widget,
+            cairo_t     *cr,
+            gint        x,
+            gint        y,
+            GtkStateFlags state,
+            gint        *width,
+            gint        *height)
+{
+  GtkStyleContext *rubberband_context;
+
+  /* This information is taken from the GtkRadioButton docs, see "CSS nodes" */
+  rubberband_context = get_style (NULL, "flowbox.rubberband");
+
+  //*width = *height = 0;
+  query_size (rubberband_context, width, height);
+
+  draw_style_common (rubberband_context, cr, x, y, *width, *height, NULL, NULL, NULL, NULL);
+
+  g_object_unref (rubberband_context);
+}
+
+void
 append_element (GtkWidgetPath *path,
                 const char    *selector)
 {
