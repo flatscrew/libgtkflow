@@ -46,6 +46,11 @@ namespace GtkFlow {
         private int resize_start_x = 0;
         private int resize_start_y = 0;
 
+        // Remember positions of rubberband
+        private Gtk.Allocation? rubber_alloc = null;
+        private int rubber_start_x = 0;
+        private int rubber_start_y = 0;
+
         // Remember the last dock the mouse hovered over, so we can unhighlight it
         private GFlow.Dock? hovered_dock = null;
 
@@ -296,6 +301,10 @@ namespace GtkFlow {
                 this.drag_start_y = e.y;
                 this.drag_diff_x = (int)this.drag_start_x - alloc.x;
                 this.drag_diff_y = (int)this.drag_start_y - alloc.y;
+            } else {
+                this.rubber_alloc = {(int)e.x, (int)e.y, 0, 0};
+                this.rubber_start_x = (int)e.x;
+                this.rubber_start_y = (int)e.y;
             }
             return false;
         }
@@ -362,8 +371,12 @@ namespace GtkFlow {
         private void stop_dragging() {
             this.drag_start_x = 0;
             this.drag_start_y = 0;
+
             this.drag_diff_x = 0;
             this.drag_diff_y = 0;
+
+            this.rubber_alloc = null;
+
             this.drag_node = null;
             if (this.drag_dock != null) {
                 this.drag_dock.active = false;
@@ -496,6 +509,11 @@ namespace GtkFlow {
                 }
                 this.allocate_minimum();
                 this.queue_draw();
+            }
+            if (this.rubber_alloc != null) {
+                this.rubber_alloc.width = /*rubber_start_x +*/ (int)e.x - this.rubber_alloc.x;
+                this.rubber_alloc.height = /*rubber_start_y */ (int)e.y - this.rubber_alloc.y;
+                // TODO: calc marked nodes
             }
             return false;
         }
@@ -730,6 +748,13 @@ namespace GtkFlow {
                 cr.rel_curve_to(w,0,0,h,w,h);
                 cr.stroke();
             }
+            // Draw rubberband
+            if (this.rubber_alloc != null) {
+                draw_rubberband(this, cr,
+                                this.rubber_alloc.x, this.rubber_alloc.y,
+                                Gtk.StateFlags.NORMAL,
+                                &this.rubber_alloc.width, &this.rubber_alloc.height);
+            }
             return true;
         }
 
@@ -785,6 +810,17 @@ namespace GtkFlow {
      * Implemented in drawinghelper.c
      */
     private extern void draw_radio(Gtk.Widget widget,
+                                   Cairo.Context cr,
+                                   int x,
+                                   int y,
+                                   Gtk.StateFlags state,
+                                   int* width,
+                                   int* height);
+    /**
+     * Draw rubberband selection.
+     * Implemented in drawinghelper.c
+     */
+    private extern void draw_rubberband(Gtk.Widget widget,
                                    Cairo.Context cr,
                                    int x,
                                    int y,
