@@ -192,6 +192,15 @@ namespace GtkFlow {
             this.node_view.queue_draw();
         }
 
+        public unowned Gdk.Point get_position() {
+            Gtk.Allocation alloc;
+            this.get_allocation(out alloc);
+            Gdk.Point pos = Gdk.Point();
+            pos.x = alloc.x;
+            pos.y = alloc.y;
+            return pos;
+        }
+
         public unowned List<DockRenderer> get_dock_renderers() {
             return this.dock_renderers;
         }
@@ -248,8 +257,8 @@ namespace GtkFlow {
             attr.height = alloc.height;
             attr.visual = this.get_visual();
             attr.event_mask = this.get_events();
-            Gdk.WindowAttributesType mask = Gdk.WindowAttributesType.X 
-                 | Gdk.WindowAttributesType.X 
+            Gdk.WindowAttributesType mask = Gdk.WindowAttributesType.X
+                 | Gdk.WindowAttributesType.X
                  | Gdk.WindowAttributesType.VISUAL;
             var window = new Gdk.Window(this.get_parent_window(), attr, mask);
             this.set_window(window);
