@@ -26,7 +26,7 @@ namespace GtkFlow {
      */
     public class NodeView : Gtk.Container {
         private List<Node> nodes = new List<Node>();
-   
+
         // The node that is currently being dragged around
         private const int DRAG_THRESHOLD = 3;
         private Node? drag_node = null;
@@ -34,7 +34,7 @@ namespace GtkFlow {
         // Coordinates where the drag started
         private double drag_start_x = 0;
         private double drag_start_y = 0;
-        // Difference from the chosen drag-point to the 
+        // Difference from the chosen drag-point to the
         // upper left corner of the drag_node
         private int drag_diff_x = 0;
         private int drag_diff_y = 0;
@@ -634,6 +634,14 @@ namespace GtkFlow {
         }
 
         /**
+         * Return the position of the given {@link GFlow.Node} on this nodeview
+         */
+        public unowned Gdk.Point get_node_position(GFlow.Node gn) {
+            Node n = this.get_node_from_gflow_node(gn);
+            return n.get_position();
+        }
+
+        /**
          * Returns the allocation of the given {@link GFlow.Node}
          */
         public unowned Gtk.Allocation get_node_allocation(GFlow.Node gn) {
@@ -754,8 +762,8 @@ namespace GtkFlow {
                  | Gdk.EventMask.BUTTON_PRESS_MASK
                  | Gdk.EventMask.BUTTON_RELEASE_MASK
                  | Gdk.EventMask.LEAVE_NOTIFY_MASK;
-            Gdk.WindowAttributesType mask = Gdk.WindowAttributesType.X 
-                 | Gdk.WindowAttributesType.X 
+            Gdk.WindowAttributesType mask = Gdk.WindowAttributesType.X
+                 | Gdk.WindowAttributesType.X
                  | Gdk.WindowAttributesType.VISUAL;
             var window = new Gdk.Window(this.get_parent_window(), attr, mask);
             this.set_window(window);
@@ -771,7 +779,7 @@ namespace GtkFlow {
             nodes.foreach(n => cb(n));
         }
     }
-    
+
     /**
      * Draw radiobutton.
      * Implemented in drawinghelper.c
