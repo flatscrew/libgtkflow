@@ -575,6 +575,7 @@ namespace GtkFlow {
                 foreach (Node node in this.nodes) {
                     node.selected = selected_nodes.index(node) != -1;
                 }
+                this.queue_draw();
             }
             return false;
 
