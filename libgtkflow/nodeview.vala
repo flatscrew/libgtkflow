@@ -190,6 +190,23 @@ namespace GtkFlow {
         }
 
         /**
+         * Returns nodes that reside inside the given rectangle
+         */
+        private List<Node> get_nodes_in_rect(Gtk.Allocation alloc) {
+            var result = new List<Node>();
+            Gdk.Rectangle res;
+            Gtk.Allocation node_alloc;
+            foreach (Node n in this.nodes) {
+                n.get_allocation(out node_alloc);
+                node_alloc.union(alloc, out res);
+                if (alloc.equal(res)) {
+                    result.append(n);
+                }
+            }
+            return result;
+        }
+
+        /**
          * Remove a {@link GFlow.Node}  from this NodeView
          */
         public void remove_node(GFlow.Node n) {
@@ -226,14 +243,19 @@ namespace GtkFlow {
             GFlow.Dock? targeted_dock = null;
             Gdk.Point pos = {(int)e.x,(int)e.y};
             if (n != null) {
+                if (!n.selected) {
+                    this.unselect_all();
+                }
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
                 bool cbp = n.gnode.deletable && n.node_renderer.is_on_closebutton(
                     pos, alloc,
                     n.border_width
                 );
-                if (cbp)
+                if (cbp) {
                     this.close_button_pressed = true;
+                    this.unselect_all();
+                }
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
                     n.border_width, alloc
@@ -302,11 +324,37 @@ namespace GtkFlow {
                 this.drag_diff_x = (int)this.drag_start_x - alloc.x;
                 this.drag_diff_y = (int)this.drag_start_y - alloc.y;
             } else {
+                this.unselect_all();
                 this.rubber_alloc = {(int)e.x, (int)e.y, 0, 0};
                 this.rubber_start_x = (int)e.x;
                 this.rubber_start_y = (int)e.y;
             }
             return false;
+        }
+
+        public void unselect_all() {
+            foreach (Node n in this.nodes) {
+                n.selected = false;
+            }
+            this.queue_draw();
+        }
+
+        private List<Node> get_selected_nodes() {
+            var result = new List<Node>();
+            foreach (Node n in this.nodes) {
+                if (n.selected)
+                    result.append(n);
+            }
+            return result;
+        }
+
+        public List<GFlow.Node> get_selected() {
+            var result = new List<GFlow.Node>();
+            foreach (Node n in this.nodes) {
+                if (n.selected)
+                    result.append(n.gnode);
+            }
+            return result;
         }
 
         //Empty remove implementation to avoid warning message
@@ -476,11 +524,21 @@ namespace GtkFlow {
             if (this.drag_threshold_fulfilled ) {
                 Gtk.Allocation alloc;
                 if (this.drag_node != null) {
-                    // Actually move the node
-                    this.drag_node.get_allocation(out alloc);
-                    alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x);
-                    alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y);
-                    this.drag_node.size_allocate(alloc);
+                    // Actually move the node(s)
+                    var nodes_to_drag = this.get_selected_nodes();
+                    Gtk.Allocation drag_node_alloc;
+                    this.drag_node.get_allocation(out drag_node_alloc);
+                    if (nodes_to_drag.length() == 0) {
+                        nodes_to_drag.append(this.drag_node);
+                    }
+                    foreach (Node node in nodes_to_drag) {
+                        node.get_allocation(out alloc);
+                        int dn_diff_x = alloc.x - drag_node_alloc.x;
+                        int dn_diff_y = alloc.y - drag_node_alloc.y;
+                        alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x + dn_diff_x);
+                        alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y + dn_diff_y);
+                        node.size_allocate(alloc);
+                    }
                 }
                 if (this.drag_dock != null) {
                     // Manipulate the temporary connector
@@ -511,11 +569,15 @@ namespace GtkFlow {
                 this.queue_draw();
             }
             if (this.rubber_alloc != null) {
-                this.rubber_alloc.width = /*rubber_start_x +*/ (int)e.x - this.rubber_alloc.x;
-                this.rubber_alloc.height = /*rubber_start_y */ (int)e.y - this.rubber_alloc.y;
-                // TODO: calc marked nodes
+                this.rubber_alloc.width = (int)e.x - this.rubber_alloc.x;
+                this.rubber_alloc.height = (int)e.y - this.rubber_alloc.y;
+                var selected_nodes = this.get_nodes_in_rect(this.rubber_alloc);
+                foreach (Node node in this.nodes) {
+                    node.selected = selected_nodes.index(node) != -1;
+                }
             }
             return false;
+
         }
 
         /**
@@ -689,7 +751,8 @@ namespace GtkFlow {
                     (int)n.border_width,
                     this.editable,
                     n.gnode.deletable,
-                    n.gnode.resizable
+                    n.gnode.resizable,
+                    n.selected
                 );
                 n.current_cairo_ctx = null;
             }
