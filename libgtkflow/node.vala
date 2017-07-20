@@ -36,6 +36,8 @@ namespace GtkFlow {
 
         public NodeView? node_view {get; set; default=null;}
 
+        internal bool selected {get; set; default=false;}
+
         private NodeRenderer? _node_renderer = null;
         public NodeRenderer? node_renderer {
             get {return this._node_renderer;}

@@ -59,7 +59,8 @@ namespace GtkFlow {
                                        int border_width,
                                        bool editable,
                                        bool deletable,
-                                       bool resizable);
+                                       bool resizable,
+                                       bool selected);
         /**
          * Implementations should calculate whether there is a dock
          * on this node specified by the {@link Gdk.Point} p . If so,
@@ -372,7 +373,8 @@ namespace GtkFlow {
                                        int border_width,
                                        bool editable,
                                        bool deletable,
-                                       bool resizable) {
+                                       bool resizable,
+                                       bool selected) {
             var sc = this.get_style();
             sc.save();
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);
@@ -471,6 +473,10 @@ namespace GtkFlow {
                 cr.stroke();
                 cr.restore();
                 sc.restore();
+            }
+
+            if (selected) {
+                draw_rubberband(w, cr, alloc.x, alloc.y, Gtk.StateFlags.NORMAL, &alloc.width, &alloc.height);
             }
         }
     }
