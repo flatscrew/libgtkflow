@@ -534,12 +534,14 @@ namespace GtkFlow {
                     }
                     Gtk.Allocation union = {0,0,0,0};
                     bool first = true;
+                    Gdk.Point upperleft = {int.MAX,int.MAX};
                     foreach (Node node in nodes_to_drag) {
                         node.get_allocation(out alloc);
-                        int dn_diff_x = alloc.x - drag_node_alloc.x;
-                        int dn_diff_y = alloc.y - drag_node_alloc.y;
-                        alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x + dn_diff_x);
-                        alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y + dn_diff_y);
+                        upperleft.x = (int)Math.fmin(alloc.x, upperleft.x);
+                        upperleft.y = (int)Math.fmin(alloc.y, upperleft.y);
+                        alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x);
+                        alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y);
+
                         if (first) {
                             union = alloc;
                         } else {
@@ -548,16 +550,15 @@ namespace GtkFlow {
                             union = (Gtk.Allocation)tmp;
                         }
                     }
-                    message("%i %i", union.x, union.y);
-                    if (union.x > 0 && union.y > 0) {
-                        foreach (Node node in nodes_to_drag) {
-                            node.get_allocation(out alloc);
-                            int dn_diff_x = alloc.x - drag_node_alloc.x;
-                            int dn_diff_y = alloc.y - drag_node_alloc.y;
-                            alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x + dn_diff_x);
-                            alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y + dn_diff_y);
-                            node.size_allocate(alloc);
-                        }
+                    foreach (Node node in nodes_to_drag) {
+                        node.get_allocation(out alloc);
+                        int dn_diff_x = alloc.x - drag_node_alloc.x;
+                        int dn_diff_y = alloc.y - drag_node_alloc.y;
+                        int ul_diff_x = alloc.x - upperleft.x;
+                        int ul_diff_y = alloc.y - upperleft.y;
+                        alloc.x = (int)Math.fmax(ul_diff_x,(int)e.x - this.drag_diff_x + dn_diff_x);
+                        alloc.y = (int)Math.fmax(ul_diff_y,(int)e.y - this.drag_diff_y + dn_diff_y);
+                        node.size_allocate(alloc);
                     }
                 }
                 if (this.drag_dock != null) {
