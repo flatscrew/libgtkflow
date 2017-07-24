@@ -127,6 +127,7 @@ namespace GtkFlow {
          */
         public void add_node(GFlow.Node gn) {
             Node n = new Node(gn);
+            n.set_allocation({1,1,0,0});
             this.add_common(n);
         }
 
@@ -531,13 +532,32 @@ namespace GtkFlow {
                     if (nodes_to_drag.length() == 0) {
                         nodes_to_drag.append(this.drag_node);
                     }
+                    Gtk.Allocation union = {0,0,0,0};
+                    bool first = true;
                     foreach (Node node in nodes_to_drag) {
                         node.get_allocation(out alloc);
                         int dn_diff_x = alloc.x - drag_node_alloc.x;
                         int dn_diff_y = alloc.y - drag_node_alloc.y;
                         alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x + dn_diff_x);
                         alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y + dn_diff_y);
-                        node.size_allocate(alloc);
+                        if (first) {
+                            union = alloc;
+                        } else {
+                            Gdk.Rectangle tmp;
+                            union.union(alloc, out tmp);
+                            union = (Gtk.Allocation)tmp;
+                        }
+                    }
+                    message("%i %i", union.x, union.y);
+                    if (union.x > 0 && union.y > 0) {
+                        foreach (Node node in nodes_to_drag) {
+                            node.get_allocation(out alloc);
+                            int dn_diff_x = alloc.x - drag_node_alloc.x;
+                            int dn_diff_y = alloc.y - drag_node_alloc.y;
+                            alloc.x = (int)Math.fmax(0,(int)e.x - this.drag_diff_x + dn_diff_x);
+                            alloc.y = (int)Math.fmax(0,(int)e.y - this.drag_diff_y + dn_diff_y);
+                            node.size_allocate(alloc);
+                        }
                     }
                 }
                 if (this.drag_dock != null) {
