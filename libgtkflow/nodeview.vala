@@ -569,8 +569,20 @@ namespace GtkFlow {
                 this.queue_draw();
             }
             if (this.rubber_alloc != null) {
-                this.rubber_alloc.width = (int)e.x - this.rubber_alloc.x;
-                this.rubber_alloc.height = (int)e.y - this.rubber_alloc.y;
+                if (e.x >= this.rubber_start_x) {
+                    this.rubber_alloc.x = (int)this.rubber_start_x;
+                    this.rubber_alloc.width = (int)e.x - this.rubber_alloc.x;
+                } else {
+                    this.rubber_alloc.x = (int)e.x;
+                    this.rubber_alloc.width = this.rubber_start_x - (int)e.x;
+                }
+                if (e.y >= this.rubber_start_y) {
+                    this.rubber_alloc.y = (int)this.rubber_start_y;
+                    this.rubber_alloc.height = (int)e.y - this.rubber_alloc.y;
+                } else {
+                    this.rubber_alloc.y = (int)e.y;
+                    this.rubber_alloc.height = this.rubber_start_y - (int)e.y;
+                }
                 var selected_nodes = this.get_nodes_in_rect(this.rubber_alloc);
                 foreach (Node node in this.nodes) {
                     node.selected = selected_nodes.index(node) != -1;
