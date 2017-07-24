@@ -25,7 +25,7 @@ namespace GtkFlow {
          * Rearranges the Nodes on a nodeview according to the
          * algorithm that implements this method
          */
-        internal abstract void arrange(List<Node> nodes);
+        internal abstract void arrange(List<unowned Node> nodes);
     }
 
     public class ForceLayout : GLib.Object, Layout {
