@@ -141,8 +141,8 @@ namespace GtkFlow {
             }
 
             // Calculate x / y force components
-            double f_x = ((force / 2.0) / real_distance) * x_dist_real;
-            double f_y = ((force / 2.0) / real_distance) * y_dist_real;
+            double f_x = 1.5*((force / 2.0) / real_distance) * x_dist_real;
+            double f_y = 0.5*((force / 2.0) / real_distance) * y_dist_real;
 
             // Write out new allocation
             return {(int)Math.round(f_x), (int)Math.round(f_y)};
