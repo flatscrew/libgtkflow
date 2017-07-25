@@ -71,6 +71,15 @@ namespace GFlow {
         public signal void linked (Dock d);
 
         /**
+         * This signal is being triggered, before a connection is made
+         * between two docks. If the implementor returns false, the
+         * connection is not being made
+         */
+        public virtual signal bool before_linking (Dock self, Dock other){
+            return true;
+        }
+
+        /**
          * This signal is being triggered, when there is a connection being established
          * from or to this Dock.
          */

@@ -175,6 +175,7 @@ namespace GFlow {
          */
         public new void link (Dock dock) throws GLib.Error {
             if (this.is_linked_to (dock)) return;
+            if (!this.before_linking(this, dock)) return;
             if (this._sources.length()+1 > this.max_sources && this.sources.length() > 0) {
                 this.unlink(this.sources.nth_data(this.sources.length()-1));
             }
