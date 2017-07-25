@@ -897,7 +897,6 @@ namespace GtkFlow {
             this.set_window(window);
             this.register_window(window);
             this.set_realized(true);
-            window.set_background_pattern(null);
         }
 
         /**
