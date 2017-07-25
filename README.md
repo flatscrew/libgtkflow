@@ -50,11 +50,11 @@ Possible Usages
 
 Specific:
 
-  * Writing a UI for [GStreamer](http://gstreamer.org)
-  * Writing a UI for [Beehive](https://github.com/muesli/beehive)
+  * Writing an UI for [GStreamer](http://gstreamer.org)
+  * Writing an UI for [Beehive](https://github.com/muesli/beehive)
   * Replacement for the UI in [Gnuradio](http://gnuradio.org)
-  * Matching monitors / inputs / outputs in [Pavucontrol](http://freedesktop.org/software/pulseaudio/pavucontrol/)
-  * Writing a UI for [GEGL](http://gegl.org)
+  * Matching monitors / inputs / outputs in [Pavucontrol](http://freedesktop.org/software/pulseaudio/pavucontrol/) this is actually being worked on → [pulse-flow](https://github.com/benwaffle/pulse-flow)
+  * Writing an UI for [GEGL](http://gegl.org)
 
 Unspecific:
 
