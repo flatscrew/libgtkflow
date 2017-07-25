@@ -189,6 +189,7 @@ namespace GtkFlow {
          */
         public void remove_node(GFlow.Node n) {
             n.unlink_all();
+            n.deleted();
             Node gn = this.get_node_from_gflow_node(n);
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
