@@ -333,6 +333,9 @@ namespace GtkFlow {
             return false;
         }
 
+        /**
+         * Every currently selected node is being unselected
+         */
         public void unselect_all() {
             foreach (Node n in this.nodes) {
                 n.selected = false;
@@ -349,6 +352,9 @@ namespace GtkFlow {
             return result;
         }
 
+        /**
+         * Returns each {@link GFlow.Node} that is currently selected
+         */
         public List<GFlow.Node> get_selected() {
             var result = new List<GFlow.Node>();
             foreach (Node n in this.nodes) {
