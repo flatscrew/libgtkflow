@@ -208,6 +208,12 @@ namespace GtkFlow {
         }
 
         /**
+         * This signal is being triggered when a node is
+         * being removed from this NodeView
+         */
+        public signal void node_removed(GFlow.Node n);
+
+        /**
          * Remove a {@link GFlow.Node}  from this NodeView
          */
         public void remove_node(GFlow.Node n) {
@@ -218,6 +224,7 @@ namespace GtkFlow {
                 gn.node_view = null;
                 assert (gn is Gtk.Widget);
                 (gn as Gtk.Widget).destroy();
+                this.node_removed(n);
                 this.queue_draw();
             }
         }
