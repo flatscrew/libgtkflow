@@ -75,6 +75,10 @@ namespace GFlow {
          * This signal is being triggered when a {@link Source} is removed from this Node
          */
         public signal void source_removed (Source s);
+        /**
+         * This signal is being triggered when the node is deleted.
+         */
+        public signal bool deleted ();
 
         /**
          * This node's name
