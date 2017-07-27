@@ -4,34 +4,34 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
-![GtkFlowMultisink](https://i.imgur.com/4E53t0n.png)
+![GtkFlowMultisink](./screenshots/multisink.png)
 
 We now have Sinks that can receive data from multiple sources!
 
-![GtkFlowColor](https://i.imgur.com/ZEOFKW6.png)
+![GtkFlowColor](./screenshots/gtk3-20.png)
 
 A more recent screenshot showing off libgtkflow with Gtk > 3.20. It looks
 a bit clearer.
 
-![LibGtkFlow](https://i.imgur.com/N10yBKP.png)
+![LibGtkFlow](./screenshots/broadway.png)
 
 This is libgtkflow running inside firefox via broadway ↑
 
-![GtkFlowWindows](https://i.imgur.com/lna1nfB.png)
+![GtkFlowWindows](./screenshots/windows.png)
 
 GtkFlow runs unter that strange M$-operating-system, too ↑
 
-![GtkFlowRes](https://i.imgur.com/RL6Fl3R.png)
+![GtkFlowRes](./screenshots/resize.png)
 
 The newest stuff in libgtkflow's development ↑
 Nodes can be deleted by clicking the X-button in the upper right corner.
 Nodes are resizable by drag-n-dropping the lower right corner. The types of the docks can be printed along with their names
 
-![GtkFlowEvopop](http://i.imgur.com/s7qbTPT.png)
+![GtkFlowEvopop](./screenshots/evopop.png)
 
 This is a screenshot of libgtkflow rendered with the evopop Gtk3 theme ↑
 
-![GtkFlow](https://i.imgur.com/BWcXGkV.png)
+![GtkFlow](./screenshots/first_shot.png)
 
 This here is the included advanced calculator demo application ↑
 
