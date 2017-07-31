@@ -839,7 +839,7 @@ namespace GtkFlow {
                     Gdk.Point source_pos = {source_pos_x,source_pos_y};
                     foreach(GFlow.Sink sink in source.sinks) {
                         // Don't draw the connection to a sink if we are dragging it
-                        if (sink == this.drag_dock)
+                        if (sink == this.drag_dock && source == sink.sources.last().nth_data(0))
                             continue;
                         Node? sink_node = this.get_node_from_gflow_node(sink.node);
                         sink_node.get_allocation(out alloc);
