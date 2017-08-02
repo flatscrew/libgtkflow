@@ -199,7 +199,7 @@ namespace GtkFlow {
             foreach (Node n in this.nodes) {
                 n.get_allocation(out node_alloc);
                 node_alloc.union(alloc, out res);
-                if (alloc.equal(res)) {
+                if (alloc.x == res.x && alloc.y == res.y && alloc.width == res.width && alloc.height == res.height) {
                     result.append(n);
                 }
             }
