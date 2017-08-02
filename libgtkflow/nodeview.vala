@@ -657,11 +657,11 @@ namespace GtkFlow {
             }
             if (this.rubber_alloc != null) {
                 x_min = Math.fmin(x_min, rubber_alloc.x);
-                x_max = Math.fmax(x_min, rubber_alloc.x + rubber_alloc.width);
+                x_max = Math.fmax(x_max, rubber_alloc.x + rubber_alloc.width);
             }
             if (this.temp_connector != null) {
                 x_min = Math.fmin(x_min, temp_connector.x);
-                x_max = Math.fmax(x_min, temp_connector.x + temp_connector.width);
+                x_max = Math.fmax(x_max, temp_connector.x + temp_connector.width);
             }
             x_min = Math.fmax(0, x_min);
             minimum_width = natural_width = (int)x_max - (int)x_min;
@@ -680,11 +680,11 @@ namespace GtkFlow {
             }
             if (this.rubber_alloc != null) {
                 y_min = Math.fmin(y_min, rubber_alloc.y);
-                y_max = Math.fmax(y_min, rubber_alloc.y + rubber_alloc.height);
+                y_max = Math.fmax(y_max, rubber_alloc.y + rubber_alloc.height);
             }
             if (this.temp_connector != null) {
                 y_min = Math.fmin(y_min, temp_connector.y);
-                y_max = Math.fmax(y_min, temp_connector.y + temp_connector.height);
+                y_max = Math.fmax(y_max, temp_connector.y + temp_connector.height);
             }
             y_min = Math.fmax(0, y_min);
             minimum_height = natural_height = (int)y_max - (int)y_min;
