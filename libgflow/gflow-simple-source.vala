@@ -163,7 +163,7 @@ namespace GFlow {
          * Disconnect from any {@link Dock} that this SimplesSource is connected to
          */
         public new void unlink_all () throws GLib.Error {
-            foreach (Sink s in this._sinks)
+            foreach (Sink s in this._sinks.copy())
                 if (s != null)
                     this.unlink(s);
         }

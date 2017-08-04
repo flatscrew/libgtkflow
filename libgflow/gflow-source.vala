@@ -35,15 +35,5 @@ namespace GFlow {
          * TODO: Consider that this value could be a stream not a fixed value
          */
         public abstract GLib.Value? val { get; set; }
-
-        /**
-         * Disconnects the Source from all {@link Sink}s that it supplies
-         * with data.
-         */
-        public virtual void unlink_all () throws GLib.Error
-        {
-            foreach (Sink s in this.sinks)
-                this.unlink (s);
-        }
     }
 }
