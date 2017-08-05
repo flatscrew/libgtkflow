@@ -808,6 +808,12 @@ namespace GtkFlow {
                 n.current_cairo_ctx = cr;
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
+                var node_properties = NodeProperties();
+                node_properties.editable = this.editable;
+                node_properties.deletable = n.gnode.deletable;
+                node_properties.resizable = n.gnode.resizable;
+                node_properties.selected = n.selected;
+
                 n.node_renderer.draw_node(
                     this,
                     cr,
@@ -815,10 +821,7 @@ namespace GtkFlow {
                     n.get_dock_renderers(),
                     n.get_childlist(),
                     (int)n.border_width,
-                    this.editable,
-                    n.gnode.deletable,
-                    n.gnode.resizable,
-                    n.selected
+                    node_properties
                 );
                 n.current_cairo_ctx = null;
             }

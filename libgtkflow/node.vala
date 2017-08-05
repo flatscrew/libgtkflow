@@ -291,4 +291,11 @@ namespace GtkFlow {
             this.size_allocate(alloc);
         }
     }
+
+    public struct NodeProperties {
+        bool editable;
+        bool deletable;
+        bool resizable;
+        bool selected;
+    }
 }

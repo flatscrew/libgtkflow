@@ -57,10 +57,7 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       bool editable,
-                                       bool deletable,
-                                       bool resizable,
-                                       bool selected);
+                                       NodeProperties node_properties);
         /**
          * Implementations should calculate whether there is a dock
          * on this node specified by the {@link Gdk.Point} p . If so,
@@ -371,10 +368,11 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       bool editable,
-                                       bool deletable,
-                                       bool resizable,
-                                       bool selected) {
+                                       NodeProperties node_properties) {
+            bool editable = node_properties.editable;
+            bool deletable = node_properties.deletable;
+            bool resizable = node_properties.resizable;
+            bool selected = node_properties.selected;
             var sc = this.get_style();
             sc.save();
             sc.render_background(cr, alloc.x, alloc.y, alloc.width, alloc.height);
