@@ -621,6 +621,7 @@ namespace GtkFlow {
                 foreach (Node node in this.nodes) {
                     node.selected = selected_nodes.index(node) != -1;
                 }
+                this.allocate_minimum();
                 this.queue_draw();
             }
             return false;
