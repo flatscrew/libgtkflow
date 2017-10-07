@@ -155,17 +155,20 @@ gtk_flow_draw_rubberband (GtkWidget *widget,
             gint        *width,
             gint        *height)
 {
-  GtkStyleContext *rubberband_context;
+  // >>> gtk-3.18 fix - segfaults
 
-  /* This information is taken from the GtkRadioButton docs, see "CSS nodes" */
-  rubberband_context = get_style (NULL, "flowbox.rubberband");
+  //GtkStyleContext *rubberband_context;
+  ///* This information is taken from the GtkRadioButton docs, see "CSS nodes" */
+  //rubberband_context = get_style (NULL, "flowbox.rubberband");
 
-  //*width = *height = 0;
-  query_size (rubberband_context, width, height);
+  ////*width = *height = 0;
+  //query_size (rubberband_context, width, height);
 
-  draw_style_common (rubberband_context, cr, x, y, *width, *height, NULL, NULL, NULL, NULL);
+  //draw_style_common (rubberband_context, cr, x, y, *width, *height, NULL, NULL, NULL, NULL);
 
-  g_object_unref (rubberband_context);
+  //g_object_unref (rubberband_context);
+  // <<< gtk-3.18 fix - segfaults
+
 }
 
 void
