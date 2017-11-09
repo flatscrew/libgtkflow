@@ -632,6 +632,12 @@ namespace GtkFlow {
          * Allocates the minimum size needed to draw the
          * contained nodes at their respective positions
          * with their respective sizes to this NodeView
+         * If the minimunsize is smaller than the containing
+         * parent (which ideally should be a scrolledwindow
+         * scrolledwindow) the parent's size will be allocated
+         * in order to prevent the nodeview from collapsing
+         * to a size of 0x0 px thus being inable to receive
+         * mouse-events
          */
         private void allocate_minimum() {
             int minwidth = 0, minheight = 0, _ = 0;
@@ -642,6 +648,14 @@ namespace GtkFlow {
             this.get_allocation(out nv_alloc);
             nv_alloc.width = minwidth;
             nv_alloc.height = minheight;
+
+            if (this.parent != null) {
+                Gtk.Allocation palloc;
+                this.parent.get_allocation(out palloc);
+                nv_alloc.width = int.max(minwidth, palloc.width);
+                nv_alloc.height = int.max(minheight, palloc.height);
+            }
+
             this.size_allocate(nv_alloc);
         }
 
