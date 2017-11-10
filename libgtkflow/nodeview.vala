@@ -70,7 +70,9 @@ namespace GtkFlow {
          * Example:  red would be "ff0000"
          */
         public virtual signal string color_calculation(GLib.Value v) {
-            return "000000";
+            Gtk.StyleContext sc = this.get_style_context();
+            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
+            return "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
         }
 
         /**
@@ -911,8 +913,12 @@ namespace GtkFlow {
             b = col_h2f(hexdigits.index_of_char(hex[4]) * 16 + hexdigits.index_of_char(hex[5]));
         }
 
-        private double col_h2f(int col) {
+        private double col_h2f(uint col) {
             return col/255.0f;
+        }
+
+        private uint col_f2h(double col) {
+            return (uint)int.parse( (col*255.0d).to_string() ).abs();
         }
 
         /**
