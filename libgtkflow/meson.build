@@ -1,6 +1,8 @@
 src = files([
     'dock_renderer.vala',
     'node_renderer.vala',
+    'default_node_renderer.vala',
+    'dockline_node_renderer.vala',
     'node.vala',
     'nodeview.vala',
     'layout.vala',

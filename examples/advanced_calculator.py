@@ -124,9 +124,11 @@ class Calculator(object):
     def do_create_addnode(self, widget=None, data=None):
         n = OperationNode()
         self.nv.add_with_child(n, n.combobox)
+        self.nv.set_node_renderer(n, GtkFlow.DocklineNodeRenderer())
     def do_create_numbernode(self, widget=None, data=None):
         n = NumberNode()
         self.nv.add_with_child(n, n.spinbutton)
+        self.nv.set_node_renderer(n, GtkFlow.DocklineNodeRenderer())
     def do_create_printnode(self, widget=None, data=None):
         n = PrintNode()
         self.nv.add_with_child(n, n.childlabel)
