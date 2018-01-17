@@ -220,7 +220,8 @@ namespace GtkFlow {
             int x = p.x;
             int y = p.y;
 
-            int i = 0;
+            int source_count = 0;
+            int sink_count = 0;
 
             int dock_x, dock_y, mh;
             uint title_offset;
@@ -233,19 +234,21 @@ namespace GtkFlow {
                     if (s is GFlow.Sink) {
                         dock_x = alloc.x + (int)border_width;
                         dock_y = alloc.y + (int)border_width + (int)title_offset
-                                 + i * mh;
+                                 + sink_count * mh;
                         if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                                 && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                             return s;
+                        sink_count++;
                     } else if (s is GFlow.Source) {
                         dock_x = alloc.x + alloc.width
                                  - (int)border_width
                                  - dock_renderer.dockpoint_height;
                         dock_y = alloc.y + (int)border_width + (int)title_offset
-                                 + i * mh;
+                                 + source_count * mh;
                         if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                                 && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                             return s;
+                        source_count++;
                     }
                 } else {
                     if (s is GFlow.Sink) {
@@ -253,20 +256,21 @@ namespace GtkFlow {
                                  - (int)border_width
                                  - dock_renderer.dockpoint_height;
                         dock_y = alloc.y + (int)border_width + (int)title_offset
-                                 + i * mh;
+                                 + sink_count * mh;
                         if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                                 && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                             return s;
+                        sink_count++;
                     } else if (s is GFlow.Source) {
                         dock_x = alloc.x + (int)border_width;
                         dock_y = alloc.y + (int)border_width + (int)title_offset
-                                 + i * mh;
+                                 + source_count * mh;
                         if (x > dock_x && x < dock_x + dock_renderer.dockpoint_height
                                 && y > dock_y && y < dock_y + dock_renderer.dockpoint_height )
                             return s;
+                        source_count++;
                     }
                 }
-                i++;
             }
             return null;
         }
