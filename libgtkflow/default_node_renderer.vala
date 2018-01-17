@@ -274,7 +274,6 @@ namespace GtkFlow {
                                        List<Gtk.Widget> children,
                                        int border_width,
                                        NodeProperties node_properties) {
-            message("wooo");
             bool editable = node_properties.editable;
             bool deletable = node_properties.deletable;
             bool resizable = node_properties.resizable;
