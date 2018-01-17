@@ -198,11 +198,14 @@ namespace GtkFlow {
                             y += alloc.y + border_width + (int)title_offset
                                       + dock_renderer.dockpoint_height/2 + i
                                       * dock_renderer.get_min_height();
+                            message("pos: x→%i y→%i",x,y);
                             return true;
                         }
                     }
                 }
-                i++;
+                if (s.get_type() == d.get_type()) {
+                    i++;
+                }
             }
             return false;
         }
