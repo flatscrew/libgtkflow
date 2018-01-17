@@ -34,6 +34,10 @@ namespace GtkFlow {
 
 
         private uint get_title_line_height() {
+            // FIXME: this is a bad solution. it should not happen in the first place
+            //        probably related to the remaining Pango-CRITICALs. but it works.
+            if (this.layout == null)
+                return 25;
             int width, height;
             this.layout.get_pixel_size(out width, out height);
             return (uint)Math.fmax(height, delete_btn_size) + title_spacing;
