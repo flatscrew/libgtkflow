@@ -4,6 +4,10 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
+![SameLineDocks](./screenshots/sameline.png)
+
+Sinks and Sources may now appear on the same line
+
 ![GtkFlowMultisink](./screenshots/multisink.png)
 
 We now have Sinks that can receive data from multiple sources!
