@@ -202,7 +202,6 @@ namespace GtkFlow {
                             y += alloc.y + border_width + (int)title_offset
                                       + dock_renderer.dockpoint_height/2 + i
                                       * dock_renderer.get_min_height();
-                            message("pos: x→%i y→%i",x,y);
                             return true;
                         }
                     }
@@ -296,7 +295,6 @@ namespace GtkFlow {
                                        List<Gtk.Widget> children,
                                        int border_width,
                                        NodeProperties node_properties) {
-            message("wee");
             bool editable = node_properties.editable;
             bool deletable = node_properties.deletable;
             bool resizable = node_properties.resizable;
