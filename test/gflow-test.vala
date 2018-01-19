@@ -1,6 +1,6 @@
 /* -*- Mode: vala; indent-tabs-mode: t; c-basic-offset: 2; tab-width: 2 -*- */
 /********************************************************************
-# Copyright 2014-2017 Daniel 'grindhold' Brendle, 2015 Daniel Espinosa <esodan@gmail.com>
+# Copyright 2014-2018 Daniel 'grindhold' Brendle, 2015 Daniel Espinosa <esodan@gmail.com>
 #
 # This file is part of libgflow.
 #
