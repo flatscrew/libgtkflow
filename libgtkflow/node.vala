@@ -75,7 +75,7 @@ namespace GtkFlow {
 
         private List<DockRenderer?> dock_renderers = new List<DockRenderer?>();
 
-        private List<weak Gtk.Widget> childlist = new List<Gtk.Widget>();
+        private List<Gtk.Widget> childlist = new List<Gtk.Widget>();
         private HashTable<weak Gtk.Widget, ulong> childlist_alloc_handles = new HashTable<weak Gtk.Widget, ulong>(direct_hash, direct_equal);
 
         public Node (GFlow.Node n) {
@@ -232,7 +232,7 @@ namespace GtkFlow {
             );
         }
 
-        public unowned List<weak Gtk.Widget> get_childlist() {
+        public unowned List<Gtk.Widget> get_childlist() {
             return this.childlist;
         }
 

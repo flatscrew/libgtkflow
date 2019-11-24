@@ -31,7 +31,7 @@ public abstract class GtkFlowTest.TestApp : GLib.Object
   public bool @continue { get; set; default = true; }
   public string test_prefix { get; set; default = "/gtkflow"; }
   public bool status { get; set; default = true; }
-  public TestApp ()
+  protected TestApp ()
   {
     window = new Gtk.Window (Gtk.WindowType.TOPLEVEL);
     result = new Gtk.Label ("Running Tests: " + test_prefix);
