@@ -63,5 +63,5 @@ if get_option('enable_valadoc')
                                  output: 'devhelp')
     install_subdir(meson.current_build_dir() + '/../devhelp/gtkflow-' + api + '/gtkflow-' + api,
                    install_dir: get_option('datadir') + '/devhelp/books',
-                   depends: [gtkflow_docs])
+                   )
 endif

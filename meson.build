@@ -19,7 +19,7 @@
 # If not, see http://www.gnu.org/licenses/.
 #*********************************************************************
 
-project ('gtkflow', 'vala', 'c', meson_version: '>=0.37.1')
+project ('gtkflow', 'vala', 'c', meson_version: '>=0.46.1')
 # If you can verify that this project also builds with a lower
 # meson version, feel free to change the meson_version kwarg
 
