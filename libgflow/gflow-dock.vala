@@ -80,10 +80,11 @@ namespace GFlow {
         }
 
         /**
-         * This signal is being triggered, when there is a connection being established
-         * from or to this Dock.
+         * This signal is being triggered, when there is a connection being removed
+         * from or to this Dock. If this the last connection of the dock, the
+         * boolean parameter last will be set to true.
          */
-        public signal void unlinked (Dock d);
+        public signal void unlinked (Dock d, bool last);
 
         /**
          * Triggers when the value of this dock changes

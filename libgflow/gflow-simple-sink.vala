@@ -122,9 +122,10 @@ namespace GFlow {
                 this._sources.remove(s);
             if (this._val.contains(s))
                 this._val.remove(s);
-            if (s.is_linked_to(this))
+            if (s.is_linked_to(this)) {
                 s.unlink (this);
-            this.unlinked(s);
+                this.unlinked(s, this._sources.length () == 0);
+            }
         }
         /**
          * Creates a new SimpleSink with the given initial {@link GLib.Value}
@@ -159,7 +160,6 @@ namespace GFlow {
             this.do_source_changed();
             dock.changed.disconnect (this.do_source_changed);
             changed();
-            if (_sources.length () == 0) unlinked (dock);
           }
         }
 
