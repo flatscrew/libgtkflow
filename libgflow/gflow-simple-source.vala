@@ -139,10 +139,10 @@ namespace GFlow {
          */
         public new void unlink (Dock dock) throws GLib.Error
         {
-          if (!this.is_linked_to (dock)) return;
-          if (dock is Sink) {
-            remove_sink ((Sink) dock);
-          }
+            if (!this.is_linked_to (dock)) return;
+            if (dock is Sink) {
+                remove_sink ((Sink) dock);
+            }
         }
 
         /**
@@ -150,13 +150,13 @@ namespace GFlow {
          */
         public new void link (Dock dock) throws GLib.Error
         {
-          if (!this.before_linking(this, dock)) return;
-          if (dock is Sink) {
-            if (this.is_linked_to (dock)) return;
-            add_sink ((Sink) dock);
-            dock.link (this);
-            linked (dock);
-          }
+            if (!this.before_linking(this, dock)) return;
+            if (dock is Sink) {
+                if (this.is_linked_to (dock)) return;
+                add_sink ((Sink) dock);
+                dock.link (this);
+                linked (dock);
+            }
         }
 
         /**

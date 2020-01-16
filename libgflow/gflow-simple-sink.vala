@@ -131,8 +131,8 @@ namespace GFlow {
          * Creates a new SimpleSink with the given initial {@link GLib.Value}
          */
         public SimpleSink (GLib.Value? initial) {
-          _val = new HashTable<Source, weak GLib.Value?>(direct_hash, direct_equal);
-          _initial = initial;
+            _val = new HashTable<Source, weak GLib.Value?>(direct_hash, direct_equal);
+            _initial = initial;
         }
 
         /**
@@ -154,13 +154,13 @@ namespace GFlow {
          * Disconnect from the given {@link Dock}
          */
         public new void unlink (Dock dock) throws GLib.Error {
-          if (!this.is_linked_to (dock)) return;
-          if (dock is Source) {
-            this.remove_source((Source) dock);
-            this.do_source_changed();
-            dock.changed.disconnect (this.do_source_changed);
-            changed();
-          }
+            if (!this.is_linked_to (dock)) return;
+            if (dock is Source) {
+                this.remove_source((Source) dock);
+                this.do_source_changed();
+                dock.changed.disconnect (this.do_source_changed);
+                changed();
+            }
         }
 
         private void do_source_changed() {
