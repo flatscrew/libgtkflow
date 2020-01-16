@@ -1,3 +1,4 @@
 # Vim buffer files
+*.c
 .*.sw*
 build/
