@@ -145,10 +145,32 @@ namespace GtkFlow {
         /**
          * This tells the NodeView to use another {@link NodeRenderer} than
          * the DefaultNodeRenderer for the given {@link GFlow.Node}
+         *
+         * If you want to use one of libgtkflow's internal node renderers,
+         * you can just pass the parameter nrt with one of the values in
+         * {@link GtkFlow.NodeRendererType}. If you want to place a custom
+         * renderer, set nrt to {@link GtkFlow.NodeRendererType.CUSTOM} and
+         * pass the instance of your custom node renderer to the third parameter
+         * called nr.
          */
-        public void set_node_renderer(GFlow.Node gn, NodeRenderer nr) {
+        public void set_node_renderer(GFlow.Node gn, NodeRendererType nrt, NodeRenderer? nr=null) throws GFlow.NodeError, NodeRendererError {
             Node n = this.get_node_from_gflow_node(gn);
-            n.node_renderer = nr;
+            switch (nrt) {
+                case NodeRendererType.DOCKLINE:
+                    n.node_renderer = new DocklineNodeRenderer(n);
+                    break;
+                case NodeRendererType.DEFAULT:
+                    n.node_renderer = new DefaultNodeRenderer(n);
+                    break;
+                case NodeRendererType.CUSTOM:
+                    if (nr == null) {
+                        throw new NodeRendererError.NO_CUSTOM_NODE_RENDERER("You must pass a valid node renderer, not null");
+                    }
+                    n.node_renderer = nr;
+                    break;
+                default:
+                    throw new NodeRendererError.NOT_A_NODE_RENDERER("This is not a valid node renderer");
+            }
             this.queue_draw();
         }
 

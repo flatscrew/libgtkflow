@@ -20,6 +20,36 @@
 *********************************************************************/
 
 namespace GtkFlow {
+    /**
+     * Representations of libgtkflows internal NodeRenderer-Types
+     */
+    public enum NodeRendererType {
+        DOCKLINE,
+        DEFAULT,
+        CUSTOM
+    }
+
+    /**
+     * Errors concerning NodeRenderer
+     */
+    public errordomain NodeRendererError {
+        /**
+         * If you pass a invalid value to {@link GtkFlow.NodeView.set_node_renderer}
+         * Thats not within {@link GtkFlow.NodeRendererType}
+         */
+        NOT_A_NODE_RENDERER,
+        /**
+         * You passed a null value to a function that needs to be passed a
+         * {@link GtkFlow.NodeRenderer}-implementation instance
+         */
+        NO_CUSTOM_NODE_RENDERER,
+    }
+
+    /**
+     * Implementing this class in your application enables you to represent
+     * your {@link GFlow.Nodes} in a completely customized manner by entirely
+     * drawing them yourself.
+     */
     public abstract class NodeRenderer : GLib.Object {
         /**
          * Default value for the spacing between the title and the first dock
