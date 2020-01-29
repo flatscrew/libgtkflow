@@ -28,6 +28,13 @@ namespace GtkFlow {
         internal abstract void arrange(List<unowned Node> nodes);
     }
 
+    /**
+     * Spring-Simulation mechanism autolayouter
+     *
+     * THIS FEATURE IS VERY EXPERIMENTAL. USE AT YOUR OWN RISK.
+     * IT WILL VERY LIKELY SEGFAULT AND MAYBE RID YOUR ACCOUNT
+     * OF ALL YOUR METICUOUSLY COLLECTED FLURBOS.
+     */
     public class ForceLayout : GLib.Object, Layout {
         /**
          * Desired spacing between nodes in pixels
