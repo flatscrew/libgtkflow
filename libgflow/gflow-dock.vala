@@ -73,7 +73,11 @@ namespace GFlow {
         /**
          * This signal is being triggered, before a connection is made
          * between two docks. If the implementor returns false, the
-         * connection is not being made
+         * connection is not being made.
+         * IMPORTANT: Connect to this signal with connect_after
+         * otherwise this default handler will be called after the
+         * signal you implemented, thus always returning true,
+         * rendering your code ineffective.
          */
         public virtual signal bool before_linking (Dock self, Dock other){
             return true;
