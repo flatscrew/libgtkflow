@@ -53,10 +53,10 @@ class AddNode(ExampleNode):
         res = 0
         for summand in self.summands:
             try:
-                val = summand.get_value()
+                val = summand.get_value(0)
                 res += val
             except:
-                self.result.invalidate()
+                self.result.set_value(None)
                 return
     
         self.result.set_value(res)
@@ -110,7 +110,6 @@ class OperationNode(ExampleNode):
 class NumberNode(ExampleNode):
     def __init__(self, number=0):
         self.number = GFlow.SimpleSource.new(float(number))
-        self.number.set_valid()
         self.number.set_name("output")
         self.add_source(self.number)
         
@@ -138,7 +137,7 @@ class PrintNode(ExampleNode):
 
     def do_printing(self, dock):
         try:
-            n = self.number.get_value()
+            n = self.number.get_value(0)
             print (n)
             self.childlabel.set_text(str(n))
         except:
