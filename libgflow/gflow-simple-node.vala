@@ -27,8 +27,8 @@ namespace GFlow {
      */
     public class SimpleNode : Object, Node
     {
-        private List<Source> sources = new List<Source>();
-        private List<Sink> sinks = new List<Sink>();
+        private List<Source> sources;
+        private List<Sink> sinks;
 
         /**
          * This SimpleNode's name
@@ -44,6 +44,12 @@ namespace GFlow {
          * Determines wheter the node can resized by the user
          */
         public bool resizable { get; set; default=true;}
+
+        public SimpleNode() {
+            base();
+            this.sources = new List<Source>();
+            this.sinks = new List<Sink>();
+        }
 
         /**
          * Add the given {@link Source} to this SimpleNode
