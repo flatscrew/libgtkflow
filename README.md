@@ -96,6 +96,13 @@ $ ninja
 # sudo ninja install
 ```
 
+A user of the library (thx @gavr) reported:
+
+"I have no idea why, but on OpenSUSE Tumbleweed pkgbuild will only be able to find gtkFlow if you build it like that:"
+```
+meson _build --buildtype=release --prefix=/usr
+```
+
 Examples
 --------
 
