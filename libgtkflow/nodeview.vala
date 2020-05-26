@@ -509,12 +509,16 @@ namespace GtkFlow {
                 Gdk.Point pos = {(int)e.x, (int)e.y};
                 Gtk.Allocation alloc;
                 n.get_allocation(out alloc);
-                bool cbp = n.node_renderer.is_on_closebutton(
-                    pos, alloc,
-                    n.border_width
-                );
-                if (!cbp)
-                    this.close_button_pressed = false;
+                // If the close button is pressed, deactivate it when
+                // we moved the node
+                if (this.close_button_pressed) {
+                    bool cbp = n.node_renderer.is_on_closebutton(
+                        pos, alloc,
+                        n.border_width
+                    );
+                    if (!cbp)
+                        this.close_button_pressed = false;
+                }
                 // Update cursor if we are on the resize area
                 bool on_resize = n.gnode.resizable && n.node_renderer.is_on_resize_handle(
                     pos, alloc,
