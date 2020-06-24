@@ -1,13 +1,13 @@
-#!/usr/bin/vala
-//Compile $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.2 --pkg gtkflow-0.2
-//Run ./minimal.vala --pkg gtk+-3.0 --pkg gtkflow-0.2 --pkg gflow-0.2
+#!/usr/bin/env -S vala --pkg gtk+-3.0 --pkg gtkflow-0.4 --pkg gflow-0.4
+// Run: $ ./minimal.vala
+// Compile: $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.4 --pkg gtkflow-0.4
 using Gtk;
 using GFlow;
 GtkFlow.NodeView nv;
 void main(string[] args)
 {
     Gtk.init(ref args);
- 
+
     var window = new Window();
     window.set_default_size(400, 300);
     window.destroy.connect(Gtk.main_quit);
@@ -15,7 +15,7 @@ void main(string[] args)
     bar.show_close_button = true;
     bar.title = "GTK Flow!";
     window.set_titlebar(bar);
-    
+
     var sw = new ScrolledWindow(null,null);
     nv = new GtkFlow.NodeView();
     var btn = new Button.with_label("Add Node");
