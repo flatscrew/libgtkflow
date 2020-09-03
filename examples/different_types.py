@@ -127,7 +127,7 @@ class NumberNode(ExampleNode):
         self.number.set_name("output")
         self.add_source(self.number)
 
-        adjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        adjustment = Gtk.Adjustment.new(0, 0, 100, 1, 10, 0)
         self.spinbutton = Gtk.SpinButton()
         self.spinbutton.set_adjustment(adjustment)
         self.spinbutton.set_size_request(50,20)
