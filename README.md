@@ -116,8 +116,8 @@ Note: If you installed the library in /usr/local, you have to export the followi
 environment variables for the examples to work:
 
 ```
-$ export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
-$ export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0/
+export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
+export GI_TYPELIB_PATH=/usr/local/lib/x86_64-linux-gnu/girepository-1.0/
 ```
 
 Please be aware that on other architectures than amd64 you will have to change the
