@@ -47,7 +47,7 @@ namespace GtkFlow {
 
     /**
      * Implementing this class in your application enables you to represent
-     * your {@link GFlow.Nodes} in a completely customized manner by entirely
+     * your {@link GFlow.Node}s in a completely customized manner by entirely
      * drawing them yourself.
      */
     public abstract class NodeRenderer : GLib.Object {
