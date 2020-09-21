@@ -55,9 +55,15 @@ if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
     gflow_docs = custom_target('gflow_apidocs',
                                input: src,
-                               command: [valadoc, '-o', 'devhelp/gflow-' + api, '--doclet', 'devhelp', '@INPUT@', '--force'],
-                               output: 'devhelp')
-    install_subdir(meson.current_build_dir() + '/../devhelp/gflow-' + api + '/gflow-' + api,
+                               install: true,
+                               # FIXME: Installing to tmp, so the target will be built
+                               #        the problem is we cannot access a subfolder of the
+                               #        buildtarget via the output parameter.
+                               #        Find a nicer solution
+                               install_dir: '/tmp',
+                               command: [valadoc, '-o', 'libgflow/gflow-' + api, '--doclet', 'devhelp', '@INPUT@', '--force'],
+                               output: 'gflow-' + api)
+    install_subdir(meson.current_build_dir() + '/gflow-' + api + '/gflow-' + api,
                    install_dir: get_option('datadir') + '/devhelp/books',
                    )
 endif
