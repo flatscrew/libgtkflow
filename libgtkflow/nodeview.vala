@@ -215,6 +215,13 @@ namespace GtkFlow {
         }
 
         /**
+         * Used by {@link GtkFlow.Minimap} to get info about nodes.
+         */
+        internal unowned List<Node> get_nodes(){
+            return this.nodes;
+        }
+
+        /**
          * Returns nodes that reside inside the given rectangle
          */
         private List<Node> get_nodes_in_rect(Gtk.Allocation alloc) {
