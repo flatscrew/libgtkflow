@@ -182,7 +182,8 @@ namespace GtkFlow {
                 alloc.width = mw;
             if (alloc.height < mh)
                 alloc.height = mh;
-            (this as Gtk.Widget).size_allocate(alloc);
+
+            ((Gtk.Widget)this).size_allocate(alloc);
         }
 
         public void set_position(int x, int y) {
