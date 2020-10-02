@@ -830,6 +830,16 @@ namespace GtkFlow {
         }
 
         /**
+         * Manually set the allocation of the given {@link GFlow.Node} on this nodeview
+         */
+        public void set_node_allocation(GFlow.Node gn, Gtk.Allocation alloc) {
+            Node n = this.get_node_from_gflow_node(gn);
+            n.set_allocation(alloc);
+            this.allocate_minimum();
+            this.queue_draw();
+        }
+
+        /**
          * Return the position of the given {@link GFlow.Node} on this nodeview
          */
         public unowned Gdk.Point get_node_position(GFlow.Node gn) {
