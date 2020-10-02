@@ -115,14 +115,12 @@ namespace GtkFlow {
          */
         public override bool draw(Cairo.Context cr) {
             Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA bg = sc.get_background_color(Gtk.StateFlags.NORMAL);
-            cr.set_source_rgba(bg.red, bg.green, bg.blue, bg.alpha);
-            cr.paint();
-
+            Gtk.Allocation own_alloc;
+            this.get_allocation(out own_alloc);
+            sc.render_background(cr, 0, 0, own_alloc.width, own_alloc.height);
 
             if (this._nodeview != null) {
-                Gtk.Allocation own_alloc, nv_alloc;
-                this.get_allocation(out own_alloc);
+                Gtk.Allocation nv_alloc;
                 this._nodeview.get_allocation(out nv_alloc);
                 this.offset_x = 0;
                 this.offset_y = 0;

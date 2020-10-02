@@ -849,9 +849,10 @@ namespace GtkFlow {
 
         private bool do_draw(Cairo.Context cr) {
             Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA bg = sc.get_background_color(Gtk.StateFlags.NORMAL);
-            cr.set_source_rgba(bg.red, bg.green, bg.blue, bg.alpha);
-            cr.paint();
+            Gtk.Allocation nv_alloc;
+            this.get_allocation(out nv_alloc);
+            sc.render_background(cr, 0, 0, nv_alloc.width, nv_alloc.height);
+
             // Draw nodes
             this.nodes.reverse();
             foreach (Node n in this.nodes) {
