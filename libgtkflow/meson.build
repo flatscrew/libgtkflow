@@ -3,6 +3,7 @@ src = files([
     'node_renderer.vala',
     'default_node_renderer.vala',
     'dockline_node_renderer.vala',
+    'minimap.vala',
     'node.vala',
     'nodeview.vala',
     'layout.vala',
