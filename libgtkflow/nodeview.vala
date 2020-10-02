@@ -937,7 +937,7 @@ namespace GtkFlow {
                                 Gtk.StateFlags.NORMAL,
                                 &this.rubber_alloc.width, &this.rubber_alloc.height);
             }
-            return true;
+            return false;
         }
 
         private void hex2col(string hex, out double r, out double g, out double b) {
