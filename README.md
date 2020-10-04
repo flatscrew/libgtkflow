@@ -70,8 +70,12 @@ Unspecific:
 Stability
 -------------
 
-Consider the API unstable for now.
-You will encounter bugs.
+Core features are implemented and work quite well.
+API undergoes additions from time to time. The project is not at 1.0 yet
+as such, API can break but we don't expect fundamental breaking changes
+to core features anytime soon. If we introduce additional features, we
+try to offer them as additional API methods rather than changing existing
+ones.
 
 Building
 --------
@@ -79,7 +83,7 @@ Building
 Make sure you get the following Dependencies:
 
   * libgtk-3-dev
-  * gobject-introspection
+  * gobject-introspection (libgirepository1.0-dev)
   * meson
   * vala
   * (valadoc)
