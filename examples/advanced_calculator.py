@@ -2,6 +2,8 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('GtkFlow', '0.6')
+gi.require_version('GFlow', '0.6')
 
 from gi.repository import GLib
 from gi.repository import Gtk
@@ -104,13 +106,13 @@ class Calculator(object):
         self.nv = GtkFlow.NodeView.new()
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
-        create_numbernode_button = Gtk.Button("Create NumberNode")
+        create_numbernode_button = Gtk.Button.new_with_label("Create NumberNode")
         create_numbernode_button.connect("clicked", self.do_create_numbernode)
         hbox.add(create_numbernode_button)
-        create_addnode_button = Gtk.Button("Create OperationNode")
+        create_addnode_button = Gtk.Button.new_with_label("Create OperationNode")
         create_addnode_button.connect("clicked", self.do_create_addnode)
         hbox.add(create_addnode_button)
-        create_printnode_button = Gtk.Button("Create PrintNode")
+        create_printnode_button = Gtk.Button.new_with_label("Create PrintNode")
         create_printnode_button.connect("clicked", self.do_create_printnode)
         hbox.add(create_printnode_button)
 
@@ -119,7 +121,6 @@ class Calculator(object):
         vbox.pack_start(self.nv, True, True, 0)
  
         w.add(vbox)
-        w.add(self.nv)
         w.show_all()
         w.connect("destroy", self.do_quit)
         Gtk.main()
