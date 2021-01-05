@@ -93,6 +93,7 @@ namespace GtkFlow {
             this.node_renderer.update_name_layout(this.gnode.name);
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
+                this.recalculate_size();
             });
 
             this.set_border_width(this.node_renderer.resize_handle_size);
@@ -121,9 +122,11 @@ namespace GtkFlow {
             dr.size_changed.connect(()=>{this.render();});
             d.notify["name"].connect(()=>{
                 dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
+                this.recalculate_size();
             });
             d.notify["typename"].connect(()=>{
                 dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
+                this.recalculate_size();
             });
             d.changed.connect(()=>{this.render();});
             this.dock_renderers.append(dr);
