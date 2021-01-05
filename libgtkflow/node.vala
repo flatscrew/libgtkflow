@@ -101,7 +101,6 @@ namespace GtkFlow {
         }
 
         public void render() {
-            this.recalculate_size();
             if (this.node_view != null) {
                 this.node_view.queue_draw();
             }
