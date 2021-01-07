@@ -2,6 +2,8 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('GFlow', '0.6')
+gi.require_version('GtkFlow', '0.6')
 
 from gi.repository import GLib
 from gi.repository import Gtk
@@ -166,30 +168,30 @@ class TypesExampleApplication(object):
         self.nv.set_show_types(True)
 
         hbox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-        create_numbernode_button = Gtk.Button("Create NumberNode")
+        create_numbernode_button = Gtk.Button.new_with_label("Create NumberNode")
         create_numbernode_button.connect("clicked", self.do_create_numbernode)
         hbox.add(create_numbernode_button)
-        create_addnode_button = Gtk.Button("Create OperationNode")
+        create_addnode_button = Gtk.Button.new_with_label("Create OperationNode")
         create_addnode_button.connect("clicked", self.do_create_addnode)
         hbox.add(create_addnode_button)
-        create_printnode_button = Gtk.Button("Create PrintNode")
+        create_printnode_button = Gtk.Button.new_with_label("Create PrintNode")
         create_printnode_button.connect("clicked", self.do_create_printnode)
         hbox.add(create_printnode_button)
-        create_concatnode_button = Gtk.Button("Create ConcatenationNode")
+        create_concatnode_button = Gtk.Button.new_with_label("Create ConcatenationNode")
         create_concatnode_button.connect("clicked", self.do_create_concatnode)
         hbox.add(create_concatnode_button)
-        create_stringnode_button = Gtk.Button("Create StringNode")
+        create_stringnode_button = Gtk.Button.new_with_label("Create StringNode")
         create_stringnode_button.connect("clicked", self.do_create_stringnode)
         hbox.add(create_stringnode_button)
-        create_conversionnode_button = Gtk.Button("Create ConversionNode")
+        create_conversionnode_button = Gtk.Button.new_with_label("Create ConversionNode")
         create_conversionnode_button.connect("clicked", self.do_create_conversionnode)
         hbox.add(create_conversionnode_button)
 
         hbox.add(Gtk.Separator())
-        show_types_button = Gtk.Button("Show Types")
+        show_types_button = Gtk.Button.new_with_label("Show Types")
         show_types_button.connect("clicked", self.do_show_types)
         hbox.add(show_types_button)
-        hide_types_button = Gtk.Button("Hide Types")
+        hide_types_button = Gtk.Button.new_with_label("Hide Types")
         hide_types_button.connect("clicked", self.do_hide_types)
         hbox.add(hide_types_button)
 
