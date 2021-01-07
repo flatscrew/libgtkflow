@@ -201,7 +201,6 @@ class TypesExampleApplication(object):
         vbox.pack_start(self.nv, True, True, 0)
 
         w.add(vbox)
-        w.add(self.nv)
         w.show_all()
         w.connect("destroy", self.do_quit)
         Gtk.main()
