@@ -34,7 +34,7 @@ namespace GtkFlow {
 
         public GFlow.Node gnode {public get; private set; default = null;}
 
-        public NodeView? node_view {get; set; default=null;}
+        public NodeView? node_view {get; internal set; default=null;}
 
         internal bool selected {get; set; default=false;}
 
@@ -94,6 +94,10 @@ namespace GtkFlow {
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
                 this.recalculate_size();
+            });
+
+            this.notify["node-view"].connect(()=>{
+                this.render_all();
             });
 
             this.set_border_width(this.node_renderer.resize_handle_size);
