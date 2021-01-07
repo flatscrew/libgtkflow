@@ -78,7 +78,16 @@ namespace GtkFlow {
         /**
          * Determines whether docks should be rendered with type-indicators
          */
-        public bool show_types {get; set; default=false;}
+        public bool show_types {
+            get {
+                return this._show_types;
+            }
+            set {
+                this._show_types = value;
+                this.render_all();
+            }
+        }
+        private bool _show_types = false;
 
         /**
          * Determines whether the displayed Nodes can be edited by the user
@@ -106,7 +115,6 @@ namespace GtkFlow {
             this.motion_notify_event.connect((e)=>{ return this.do_motion_notify_event(e); });
             this.button_press_event.connect((e)=>{ return this.do_button_press_event(e); });
             this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
-            this.notify["show-types"].connect(()=>{this.render_all();});
         }
 
         private void add_common(Node n) {

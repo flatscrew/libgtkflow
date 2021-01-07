@@ -114,6 +114,7 @@ namespace GtkFlow {
                 if (dr != null) {
                     bool show_types = this.node_view != null ? this.node_view.show_types : false;
                     dr.update_name_layout(show_types);
+                    this.recalculate_size();
                 }
         }
 
