@@ -124,7 +124,7 @@ namespace GtkFlow {
 
         private void register_dock(GFlow.Dock d) {
             DefaultDockRenderer dr = new DefaultDockRenderer(this, d);
-            dr.size_changed.connect(()=>{this.render();});
+            dr.size_changed.connect(this.render);
             d.notify["name"].connect(()=>{
                 dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
                 this.recalculate_size();
@@ -133,7 +133,7 @@ namespace GtkFlow {
                 dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
                 this.recalculate_size();
             });
-            d.changed.connect(()=>{this.render();});
+            d.changed.connect(this.render);
             this.dock_renderers.append(dr);
             dr.update_name_layout(this.node_view != null ? this.node_view.show_types : false);
             if (this.get_realized())

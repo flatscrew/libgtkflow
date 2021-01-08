@@ -65,7 +65,7 @@ namespace GFlow {
           set {
             if (value != null && !_initial.holds (value.type ())) return;
             _val = value;
-            changed ();
+            changed(new CompositeValue.from_single_source(this));
           }
         }
         /**
@@ -103,7 +103,7 @@ namespace GFlow {
                 );
             }
             this._sinks.append (s);
-            this.changed();
+            this.changed(new CompositeValue.from_single_source(this));
         }
 
         /**
@@ -171,7 +171,7 @@ namespace GFlow {
         /**
          * Set the value of this SimpleSource
          */
-        public void set_value (GLib.Value? v) throws GLib.Error
+        public void set_value (GLib.Value? v, string? flow_id = null) throws GLib.Error
         {
             if (v != null && this.initial.type() != v.type())
                 throw new NodeError.INCOMPATIBLE_VALUE(

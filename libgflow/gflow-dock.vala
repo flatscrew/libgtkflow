@@ -93,7 +93,7 @@ namespace GFlow {
         /**
          * Triggers when the value of this dock changes
          */
-        public signal void changed ();
+        public signal void changed(CompositeValue value, string? flow_id = null);
 
         /**
          * Implementations should return true if this dock has at least one
@@ -136,6 +136,28 @@ namespace GFlow {
          */
         public virtual bool has_same_type (Dock other) {
             return this.initial.type_name() == other.initial.type_name();
+        }
+    }
+
+    public class CompositeValue : Object {
+
+        private List<GLib.Value?> _values = new List<GLib.Value?>();
+
+        public CompositeValue.from_single_source(Source source) {
+            _values.append(source.val);
+        }
+        
+        public CompositeValue.from_sources_values(List<Source> sources) {
+            foreach (var source in sources) {
+                _values.append(source.val);
+            }
+        }
+
+        public Value? get_value(uint index = 0) throws NodeError {
+            if (this._values.length() > index)
+                return this._values.nth_data(index);
+            else
+                return null;
         }
     }
 }
