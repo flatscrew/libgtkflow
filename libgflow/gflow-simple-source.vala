@@ -65,7 +65,7 @@ namespace GFlow {
           set {
             if (value != null && !_initial.holds (value.type ())) return;
             _val = value;
-            changed(new CompositeValue.from_single_source(this));
+            changed(value);
           }
         }
         /**
@@ -103,7 +103,7 @@ namespace GFlow {
                 );
             }
             this._sinks.append (s);
-            this.changed(new CompositeValue.from_single_source(this));
+            this.changed();
         }
 
         /**

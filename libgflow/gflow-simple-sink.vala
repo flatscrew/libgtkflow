@@ -136,14 +136,14 @@ namespace GFlow {
             if (!this.is_linked_to (dock)) return;
             if (dock is Source) {
                 this.remove_source((Source) dock);
-                this.do_source_changed(sources_value());
+                this.do_source_changed();
                 dock.changed.disconnect(this.do_source_changed);
-                changed(sources_value());
+                changed();
             }
         }
 
-        private void do_source_changed(CompositeValue value, string? flow_id = null) {
-            changed(sources_value(), flow_id);
+        private void do_source_changed(Value? source_value = null, string? flow_id = null) {
+            changed(source_value, flow_id);
         }
 
         /**
@@ -157,7 +157,7 @@ namespace GFlow {
             }
             if (dock is Source) {
                 add_source((Source) dock);
-                changed(sources_value());
+                changed();
                 dock.link (this);
                 linked (dock);
             }
@@ -170,10 +170,6 @@ namespace GFlow {
             foreach (Source s in this._sources)
                 if (s != null)
                     this.unlink(s);
-        }
-
-        private CompositeValue sources_value() {
-            return new CompositeValue.from_sources_values(_sources);
         }
     }
 }
