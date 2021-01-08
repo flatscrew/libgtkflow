@@ -70,9 +70,7 @@ namespace GtkFlow {
          * Example:  red would be "ff0000"
          */
         public virtual signal string color_calculation(GLib.Value v) {
-            Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
-            return "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
+            return this.default_connector_color;
         }
 
         /**
@@ -106,6 +104,12 @@ namespace GtkFlow {
         public bool allow_recursion {get; set; default=false;}
 
         /**
+         * Used to store fg color at iniialization as getting this on the
+         * fly has lead to endless-loop-problems.
+         */
+        private string default_connector_color = "000000";
+
+        /**
          * Creates a new empty {@link NodeView}
          */
         public NodeView() {
@@ -115,6 +119,10 @@ namespace GtkFlow {
             this.motion_notify_event.connect((e)=>{ return this.do_motion_notify_event(e); });
             this.button_press_event.connect((e)=>{ return this.do_button_press_event(e); });
             this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
+
+            Gtk.StyleContext sc = this.get_style_context();
+            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
+            this.default_connector_color = "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
         }
 
         private void add_common(Node n) {
@@ -931,7 +939,8 @@ namespace GtkFlow {
                         cr.save();
                         if (source != null && source.val != null) {
                             double r=0, g=0, b=0;
-                            this.hex2col(color_calculation(source.val),out r, out g, out b);
+                            string hexcol = color_calculation(source.val);
+                            this.hex2col(hexcol ,out r, out g, out b);
                             cr.set_source_rgba(r,g,b,1.0);
                         }
                         cr.move_to(source_pos.x, source_pos.y);
