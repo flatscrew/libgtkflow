@@ -66,52 +66,6 @@ class AddNode(ExampleNode):
     
         self.result.set_value(res)
 
-class OperationNode(ExampleNode):
-    def __init__(self):
-        self.summand_a = GFlow.SimpleSink.new(float(0))
-        self.summand_b = GFlow.SimpleSink.new(float(0))
-        self.summand_a.set_name("operand A")
-        self.summand_b.set_name("operand B")
-        self.add_sink(self.summand_a)
-        self.add_sink(self.summand_b)    
-    
-        self.result = GFlow.SimpleSource.new(float(0))
-        self.result.set_name("result")
-        self.add_source(self.result)
-
-        operations = ["+", "-", "*", "/"]
-        self.combobox = Gtk.ComboBoxText()
-        self.combobox.connect("changed", self.do_calculations)
-        self.combobox.set_entry_text_column(0)
-        for op in operations:
-            self.combobox.append_text(op)
-
-        self.summand_a.connect("changed", self.do_calculations)
-        self.summand_b.connect("changed", self.do_calculations)
-
-        self.set_name("Operation")
-
-    def do_calculations(self, dock, val=None):
-        op = self.combobox.get_active_text() 
-        
-        try:
-            val_a = self.summand_a.get_value()
-            val_b = self.summand_b.get_value()
-        except:
-            self.result.invalidate()
-            return
-    
-        if op == "+":
-            self.result.set_value(val_a+val_b)
-        elif op == "-":
-            self.result.set_value(val_a-val_b)
-        elif op == "*":
-            self.result.set_value(val_a*val_b)
-        elif op == "/":
-            self.result.set_value(val_a/val_b)
-        else:
-            self.result.invalidate()
-
 class NumberNode(ExampleNode):
     def __init__(self, number=0):
         self.number = GFlow.SimpleSource.new(float(number))
