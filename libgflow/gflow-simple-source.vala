@@ -65,7 +65,6 @@ namespace GFlow {
           set {
             if (value != null && !_initial.holds (value.type ())) return;
             _val = value;
-            changed(value);
           }
         }
         /**
@@ -176,9 +175,10 @@ namespace GFlow {
             if (v != null && this.initial.type() != v.type())
                 throw new NodeError.INCOMPATIBLE_VALUE(
                     "Cannot set a %s value to this %s Source".printf(
-                        v.type().name(),this.val.type().name())
+                        v.type().name(), this.initial.type().name())
                 );
             this.val = v;
+            changed(v, flow_id);
         }
     }
 }
