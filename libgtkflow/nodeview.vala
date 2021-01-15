@@ -121,9 +121,11 @@ namespace GtkFlow {
             this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
 
             Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
+            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.LINK);
             this.default_connector_color = "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
         }
+
+        public signal void node_added(GFlow.Node n);
 
         private void add_common(Node n) {
             if (this.nodes.index(n) == -1) {
@@ -147,6 +149,7 @@ namespace GtkFlow {
             Node n = new Node(gn);
             n.set_allocation({1,1,0,0});
             this.add_common(n);
+            node_added(gn);
         }
 
         /**
@@ -156,6 +159,7 @@ namespace GtkFlow {
         public void add_with_child(GFlow.Node gn, Gtk.Widget child) {
             Node n = new Node.with_child(gn, child);
             this.add_common(n);
+            node_added(gn);
         }
 
         /**
