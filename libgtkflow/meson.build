@@ -22,6 +22,7 @@ gtkflow_inc = include_directories('.')
 
 custom_target('gtkflow-typelib',
               command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow-' + api + '.gir',
+                       '--includedir', gflow_girdir,
                        '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow-'+ api +'.so'],
               output: 'GtkFlow-' + api + '.typelib',
               depends: gtkflow,

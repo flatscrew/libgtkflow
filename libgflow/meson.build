@@ -16,6 +16,9 @@ gflow = library('gflow-' + api,
 
 gflow_inc = include_directories('.')
 
+# necessary to be able to pass it to g-ir-compiler in other libs
+gflow_girdir = meson.current_build_dir()
+
 # TODO: figure out how specify gir as input
 custom_target('gflow-typelib',
               command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GFlow-' + api + '.gir',
