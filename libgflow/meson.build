@@ -1,4 +1,5 @@
 src = files([
+    'gflow.vala',
     'gflow-dock.vala',
     'gflow-node.vala',
     'gflow-simple-node.vala',
