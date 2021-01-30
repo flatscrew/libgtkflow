@@ -35,5 +35,6 @@ math = meson.get_compiler('c').find_library('m', required: true)
 g_ir_compiler = find_program('g-ir-compiler')
 
 subdir('libgflow')
+subdir('libgflowpatterns')
 subdir('libgtkflow')
 subdir('test')

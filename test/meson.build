@@ -6,11 +6,12 @@ src = files([
     'gflow-test.vala',
     'gtkflow-node-test.vala',
     'gtkflow-test-app-class.vala',
+    'gflowpatterns-aggregator-test.vala'
 ])
 
 test('gflow-test',
      executable('gflow_test',
                 src,
                 dependencies: [glib, gobject, gtk],
-                link_with: [gflow, gtkflow],
-                include_directories: [gflow_inc, gtkflow_inc]))
+                link_with: [gflow, gtkflow, gflowpatterns],
+                include_directories: [gflow_inc, gtkflow_inc, gflowpatterns_inc]))
