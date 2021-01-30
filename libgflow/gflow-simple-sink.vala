@@ -25,7 +25,7 @@ namespace GFlow {
      */
     public class SimpleSink : Object, Dock, Sink {
         // Dock interface
-        protected GLib.Value? _initial = null;
+        protected GLib.Type _type = GLib.Type.NONE;
 
         private string? _name = null;
         /**
@@ -66,9 +66,9 @@ namespace GFlow {
          */
         public weak Node? node { get; set; }
         /**
-         * The value that this SimpleSink was initialized with
+         * The type that this SimpleSink was initialized with
          */
-        public GLib.Value? initial { get { return _initial; } }
+        public GLib.Type value_type { get { return _type; } }
 
         // Sink Interface
         private List<Source> _sources = new List<Source> ();
@@ -84,10 +84,10 @@ namespace GFlow {
          */
         protected void add_source(Source s) throws Error
         {
-            if (this.initial.type() != s.initial.type()) {
+            if (this.value_type != s.value_type) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Source has type %s while Sink has type %s".printf(
-                        s.val.type().name(), this.initial.type().name()
+                        s.value_type.name(), this.value_type.name()
                     )
                 );
             }
@@ -107,11 +107,19 @@ namespace GFlow {
                 this.unlinked(s, this._sources.length () == 0);
             }
         }
+        
         /**
-         * Creates a new SimpleSink with the given initial {@link GLib.Value}
+         * Creates a new SimpleSink with type of given value {@link GLib.Value}
          */
-        public SimpleSink (GLib.Value? initial) {
-            _initial = initial;
+        public SimpleSink(GLib.Value value) {
+            _type = value.type();
+        }
+
+        /**
+         * Creates a new SimpleSink with given type {@link GLib.Type}
+         */
+        public SimpleSink.with_type(GLib.Type type) {
+            _type = type;
         }
 
         /**
