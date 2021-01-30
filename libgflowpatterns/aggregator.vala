@@ -25,7 +25,10 @@ namespace GFlowPatterns {
             _pipelines.unset(id);
         }
 
-        public AggregationPipeline find_aggregation_pipeline(string id) {
+        public AggregationPipeline? find_aggregation_pipeline(string? id) {
+            if (id == null) {
+                return null;
+            }
             return _pipelines.get(id);
         }
     }
