@@ -25,8 +25,7 @@ namespace GFlow {
      */
     public class SimpleSource : Object, Dock, Source {
         // Dock interface
-        protected GLib.Value? _val;
-        protected GLib.Value? _initial;
+        protected GLib.Type _type;
         protected bool _valid = false;
 
         private string? _name = null;
@@ -58,28 +57,24 @@ namespace GFlow {
          */
         public weak Node? node { get; set; }
         /**
-         * The value that this SimpleSource holds
-         */
-        public GLib.Value? val {
-          get { return _val; }
-          set {
-            if (value != null && !_initial.holds (value.type ())) return;
-            _val = value;
-            changed ();
-          }
-        }
-        /**
          * Creates a new SimpleSource. Supply an arbitrary {@link GLib.Value}. This
          * initial value's type will determine this SimpleSource's type.
          */
-        public SimpleSource (GLib.Value initial) {
-          _initial = initial;
-          _val = _initial;
+        public SimpleSource(GLib.Value value) {
+          _type = value.get_gtype();
         }
+
+        /**
+         * Creates a new SimpleSource with given type {@link GLib.Type}
+         */
+         public SimpleSource.with_type(GLib.Type type) {
+            _type = type;
+          }
+
         /**
          * The value that this SimpleSource was initialized with
          */
-        public GLib.Value? initial { get { return _initial; } }
+        public GLib.Type value_type { get { return _type; } }
 
         // Source interface
         private List<Sink> _sinks = new List<Sink> ();
@@ -95,10 +90,10 @@ namespace GFlow {
          */
         protected void add_sink (Sink s) throws Error
         {
-            if (this.initial.type() != s.initial.type()) {
+            if (this.value_type != s.value_type) {
                 throw new NodeError.INCOMPATIBLE_SINKTYPE(
                     "Can't connect. Sink has type %s while Source has type %s".printf(
-                        s.initial.type().name(), this.val.type().name()
+                        s.value_type.name(), this.value_type.name()
                     )
                 );
             }
@@ -171,14 +166,14 @@ namespace GFlow {
         /**
          * Set the value of this SimpleSource
          */
-        public void set_value (GLib.Value? v) throws GLib.Error
+        public void set_value (GLib.Value? v, string? flow_id = null) throws GLib.Error
         {
-            if (v != null && this.initial.type() != v.type())
+            if (v != null && this.value_type != v.type())
                 throw new NodeError.INCOMPATIBLE_VALUE(
                     "Cannot set a %s value to this %s Source".printf(
-                        v.type().name(),this.val.type().name())
+                        v.type().name(), this.value_type.name())
                 );
-            this.val = v;
+            changed(v, flow_id);
         }
     }
 }

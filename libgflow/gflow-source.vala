@@ -29,11 +29,5 @@ namespace GFlow {
          * Returns the sinks that this source is connected to
          */
         public abstract List<Sink> sinks { get; }
-
-        /**
-         * The value that is stored in this Dock
-         * TODO: Consider that this value could be a stream not a fixed value
-         */
-        public abstract GLib.Value? val { get; set; }
     }
 }

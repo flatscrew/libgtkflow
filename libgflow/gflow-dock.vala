@@ -58,11 +58,9 @@ namespace GFlow {
         public abstract weak Node? node { get; set; }
 
         /**
-         * The initial value that has been set to this dock
-         * The dock will be set to this value when it is rendered
-         * invalid
+         * The type that has been set to this dock
          */
-        public abstract GLib.Value? initial { get; }
+        public abstract GLib.Type value_type { get; }
 
         /**
          * This signal is being triggered, when there is a connection being established
@@ -93,7 +91,7 @@ namespace GFlow {
         /**
          * Triggers when the value of this dock changes
          */
-        public signal void changed ();
+        public signal void changed(Value? value = null, string? flow_id = null);
 
         /**
          * Implementations should return true if this dock has at least one
@@ -124,10 +122,7 @@ namespace GFlow {
          * Tries to resolve this Dock's value-type to a displayable string
          */
         public virtual string determine_typestring () {
-            if (this.initial != null)
-                return this.initial.type().name();
-            else
-                return "";
+            return this.value_type.name();
         }
 
         /**
@@ -135,7 +130,7 @@ namespace GFlow {
          * same type
          */
         public virtual bool has_same_type (Dock other) {
-            return this.initial.type_name() == other.initial.type_name();
+            return this.value_type == other.value_type;
         }
     }
 }

@@ -1,0 +1,14 @@
+Source: libgtkflow
+Section: unknown
+Priority: optional
+Maintainer: Grindhold <grindhold@unknown>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.1.2
+Homepage: https://notabug.org/grindhold/libgtkflow
+Vcs-Git: https://notabug.org/grindhold/libgtkflow.git
+
+Package: libgtkflow
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Here you see libgtkflow, a universal library 
+ for drawing flow graphs with Gtk+ 3.

@@ -121,9 +121,11 @@ namespace GtkFlow {
             this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
 
             Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
+            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.LINK);
             this.default_connector_color = "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
         }
+
+        public signal void node_added(GFlow.Node n);
 
         private void add_common(Node n) {
             if (this.nodes.index(n) == -1) {
@@ -147,6 +149,7 @@ namespace GtkFlow {
             Node n = new Node(gn);
             n.set_allocation({1,1,0,0});
             this.add_common(n);
+            node_added(gn);
         }
 
         /**
@@ -156,6 +159,7 @@ namespace GtkFlow {
         public void add_with_child(GFlow.Node gn, Gtk.Widget child) {
             Node n = new Node.with_child(gn, child);
             this.add_common(n);
+            node_added(gn);
         }
 
         /**
@@ -937,12 +941,18 @@ namespace GtkFlow {
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
                         cr.save();
-                        if (source != null && source.val != null) {
-                            double r=0, g=0, b=0;
-                            string hexcol = color_calculation(source.val);
-                            this.hex2col(hexcol ,out r, out g, out b);
-                            cr.set_source_rgba(r,g,b,1.0);
-                        }
+                        
+                        // TODO rewrite this part to allow node color manipulation
+                        //  if (source != null && source.val != null) {
+                        //      double r=0, g=0, b=0;
+                        //      string hexcol = color_calculation(source.val);
+                        //      this.hex2col(hexcol ,out r, out g, out b);
+                        //      cr.set_source_rgba(r,g,b,1.0);
+                        //  }
+                        double r=0, g=0, b=0;
+                        this.hex2col(default_connector_color ,out r, out g, out b);
+                        cr.set_source_rgba(r,g,b,1.0);
+
                         cr.move_to(source_pos.x, source_pos.y);
                         cr.rel_curve_to(w,0,0,h,w,h);
                         cr.stroke();
