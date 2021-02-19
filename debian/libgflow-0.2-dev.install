@@ -1,0 +1,5 @@
+usr/include/gflow*/*
+usr/lib/*/libgflow*.so
+usr/lib/*/pkgconfig/gflow*
+usr/share/vala/vapi/gflow-*
+usr/share/gir-*/GFlow*
