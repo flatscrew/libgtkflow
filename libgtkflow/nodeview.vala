@@ -121,7 +121,7 @@ namespace GtkFlow {
             this.button_release_event.connect((e)=>{ return this.do_button_release_event(e); });
 
             Gtk.StyleContext sc = this.get_style_context();
-            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.LINK);
+            Gdk.RGBA fg = sc.get_color(Gtk.StateFlags.NORMAL);
             this.default_connector_color = "%2x%2x%2x".printf(col_f2h(fg.red), col_f2h(fg.green), col_f2h(fg.blue));
         }
 
