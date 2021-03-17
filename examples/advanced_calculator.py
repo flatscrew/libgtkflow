@@ -26,8 +26,10 @@ class OperationNode(CalculatorNode):
         self.summand_b.set_name("operand B")
         self.add_sink(self.summand_a)
         self.add_sink(self.summand_b)
+        self.val_a = None
+        self.val_b = None
 
-        self.result = GFlow.SimpleSource.new(float(0))
+        self.result = GFlow.SimpleSource.with_type(float)
         self.result.set_name("result")
         self.add_source(self.result)
         self.result.set_value(None)
@@ -39,34 +41,37 @@ class OperationNode(CalculatorNode):
         for op in operations:
             self.combobox.append_text(op)
 
-        self.summand_a.connect("changed", self.do_calculations)
-        self.summand_b.connect("changed", self.do_calculations)
+        self.summand_a.connect("changed", self.do_calculations, "a")
+        self.summand_b.connect("changed", self.do_calculations, "b")
 
         self.set_name("Operation")
 
-    def do_calculations(self, dock, val=None):
+    def do_calculations(self, dock, val=None, flow_id=None, data=None):
         op = self.combobox.get_active_text() 
 
-        val_a = self.summand_a.get_value(0)
-        val_b = self.summand_b.get_value(0)
-        if val_a is None or val_b is None:
+        if data == "a":
+            self.val_a = val
+        if data == "b":
+            self.val_b = val
+
+        if self.val_a is None or self.val_b is None:
             self.result.set_value(None)
             return
 
         if op == "+":
-            self.result.set_value(val_a+val_b)
+            self.result.set_value(self.val_a+self.val_b)
         elif op == "-":
-            self.result.set_value(val_a-val_b)
+            self.result.set_value(self.val_a-self.val_b)
         elif op == "*":
-            self.result.set_value(val_a*val_b)
+            self.result.set_value(self.val_a*self.val_b)
         elif op == "/":
-            self.result.set_value(val_a/val_b)
+            self.result.set_value(self.val_a/self.val_b)
         else:
             self.result.set_value(None)
 
 class NumberNode(CalculatorNode):
     def __init__(self, number=0):
-        self.number = GFlow.SimpleSource.new(float(number))
+        self.number = GFlow.SimpleSource.with_type(float)
         self.number.set_name("output")
         self.add_source(self.number)
 
@@ -79,7 +84,7 @@ class NumberNode(CalculatorNode):
 
         self.set_name("NumberGenerator")
 
-    def do_value_changed(self, widget=None, data=None):
+    def do_value_changed(self, widget=None, data=None, flow_id=None):
         self.number.set_value(float(self.spinbutton.get_value()))
 
 class PrintNode(CalculatorNode):
@@ -93,10 +98,9 @@ class PrintNode(CalculatorNode):
 
         self.set_name("Output")
 
-    def do_printing(self, dock):
-        n = self.number.get_value(0)
-        if n is not None:
-            self.childlabel.set_text(str(n))
+    def do_printing(self, dock, val=None, flow_id=None):
+        if val is not None:
+            self.childlabel.set_text(str(val))
         else:
             self.childlabel.set_text("")
 
