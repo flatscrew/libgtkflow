@@ -20,35 +20,41 @@ class ExampleNode(GFlow.SimpleNode):
 
 class ConcatNode(ExampleNode):
     def __init__(self):
-        self.string_a = GFlow.SimpleSink.new("")
-        self.string_b = GFlow.SimpleSink.new("")
+        self.string_a = GFlow.SimpleSink.with_type(str)
+        self.string_b = GFlow.SimpleSink.with_type(str)
         self.string_a.set_name("string A")
         self.string_b.set_name("string B")
         self.add_sink(self.string_a)
         self.add_sink(self.string_b)
+        self.val_a = None
+        self.val_b = None
 
-        self.result = GFlow.SimpleSource.new("")
+        self.result = GFlow.SimpleSource.with_type(str)
         self.result.set_name("output")
         self.add_source(self.result)
         self.result.set_value(None)
 
-        self.string_a.connect("changed", self.do_concatenation)
-        self.string_b.connect("changed", self.do_concatenation)
+        self.string_a.connect("changed", self.do_concatenation, "a")
+        self.string_b.connect("changed", self.do_concatenation, "b")
         self.set_name("Concatenation")
 
 
-    def do_concatenation(self, dock, val=None):
-        val_a = self.string_a.get_value(0) or ""
-        val_b = self.string_b.get_value(0) or ""
+    def do_concatenation(self, dock, val=None, flow_id=None, affiliation=None):
+        if affiliation == "a":
+            self.val_a = val
+        if affiliation == "b":
+            self.val_b = val
+        val_a = self.val_a or ""
+        val_b = self.val_b or ""
         self.result.set_value(val_a+val_b)
 
 class ConversionNode(ExampleNode):
     def __init__(self):
-        self.sink = GFlow.SimpleSink.new(float(0))
+        self.sink = GFlow.SimpleSink.with_type(float)
         self.sink.set_name("input")
         self.add_sink(self.sink)
 
-        self.source = GFlow.SimpleSource.new("")
+        self.source = GFlow.SimpleSource.with_type(str)
         self.source.set_name("output")
         self.add_source(self.source)
         self.source.set_value(None)
@@ -56,10 +62,9 @@ class ConversionNode(ExampleNode):
         self.sink.connect("changed", self.do_conversion)
         self.set_name("Number2String")
 
-    def do_conversion(self, dock, val=None):
-        v = self.sink.get_value(0)
-        if v is not None:
-            self.source.set_value(str(v))
+    def do_conversion(self, dock, val=None, flow_id=None):
+        if val is not None:
+            self.source.set_value(str(val))
         else:
             self.source.set_value(None)
 
@@ -67,7 +72,7 @@ class StringNode(ExampleNode):
     def __init__(self):
         ExampleNode.__init__(self)
 
-        self.source = GFlow.SimpleSource.new("")
+        self.source = GFlow.SimpleSource.with_type(str)
         self.source.set_name("output")
         self.add_source(self.source)
 
@@ -81,14 +86,16 @@ class StringNode(ExampleNode):
 
 class OperationNode(ExampleNode):
     def __init__(self):
-        self.summand_a = GFlow.SimpleSink.new(float(0))
-        self.summand_b = GFlow.SimpleSink.new(float(0))
+        self.summand_a = GFlow.SimpleSink.with_type(float)
+        self.summand_b = GFlow.SimpleSink.with_type(float)
         self.summand_a.set_name("operand A")
         self.summand_b.set_name("operand B")
         self.add_sink(self.summand_a)
         self.add_sink(self.summand_b)
+        self.val_a = None
+        self.val_b = None
 
-        self.result = GFlow.SimpleSource.new(float(0))
+        self.result = GFlow.SimpleSource.with_type(float)
         self.result.set_name("result")
         self.add_source(self.result)
         self.result.set_value(None)
@@ -100,35 +107,37 @@ class OperationNode(ExampleNode):
         for op in operations:
             self.combobox.append_text(op)
 
-        self.summand_a.connect("changed", self.do_calculations)
-        self.summand_b.connect("changed", self.do_calculations)
+        self.summand_a.connect("changed", self.do_calculations, "a")
+        self.summand_b.connect("changed", self.do_calculations, "b")
 
         self.set_name("Operation")
 
 
-    def do_calculations(self, dock, val=None):
+    def do_calculations(self, dock, val=None, flow_id=None, affiliation=None):
         op = self.combobox.get_active_text()
 
-        val_a = self.summand_a.get_value(0)
-        val_b = self.summand_b.get_value(0)
-        if val_a is None or val_b is None:
+        if affiliation == "a":
+            self.val_a = val
+        if affiliation == "b":
+            self.val_b = val
+        if self.val_a is None or self.val_b is None:
             self.result.set_value(None)
             return
 
         if op == "+":
-            self.result.set_value(val_a+val_b)
+            self.result.set_value(self.val_a+self.val_b)
         elif op == "-":
-            self.result.set_value(val_a-val_b)
+            self.result.set_value(self.val_a-self.val_b)
         elif op == "*":
-            self.result.set_value(val_a*val_b)
+            self.result.set_value(self.val_a*self.val_b)
         elif op == "/":
-            self.result.set_value(val_a/val_b)
+            self.result.set_value(self.val_a/self.val_b)
         else:
             self.result.set_value(None)
 
 class NumberNode(ExampleNode):
     def __init__(self, number=0):
-        self.number = GFlow.SimpleSource.new(float(number))
+        self.number = GFlow.SimpleSource.with_type(float)
         self.number.set_name("output")
         self.add_source(self.number)
 
@@ -140,12 +149,12 @@ class NumberNode(ExampleNode):
 
         self.set_name("NumberGenerator")
 
-    def do_value_changed(self, widget=None, data=None):
+    def do_value_changed(self, widget=None, data=None, flow_id=None):
         self.number.set_value(float(self.spinbutton.get_value()))
 
 class PrintNode(ExampleNode):
     def __init__(self):
-        self.sink = GFlow.SimpleSink.new("")
+        self.sink = GFlow.SimpleSink.with_type(str)
         self.sink.set_name("")
         self.sink.connect("changed", self.do_printing)
         self.add_sink(self.sink)
@@ -154,10 +163,9 @@ class PrintNode(ExampleNode):
 
         self.set_name("Output")
 
-    def do_printing(self, dock, val=None):
-        v = self.sink.get_value(0)
-        if v is not None:
-            self.childlabel.set_text(v)
+    def do_printing(self, dock, val=None, flow_id=None):
+        if val is not None:
+            self.childlabel.set_text(val)
         else:
             self.childlabel.set_text("")
 
