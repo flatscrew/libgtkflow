@@ -27,8 +27,6 @@ public class GFlowTest.SinkTest
       Value initial = Value(typeof(int));
       initial.set_int (1);
       var s = new GFlow.SimpleSink (initial);
-      assert (s.initial != null);
-      //  assert (s.val.length() == 0);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -41,8 +39,6 @@ public class GFlowTest.SinkTest
       initial.set_int (1);
       var s = new GFlow.SimpleSink (initial);
       var src = new GFlow.SimpleSource (initial);
-      assert (s.initial != null);
-      //  assert (s.val.length() == 0);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -57,8 +53,6 @@ public class GFlowTest.SinkTest
       initial.set_int (1);
       var s = new GFlow.SimpleSink (initial);
       var src = new GFlow.SimpleSource (initial);
-      assert (s.initial != null);
-      //  assert (s.val.length() == 0);
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -66,12 +60,10 @@ public class GFlowTest.SinkTest
       assert (!s.is_linked ());
       try { s.link (src); } catch { assert_not_reached (); }
       assert (s.is_linked ());
-      src.val = 10;
-      assert (((int) src.val) == 10);
-      //  assert (s.val != null);
-      //  assert (( (int) s.val.nth_data(0)) == 10);
-      src.val = "text";
-      //  assert (((int) s.val.nth_data(0)) == 10);
+      try {
+          src.set_value(10);
+          src.set_value("text");
+      } catch { assert_not_reached(); }
     });
   }
 }
