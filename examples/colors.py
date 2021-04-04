@@ -20,11 +20,12 @@ class ExampleNode(GFlow.SimpleNode):
 
 class AddNode(ExampleNode):
     def add_summand(self, widget=None, data=None):
-        summand_a = GFlow.SimpleSink.new(float(0))
+        summand_a = GFlow.SimpleSink.with_type(float)
         summand_a.set_name("operand %i"%(len(self.summands),))
         self.add_sink(summand_a)
-        summand_a.connect("changed", self.do_calculations)
         self.summands.append(summand_a)
+        self.summands_values.append(None)
+        summand_a.connect("changed", self.do_calculations, self.summands.index(summand_a))
         self.do_calculations(None)
  
     def remove_summand(self, widget=None, data=None):
@@ -34,13 +35,15 @@ class AddNode(ExampleNode):
         summand.unlink_all()
         self.remove_sink(summand)
         self.summands.remove(summand)
+        self.summands_values.remove(self.summands_values[-1])
         self.do_calculations(None)
 
 
     def __init__(self):
         self.summands = []
+        self.summands_values = []
 
-        self.result = GFlow.SimpleSource.new(float(0))
+        self.result = GFlow.SimpleSource.with_type(float)
         self.result.set_name("result")
         self.add_source(self.result)
         self.result.set_value(None)
@@ -55,14 +58,16 @@ class AddNode(ExampleNode):
 
         self.set_name("Operation")
 
-    def do_calculations(self, dock, val=None):
-        res = 0
+    def do_calculations(self, dock, val=None, flow_id=None, affiliation=None):
         if len(self.summands) == 0:
             self.result.set_value(None)
             return
 
-        for summand in self.summands:
-            val = summand.get_value(0)
+        if affiliation is not None:
+            self.summands_values[affiliation] = val
+
+        res = 0
+        for val in self.summands_values:
             if val is None:
                 self.result.set_value(None)
                 return
@@ -72,7 +77,7 @@ class AddNode(ExampleNode):
 
 class NumberNode(ExampleNode):
     def __init__(self, number=0):
-        self.number = GFlow.SimpleSource.new(float(number))
+        self.number = GFlow.SimpleSource.with_type(float)
         self.number.set_name("output")
         self.add_source(self.number)
 
@@ -98,12 +103,11 @@ class PrintNode(ExampleNode):
 
         self.set_name("Output")
 
-    def do_printing(self, dock):
-        n = self.number.get_value(0)
-        if n is None:
+    def do_printing(self, dock, val=None, flow_id=None):
+        if val is None:
             self.childlabel.set_text("")
         else:
-            self.childlabel.set_text(str(n))
+            self.childlabel.set_text(str(val))
 
 class Calculator(object):
     def __init__(self):

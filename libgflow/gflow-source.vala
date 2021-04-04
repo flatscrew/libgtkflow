@@ -29,5 +29,9 @@ namespace GFlow {
          * Returns the sinks that this source is connected to
          */
         public abstract List<Sink> sinks { get; }
+        /**
+         * Returns the last value passed throguh this source
+         */
+        public abstract GLib.Value? get_last_value();
     }
 }

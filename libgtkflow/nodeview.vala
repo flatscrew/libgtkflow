@@ -941,16 +941,15 @@ namespace GtkFlow {
                         int w = sink_pos.x - source_pos.x;
                         int h = sink_pos.y - source_pos.y;
                         cr.save();
-                        
-                        // TODO rewrite this part to allow node color manipulation
-                        //  if (source != null && source.val != null) {
-                        //      double r=0, g=0, b=0;
-                        //      string hexcol = color_calculation(source.val);
-                        //      this.hex2col(hexcol ,out r, out g, out b);
-                        //      cr.set_source_rgba(r,g,b,1.0);
-                        //  }
+
                         double r=0, g=0, b=0;
-                        this.hex2col(default_connector_color ,out r, out g, out b);
+                        if (source != null && source.get_last_value() != null) {
+                            string hexcol = color_calculation(source.get_last_value());
+                            this.hex2col(hexcol ,out r, out g, out b);
+                            cr.set_source_rgba(r,g,b,1.0);
+                        } else {
+                            this.hex2col(default_connector_color ,out r, out g, out b);
+                        }
                         cr.set_source_rgba(r,g,b,1.0);
 
                         cr.move_to(source_pos.x, source_pos.y);

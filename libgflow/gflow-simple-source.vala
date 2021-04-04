@@ -27,6 +27,7 @@ namespace GFlow {
         // Dock interface
         protected GLib.Type _type;
         protected bool _valid = false;
+        private GLib.Value? last_value = null;
 
         private string? _name = null;
         /**
@@ -173,7 +174,16 @@ namespace GFlow {
                     "Cannot set a %s value to this %s Source".printf(
                         v.type().name(), this.value_type.name())
                 );
+            message("LOL");
+            this.last_value = v;
             changed(v, flow_id);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public new GLib.Value? get_last_value() {
+            return this.last_value;
         }
     }
 }
