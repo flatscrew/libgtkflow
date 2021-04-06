@@ -163,7 +163,16 @@ namespace GtkFlow {
         public Node.with_child(GFlow.Node n, Gtk.Widget c) {
             this(n);
             this.add(c);
-            this.show_all();
+            this.realize.connect(()=>{
+                // Bad fix for the wigglebug: Find more elegant solution than this.
+                // key is that the children will only render correctly if the node they
+                // reside in has already been realized. redrawing without changing
+                // the position, however, will result in NOP.
+                var p = this.get_position();
+                this.set_position(p.x+1,p.y);
+                this.set_position(p.x,p.y);
+                this.node_view.queue_draw();
+            });
         }
 
         public void on_child_size_allocate(Gtk.Allocation _) {
