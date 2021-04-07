@@ -32,8 +32,13 @@ public class GtkFlowTest.GuiNodeTest : GtkFlowTest.TestApp
       GLib.message ("Executing Tests...");
       var nview = new GtkFlow.NodeView ();
       this.action_area.pack_end (nview);
-      var s1 = new GFlow.SimpleSink (true);
-      var src1 = new GFlow.SimpleSource (true);
+      var s1 = new GFlow.SimpleSink.with_type (typeof(bool));
+      var src1 = new GFlow.SimpleSource.with_type (typeof(bool));
+      try {
+          src1.set_value(true);
+      } catch {
+          assert_not_reached();
+      }
       var n1 = new GFlow.SimpleNode ();
       n1.add_sink (s1);
       var n2 = new GFlow.SimpleNode ();

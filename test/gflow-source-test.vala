@@ -21,8 +21,7 @@ using GFlow;
 public class GFlowTest.Source : GFlow.SimpleSource
 {
   public Source () {
-    Value v = false;
-    base (v);
+    base.with_type (typeof(bool));
   }
 }
 
@@ -33,14 +32,24 @@ public class GFlowTest.SourceTest
     Test.add_func ("/gflow/source", 
     () => {
       var src = new GFlow.SimpleSource.with_type (typeof(int));
+      try {
+          src.set_value(0);
+      } catch {
+          assert_not_reached();
+      }
       assert (!src.is_linked ());
     });
     Test.add_func ("/gflow/source/link", 
     () => {
-      var src = new GFlow.SimpleSource (0);
-      var s = new GFlow.SimpleSink (true);
-      var s1 = new GFlow.SimpleSink (1);
-      var s2 = new GFlow.SimpleSink (10);
+      var src = new GFlow.SimpleSource.with_type (typeof(int));
+      try{
+          src.set_value(0);
+      } catch {
+          assert_not_reached();
+      }
+      var s = new GFlow.SimpleSink.with_type (typeof(bool));
+      var s1 = new GFlow.SimpleSink.with_type (typeof(int));
+      var s2 = new GFlow.SimpleSink.with_type (typeof(int));
       assert (!src.is_linked ());
       bool fail = true;
       try { src.link (s); } catch { fail = false; }
@@ -59,7 +68,11 @@ public class GFlowTest.SourceTest
         });
         src.link (s2);
         if (fail)  assert_not_reached ();
-        src.set_value(20);
+        try {
+            src.set_value(20);
+        } catch {
+            assert_not_reached();
+        }
 
         //  assert (((int) s1.val.nth_data(0)) == 20);
         //  assert (((int) s2.val.nth_data(0)) == 20);

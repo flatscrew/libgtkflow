@@ -22,10 +22,8 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/sink",
         () => {
             try {
-                Value initial = Value(typeof(int));
-                initial.set_int (1);
-                var s = new GFlow.SimpleSink (initial);
-                var n = new GFlow.SimpleNode ();
+                var s = new GFlow.SimpleSink.with_type (typeof(int));
+                var n = new GFlow.SimpleNode();
                 assert (n.has_sink(s) == false);
                 n.add_sink(s);
                 assert (n.has_sink(s) == true);
@@ -38,10 +36,13 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/source",
         () => {
             try {
-                Value initial = Value(typeof(int));
-                initial.set_int (1);
-                var s = new GFlow.SimpleSource (initial);
-                var n = new GFlow.SimpleNode ();
+                var s = new GFlow.SimpleSource.with_type (typeof(int));
+                var n = new GFlow.SimpleNode();
+                try {
+                    s.set_value(1);
+                } catch {
+                    assert_not_reached();
+                }
                 assert (n.has_source(s) == false);
                 n.add_source(s);
                 assert (n.has_source(s) == true);
@@ -54,12 +55,13 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/dock",
         () => {
             try {
-                Value si_initial = Value(typeof(int));
-                si_initial.set_int (1);
-                var si = new GFlow.SimpleSink (si_initial);
-                Value so_initial = Value(typeof(int));
-                so_initial.set_int (1);
-                var so = new GFlow.SimpleSource (so_initial);
+                var si = new GFlow.SimpleSink (typeof(int));
+                var so = new GFlow.SimpleSource (typeof(int));
+                try {
+                    so.set_value(1);
+                } catch {
+                    assert_not_reached();
+                }
 
                 var n = new GFlow.SimpleNode ();
                 assert (n.has_dock(si) == false);
@@ -79,14 +81,15 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/get_dock",
         () => {
             try {
-                Value si_initial = Value(typeof(int));
-                si_initial.set_int (1);
-                var si = new GFlow.SimpleSink (si_initial);
+                var si = new GFlow.SimpleSink (typeof(int));
+                var so = new GFlow.SimpleSource (typeof(int));
                 si.name = "foo";
-                Value so_initial = Value(typeof(int));
-                so_initial.set_int (1);
-                var so = new GFlow.SimpleSource (so_initial);
                 so.name = "bar";
+                try {
+                    so.set_value(1);
+                } catch {
+                    assert_not_reached();
+                }
                 var n = new GFlow.SimpleNode();
                 assert(n.get_dock("foo") == null);
                 assert(n.get_dock("bar") == null);

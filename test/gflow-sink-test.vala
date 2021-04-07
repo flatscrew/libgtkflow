@@ -24,9 +24,7 @@ public class GFlowTest.SinkTest
   {
     Test.add_func ("/gflow/sink", 
     () => {
-      Value initial = Value(typeof(int));
-      initial.set_int (1);
-      var s = new GFlow.SimpleSink (initial);
+      var s = new GFlow.SimpleSink.with_type (typeof(int));
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -35,10 +33,13 @@ public class GFlowTest.SinkTest
     });
     Test.add_func ("/gflow/sink/source", 
     () => {
-      Value initial = Value(typeof(int));
-      initial.set_int (1);
-      var s = new GFlow.SimpleSink (initial);
-      var src = new GFlow.SimpleSource (initial);
+      var s = new GFlow.SimpleSink.with_type (typeof(int));
+      var src = new GFlow.SimpleSource.with_type (typeof(int));
+      try {
+        src.set_value(1);
+      } catch {
+        assert_not_reached();
+      }
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -49,10 +50,13 @@ public class GFlowTest.SinkTest
     });
     Test.add_func ("/gflow/sink/source/changes", 
     () => {
-      Value initial = Value(typeof(int));
-      initial.set_int (1);
-      var s = new GFlow.SimpleSink (initial);
-      var src = new GFlow.SimpleSource (initial);
+      var s = new GFlow.SimpleSink.with_type (typeof(int));
+      var src = new GFlow.SimpleSource.with_type (typeof(int));
+      try {
+        src.set_value(1);
+      } catch {
+        assert_not_reached();
+      }
       assert (!s.highlight);
       assert (!s.active);
       assert (s.node == null);
@@ -62,7 +66,6 @@ public class GFlowTest.SinkTest
       assert (s.is_linked ());
       try {
           src.set_value(10);
-          src.set_value("text");
       } catch { assert_not_reached(); }
     });
   }
