@@ -2,8 +2,8 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('GtkFlow', '0.6')
-gi.require_version('GFlow', '0.6')
+gi.require_version('GtkFlow', '0.8')
+gi.require_version('GFlow', '0.8')
 
 from gi.repository import GLib
 from gi.repository import Gtk

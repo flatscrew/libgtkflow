@@ -1,5 +1,5 @@
 /********************************************************************
-# Copyright 2014-2019 Daniel 'grindhold' Brendle, 2015 Daniel Espinosa <esodan@gmail.com>
+# Copyright 2014-2021 Daniel 'grindhold' Brendle, 2015 Daniel Espinosa <esodan@gmail.com>
 #
 # This file is part of libgflow.
 #

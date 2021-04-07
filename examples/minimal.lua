@@ -1,8 +1,8 @@
 #! /usr/bin/env lua
 
-# XXX:This example is outdated and uses libgtkflow in a pre-0.8-way
+-- XXX:This example is outdated and uses libgtkflow in a pre-0.8-way
 
-# TODO: fix this example. use the .with_type-constructor of Sources and Sinks
+-- TODO: fix this example. use the .with_type-constructor of Sources and Sinks
 
 
 local lgi = require 'lgi'
