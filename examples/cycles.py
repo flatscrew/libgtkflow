@@ -26,55 +26,60 @@ class ExampleNode(GFlow.SimpleNode):
 
 class StarterNode(ExampleNode):
     def __init__(self):
-        self.emitter = GFlow.SimpleSource.new(float(0))
+        self.emitter = GFlow.SimpleSource.with_type(int)
         self.emitter.set_name("emitter")
         self.add_source(self.emitter)
 
-        self.button = Gtk.Button.new_with_label("Start!")
+        self.button = Gtk.Button.new()
+        self.button.set_label("Start!")
         self.button.connect("clicked", self.do_send_start)
 
         self.set_name("Counter")
 
     def do_send_start(self, dock, val=None):
-        self.emitter.set_value(1.0)
+        self.emitter.set_value(1)
 
 class CountNode(ExampleNode):
     def __init__(self):
-        self.counter = 0.0
-        self.target = 10.0
+        self.counter = 0
+        self.target = 10
 
-        self.enable = GFlow.SimpleSink.new(float(0))
-        self.clock = GFlow.SimpleSink.new(float(0))
+        self.enabled = False
+
+        self.enable = GFlow.SimpleSink.with_type(int)
+        self.clock = GFlow.SimpleSink.with_type(int)
         self.enable.set_name("enable")
         self.clock.set_name("clock")
         self.add_sink(self.enable)
         self.add_sink(self.clock)
 
-        self.result = GFlow.SimpleSource.new(float(0))
-        self.counted = GFlow.SimpleSource.new(float(0))
+        self.result = GFlow.SimpleSource.with_type(int)
+        self.counted = GFlow.SimpleSource.with_type(int)
+        self.result.set_value(0)
+        self.counted.set_value(0)
         self.result.set_name("result")
         self.counted.set_name("counted")
         self.add_source(self.result)
         self.add_source(self.counted)
 
-        self.enable.connect("changed", self.do_calculations)
-        self.clock.connect("changed", self.do_calculations)
+        self.enable.connect("changed", self.do_calculations, "enable")
+        self.clock.connect("changed", self.do_calculations, "clock")
 
         self.set_name("Counter")
 
-    def do_calculations(self, dock, val=None):
-        enable = self.enable.get_value(0)
-        if enable != 1.0:
-            return
+    def do_calculations(self, dock, val=None, flow_id=None, affiliation=None):
+        if affiliation == "enable":
+            self.enabled = val == 1
 
-        if self.counter < self.target:
-            self.counter += 1.0
-            self.counted.set_value(self.counter)
-        self.result.set_value(self.counter)
+        elif affiliation == "clock" and self.enabled:
+            if self.counter < self.target:
+                self.counter += 1
+                self.counted.set_value(self.counter)
+            self.result.set_value(self.counter)
 
 class PrintNode(ExampleNode):
     def __init__(self):
-        self.number = GFlow.SimpleSink.new(float(0))
+        self.number = GFlow.SimpleSink.with_type(int)
         self.number.set_name("input")
         self.number.connect("changed", self.do_printing)
         self.add_sink(self.number)
@@ -83,11 +88,9 @@ class PrintNode(ExampleNode):
 
         self.set_name("Output")
 
-    def do_printing(self, dock):
-        n = self.number.get_value(0)
-        if n is not None:
-            print (n)
-            self.childlabel.set_text(str(n))
+    def do_printing(self, dock, val=None, flow_id=None):
+        if val is not None:
+            self.childlabel.set_text(str(val))
         else:
             self.childlabel.set_text("")
 
@@ -100,13 +103,13 @@ class CountDemo(object):
         self.nv.set_allow_recursion(True)
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
-        create_starternode_button = Gtk.Button("Create StarterNode")
+        create_starternode_button = Gtk.Button.new_with_label("Create StarterNode")
         create_starternode_button.connect("clicked", self.do_create_starternode)
         hbox.add(create_starternode_button)
-        create_countnode_button = Gtk.Button("Create CountNode")
+        create_countnode_button = Gtk.Button.new_with_label("Create CountNode")
         create_countnode_button.connect("clicked", self.do_create_countnode)
         hbox.add(create_countnode_button)
-        create_printnode_button = Gtk.Button("Create PrintNode")
+        create_printnode_button = Gtk.Button.new_with_label("Create PrintNode")
         create_printnode_button.connect("clicked", self.do_create_printnode)
         hbox.add(create_printnode_button)
 
@@ -123,12 +126,14 @@ class CountDemo(object):
     def do_create_starternode(self, widget=None, data=None):
         n = StarterNode()
         self.nv.add_with_child(n, n.button)
+        self.nv.show_all()
     def do_create_countnode(self, widget=None, data=None):
         n = CountNode()
         self.nv.add_node(n)
     def do_create_printnode(self, widget=None, data=None):
         n = PrintNode()
         self.nv.add_with_child(n, n.childlabel)
+        self.nv.show_all()
     def do_quit(self, widget=None, data=None):
         Gtk.main_quit()
         sys.exit(0)
