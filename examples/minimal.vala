@@ -25,8 +25,8 @@ void main(string[] args)
         var n = new GFlow.SimpleNode ();
         var sink_v = Value(Type.INT);
         var source_v = Value(Type.INT);
-        var sink = new GFlow.SimpleSink(sink_v);
-        var source = new GFlow.SimpleSource(source_v);
+        var sink = new GFlow.SimpleSink.with_type(typeof(int));
+        var source = new GFlow.SimpleSource.with_type(typeof(int));
         sink.name = "sink";
         source.name = "source";
         n.add_source(source);
