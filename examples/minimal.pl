@@ -1,3 +1,9 @@
+#!/usr/bin/perl
+
+# XXX:This example is outdated and uses libgtkflow in a pre-0.8-way
+
+# TODO: fix this example. use the .with_type-constructor of Sources and Sinks
+
 use Glib::Object::Introspection;
 Glib::Object::Introspection->setup(
     basename => 'Gtk',
