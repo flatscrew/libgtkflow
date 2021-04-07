@@ -174,7 +174,6 @@ namespace GFlow {
                     "Cannot set a %s value to this %s Source".printf(
                         v.type().name(), this.value_type.name())
                 );
-            message("LOL");
             this.last_value = v;
             changed(v, flow_id);
         }
