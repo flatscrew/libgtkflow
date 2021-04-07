@@ -173,6 +173,7 @@ namespace GtkFlow {
                 this.set_position(p.x,p.y);
                 this.node_view.queue_draw();
             });
+            this.show_all();
         }
 
         public void on_child_size_allocate(Gtk.Allocation _) {

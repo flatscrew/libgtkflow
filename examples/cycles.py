@@ -126,14 +126,12 @@ class CountDemo(object):
     def do_create_starternode(self, widget=None, data=None):
         n = StarterNode()
         self.nv.add_with_child(n, n.button)
-        self.nv.show_all()
     def do_create_countnode(self, widget=None, data=None):
         n = CountNode()
         self.nv.add_node(n)
     def do_create_printnode(self, widget=None, data=None):
         n = PrintNode()
         self.nv.add_with_child(n, n.childlabel)
-        self.nv.show_all()
     def do_quit(self, widget=None, data=None):
         Gtk.main_quit()
         sys.exit(0)
