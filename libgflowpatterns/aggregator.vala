@@ -2,7 +2,7 @@ namespace GFlowPatterns {
 
     public class Aggregator {
         
-        private Gee.Map<string, AggregationPipeline?> _pipelines = new Gee.HashMap<string, AggregationPipeline?>();
+        private GLib.HashTable<string, AggregationPipeline?> _pipelines = new GLib.HashTable<string, AggregationPipeline?>(str_hash, str_equal);
         private static Aggregator _instance;
 
         private Aggregator() {}
@@ -22,7 +22,7 @@ namespace GFlowPatterns {
         }
 
         private void commit_pipeline(string id) {
-            _pipelines.unset(id);
+            _pipelines.remove(id);
         }
 
         public AggregationPipeline? find_aggregation_pipeline(string? id) {
@@ -43,8 +43,8 @@ namespace GFlowPatterns {
         public signal void pipeline_commit(string id);
         public delegate bool PipelineDelegate(AggregationPipeline pipeline);
 
-        private Gee.Map<string, Value?> _attributes = new Gee.HashMap<string, Value?>();
-        private Gee.Map<string, ValuesArray> _indexed_attributes = new Gee.HashMap<string, ValuesArray>();
+        private GLib.HashTable<string, Value?> _attributes = new GLib.HashTable<string, Value?>(str_hash, str_equal);
+        private GLib.HashTable<string, ValuesArray> _indexed_attributes = new GLib.HashTable<string, ValuesArray>(str_hash, str_equal);
         
         public string id { 
             public get; 
@@ -87,7 +87,7 @@ namespace GFlowPatterns {
         }
 
         public bool has_attribute(string name) {
-            return _attributes.has_key(name) || _indexed_attributes.has_key(name);
+            return _attributes.contains(name) || _indexed_attributes.contains(name);
         }
 
         public void commit(AggregationPredicate aggregation_predicate, PipelineDelegate pipeline_delegate) {
@@ -96,26 +96,31 @@ namespace GFlowPatterns {
             }
             if (pipeline_delegate(this)) {
                 pipeline_commit(id);
-                _attributes.clear();
-                _indexed_attributes.clear();
+                _attributes.remove_all();
+                _indexed_attributes.remove_all();
             }
         }
     }
 
     public class ValuesArray : Object {
 
-        private Gee.Map<uint, Value?> _array = new Gee.HashMap<uint, Value?>();
+        private GLib.HashTable<int, Value?> _array = new GLib.HashTable<int, Value?>(direct_hash, direct_equal);
     
         public void insert(uint index, Value? value) {
-            _array.set(index, value);
+            _array.set((int)index, value);
         }
         
         public Value? get_value(uint index) {
-            return _array.get(index);
+            return _array.get((int)index);
         }
 
         public Value?[] to_array() {
-            return _array.values.to_array();
+            var ret = new Value?[_array.length];
+            int i = 0;
+            foreach (Value? v in _array.get_values()) {
+                ret[i++] = v;
+            }
+            return ret;
         }
     }
 }

@@ -4,11 +4,9 @@ src = files([
 
 gflowpatterns_inc = include_directories('.')
 
-gee = dependency('gee-0.8')
-
 gflowpatterns = library('gflowpatterns-' + api,
                   src,
-                  dependencies: [glib, gobject, gee],
+                  dependencies: [glib, gobject],
                   link_with: gflow,
                   include_directories: gflow_inc,
                   vala_gir: 'GFlowPatterns-' + api + '.gir',
