@@ -1,4 +1,4 @@
-namespace GFlowPatterns {
+namespace GFlow {
 
     public class Aggregator {
         

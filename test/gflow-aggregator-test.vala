@@ -1,9 +1,8 @@
 using GFlow;
-using GFlowPatterns;
 
-public class GFlowPatternsTest.AggregatorTest {
+public class GFlowTest.AggregatorTest {
     public static void add_tests() {
-        Test.add_func("/gflowpatterns/aggregator/array-attributes",
+        Test.add_func("/gflow/aggregator/array-attributes",
             () => {
 
                 var new_flow_id = "test";
@@ -25,7 +24,7 @@ public class GFlowPatternsTest.AggregatorTest {
 
     public class TestPredicate : AggregationPredicate, Object {
 
-        public bool should_commit (GFlowPatterns.AggregationPipeline aggregation_pipeline) {
+        public bool should_commit (GFlow.AggregationPipeline aggregation_pipeline) {
             return aggregation_pipeline.get_array_attribute("test").length == 3;
         }
     }

@@ -31,7 +31,7 @@ class GFlowTest.Main {
 		DockTest.add_tests ();
 		NodeTest.add_tests ();
 		GtkFlowTest.NodeTest.add_tests ();
-		GFlowPatternsTest.AggregatorTest.add_tests() ;
+		GFlowTest.AggregatorTest.add_tests() ;
 		Test.run ();
 		return 0;
 	}
