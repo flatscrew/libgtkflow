@@ -28,9 +28,9 @@ namespace GtkFlow {
      * This is done by adding Sources and Sinks to it. The inner logic of
      * The node can be represented towards the user as arbitrary Gtk widget.
      *
-     * IMPORTANT: DO NOT USE THIS NODE IN APPLICATION CCODE
-     *            this node is solely public to mitigate a problem
-     *            generating gir bindings
+     * IMPORTANT: DO NOT USE THIS CLASS IN APPLICATION CODE
+     * this node is solely public to mitigate a problem
+     * generating gir bindings
      */
     public class Node : Gtk.Container {
         // Determines the space between the title and the first dock (y-axis)
