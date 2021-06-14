@@ -953,7 +953,11 @@ namespace GtkFlow {
                         cr.set_source_rgba(r,g,b,1.0);
 
                         cr.move_to(source_pos.x, source_pos.y);
-                        cr.rel_curve_to(w,0,0,h,w,h);
+                        if (w > 0) {
+                            cr.rel_curve_to(w/3,0,2*w/3,h,w,h);
+                        } else {
+                            cr.rel_curve_to(-w/3,0,1.3*w,h,w,h);
+                        }
                         cr.stroke();
                         cr.restore();
                     }
@@ -964,7 +968,11 @@ namespace GtkFlow {
                 int w = this.temp_connector.width;
                 int h = this.temp_connector.height;
                 cr.move_to(this.temp_connector.x, this.temp_connector.y);
-                cr.rel_curve_to(w,0,0,h,w,h);
+                if (w > 0) {
+                    cr.rel_curve_to(w/3,0,2*w/3,h,w,h);
+                } else {
+                    cr.rel_curve_to(-w/3,0,1.3*w,h,w,h);
+                }
                 cr.stroke();
             }
             // Draw rubberband
