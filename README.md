@@ -4,6 +4,15 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
+Flow graphs are a possibility to let your user model flows of data from, through
+and into several stations.
+
+Whenever you have to let your users model a process or have to display the topology
+of a process to your users, flow graphs are the way to go.
+
+Screenshots
+-----------
+
 ![ConnectorAesthetics](./screenshots/connection_aesthetics.png)
 
 GtkFlow has been optimized to provide much nicer visual cues on the direction of connections
@@ -28,23 +37,6 @@ This is libgtkflow running inside firefox via broadway ↑
 ![GtkFlowWindows](./screenshots/windows.png)
 
 GtkFlow runs unter that strange M$-operating-system, too ↑
-
-![GtkFlowRes](./screenshots/resize.png)
-
-The newest stuff in libgtkflow's development ↑
-Nodes can be deleted by clicking the X-button in the upper right corner.
-Nodes are resizable by drag-n-dropping the lower right corner. The types of the docks can be printed along with their names
-
-![GtkFlowEvopop](./screenshots/evopop.png)
-
-This is a screenshot of libgtkflow rendered with the evopop Gtk3 theme ↑
-
-![GtkFlow](./screenshots/first_shot.png)
-
-This here is the included advanced calculator demo application ↑
-
-Flow graphs are a possibility to let your user model flows of data from, through
-and into several stations.
 
 Motivation
 ----------
