@@ -4,6 +4,10 @@ GtkFlow
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
+![ConnectorAesthetics](./screenshots/connection_aesthetics.png)
+
+GtkFlow has been optimized to provide much nicer visual cues on the direction of connections
+
 ![SameLineDocks](./screenshots/sameline.png)
 
 Sinks and Sources may now appear on the same line
