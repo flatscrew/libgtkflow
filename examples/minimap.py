@@ -57,6 +57,7 @@ class Calculator(object):
     def __init__(self):
         w = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
         self.nv = GtkFlow.NodeView.new()
+        self.nv.set_placeholder("Please click the buttons above to spawn nodes.")
         self.vp = Gtk.Viewport()
         self.sw = Gtk.ScrolledWindow()
         self.minimap = GtkFlow.Minimap.new()

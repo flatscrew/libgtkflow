@@ -132,6 +132,7 @@ class Calculator(object):
         self.nv = GtkFlow.NodeView.new()
 
         self.nv.set_show_types(True)
+        self.nv.set_placeholder("Please click the buttons above to spawn nodes.")
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         create_numbernode_button = Gtk.Button.new_with_label("Create NumberNode")

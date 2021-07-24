@@ -114,6 +114,7 @@ class Calculator(object):
         w = Gtk.Window.new(Gtk.WindowType.TOPLEVEL)
         self.nv = GtkFlow.NodeView.new()
         self.nv.connect_after("color-calculation", self.do_color_request)
+        self.nv.set_placeholder("Please click the buttons above to spawn nodes.")
         self.sw = Gtk.ScrolledWindow()
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)

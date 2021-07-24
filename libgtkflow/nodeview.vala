@@ -104,6 +104,14 @@ namespace GtkFlow {
         public bool allow_recursion {get; set; default=false;}
 
         /**
+         * A string that is displayed at the center of the NodeView
+         * When no nodes are displayed. You can use it to e.g display
+         * a text that encourages the user to spawn nodes.
+         */
+        public string placeholder {get; set; default="";}
+        private Pango.Layout placeholder_layout;
+
+        /**
          * Used to store fg color at iniialization as getting this on the
          * fly has lead to endless-loop-problems.
          */
@@ -114,6 +122,13 @@ namespace GtkFlow {
          */
         public NodeView() {
             Object();
+
+            this.placeholder_layout = (new Gtk.Label("")).create_pango_layout("");
+            this.notify["placeholder"].connect(()=>{
+                this.placeholder_layout.set_markup(this.placeholder, -1);
+                this.queue_draw();
+            });
+
             this.set_size_request(100,100);
             this.draw.connect((cr)=>{ return this.do_draw(cr); });
             this.motion_notify_event.connect((e)=>{ return this.do_motion_notify_event(e); });
@@ -981,6 +996,23 @@ namespace GtkFlow {
                                 this.rubber_alloc.x, this.rubber_alloc.y,
                                 Gtk.StateFlags.NORMAL,
                                 &this.rubber_alloc.width, &this.rubber_alloc.height);
+            }
+            // Draw placeholder if there are no nodes
+            if (this.nodes.length() == 0) {
+                sc.save();
+                cr.save();
+                sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+                Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+                cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
+
+                int placeholder_width, placeholder_height;
+                this.placeholder_layout.get_pixel_size(out placeholder_width, out placeholder_height);
+
+                cr.move_to(nv_alloc.width / 2 - placeholder_width / 2,
+                           nv_alloc.height / 2 - placeholder_height / 2);
+                Pango.cairo_show_layout(cr, this.placeholder_layout);
+                cr.restore();
+                sc.restore();
             }
             return false;
         }

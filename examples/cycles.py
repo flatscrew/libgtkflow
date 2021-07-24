@@ -103,6 +103,7 @@ class CountDemo(object):
 
         # This deactivates nodeview's self-check for recursions
         self.nv.set_allow_recursion(True)
+        self.nv.set_placeholder("Please click the buttons above to spawn nodes.")
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         create_starternode_button = Gtk.Button.new_with_label("Create StarterNode")
