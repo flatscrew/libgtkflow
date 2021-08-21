@@ -1,4 +1,4 @@
-libgtkflow (0.1.0.20150719-1) unstable; urgency=low
+libgtkflow (0.8.0-1) unstable; urgency=low
 
   * Initial release (Closes: #792885)
 

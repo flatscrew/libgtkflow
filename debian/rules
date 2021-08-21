@@ -4,8 +4,8 @@
 
 .PHONY:
 override_dh_strip:
-	dh_strip --dbg-package=libgtkflow-0.2-dbg -plibgtkflow-0.2-1
-	dh_strip --dbg-package=libgflow-0.2-dbg -plibgflow-0.2-1
+	dh_strip --dbg-package=libgtkflow-0.8-dbg -plibgtkflow-0.8-1
+	dh_strip --dbg-package=libgflow-0.8-dbg -plibgflow-0.8-1
 
 override_dh_autoreconf:
 	dh_autoreconf --as-needed
