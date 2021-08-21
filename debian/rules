@@ -3,12 +3,9 @@
 	dh $@ --buildsystem=meson
 
 .PHONY:
-override_dh_strip:
-	dh_strip --dbg-package=libgtkflow-0.8-dbg -plibgtkflow-0.8-1
-	dh_strip --dbg-package=libgflow-0.8-dbg -plibgflow-0.8-1
 
-override_dh_autoreconf:
-	dh_autoreconf --as-needed
+#override_dh_autoreconf:
+#	dh_autoreconf --as-needed
 
 override_dh_auto_test:
 	xvfb-run -a dh_auto_test

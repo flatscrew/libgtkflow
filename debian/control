@@ -47,16 +47,6 @@ Description: Flow graph library for Gtk+-3.0 headerfiles
  flow-graph-library libgtkflow. It contains c-headers 
  and vapi-files.
 
-Package: libgtkflow-0.8-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Multi-Arch: same
-Depends: libgtkflow-0.8-1 (= ${binary:Version}), ${misc:Depends}
-Description: Debugging information for libgtkflow-0.8
- This package provides debugging symbols for the flow graph
- library libgtkflow-0.8
-
 Package: gir1.2-gtkflow-0.8
 Section: introspection
 Architecture: any
@@ -101,16 +91,6 @@ Description: Data flow modeling library headerfiles
  This library provides development headers for libgflow
  It contains typelib-files for gobject-introspection,
  c-headers and vapi-files.
-
-Package: libgflow-0.8-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Multi-Arch: same
-Depends: libgflow-0.8-1 (= ${binary:Version}), ${misc:Depends}
-Description: Debugging information for libgflow-0.8
- This package provides debugging symbols for the data flow
- modeling library libgflow-0.2
 
 Package: gir1.2-gflow-0.8
 Section: introspection
