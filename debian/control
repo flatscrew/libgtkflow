@@ -1,7 +1,7 @@
 Source: libgtkflow
 Priority: optional
 Maintainer: Daniel Brendle <grindhold@skarphed.org>
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 11),
                dh-autoreconf,
                autotools-dev,
                intltool (>=0.35),

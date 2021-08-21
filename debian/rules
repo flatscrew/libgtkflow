@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 %:
-	dh $@  --with autoreconf,gir
+	dh $@ --buildsystem=meson
 
 .PHONY:
 override_dh_strip:
@@ -13,5 +13,5 @@ override_dh_autoreconf:
 override_dh_auto_test:
 	xvfb-run -a dh_auto_test
 
-override_dh_auto_configure:
-	dh_auto_configure -- --enable-docs --enable-gtk-docs --enable-devhelp-docs
+#override_dh_auto_configure:
+#	dh_auto_configure -- --enable-docs --enable-gtk-docs --enable-devhelp-docs
