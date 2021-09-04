@@ -84,7 +84,7 @@ namespace GtkFlow {
         private List<Gtk.Widget> childlist = new List<Gtk.Widget>();
         private HashTable<weak Gtk.Widget, ulong> childlist_alloc_handles = new HashTable<weak Gtk.Widget, ulong>(direct_hash, direct_equal);
 
-        public Node (GFlow.Node n, Gtk.Widget? title=null) {
+        public Node (GFlow.Node n) {
             this.gnode = n;
             this.node_renderer = new DefaultNodeRenderer(this);
             foreach (GFlow.Dock d in this.gnode.get_sources())

@@ -151,7 +151,7 @@ class Calculator(object):
 
     def do_create_addnode(self, widget=None, data=None):
         n = OperationNode()
-        self.nv.add_with_child(n, n.combobox, n.titlestack)
+        self.nv.add_with_child(n, n.combobox, title=n.titlestack)
         self.nv.set_node_renderer(n, GtkFlow.NodeRendererType.DEFAULT)
     def do_create_numbernode(self, widget=None, data=None):
         n = NumberNode()

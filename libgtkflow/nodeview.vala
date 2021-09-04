@@ -161,7 +161,7 @@ namespace GtkFlow {
          * This methods adds a {@link GFlow.Node} to this NodeView
          */
         public void add_node(GFlow.Node gn, Gtk.Widget? title=null) {
-            Node n = new Node(gn, title);
+            Node n = new Node.with_child(gn, new Gtk.Box(Gtk.Orientation.VERTICAL,0), title);
             n.set_allocation({1,1,0,0});
             this.add_common(n);
             node_added(gn);
