@@ -87,7 +87,8 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       NodeProperties node_properties);
+                                       NodeProperties node_properties,
+                                       Gtk.Widget? title=null);
         /**
          * Implementations should calculate whether there is a dock
          * on this node specified by the {@link Gdk.Point} p . If so,
@@ -96,7 +97,8 @@ namespace GtkFlow {
         public abstract GFlow.Dock? get_dock_on_position(Gdk.Point p,
                                                     List<DockRenderer> dock_renderers,
                                                     uint border_width,
-                                                    Gtk.Allocation alloc );
+                                                    Gtk.Allocation alloc,
+                                                    Gtk.Widget? title=null);
         /**
          * Implementations should calculate the position of the given
          * dock on the canvas and write it into the parameters x and y.
@@ -108,7 +110,8 @@ namespace GtkFlow {
                                                     int border_width,
                                                     Gtk.Allocation alloc,
                                                     out int x,
-                                                    out int y);
+                                                    out int y,
+                                                    Gtk.Widget? title=null);
         /**
          * Implementations should return true if the given position is
          * on the node's closebutton.
@@ -136,7 +139,8 @@ namespace GtkFlow {
          */
         public abstract uint get_min_height(List<DockRenderer> dock_renderers,
                                            List<Gtk.Widget> children,
-                                           int border_width);
+                                           int border_width,
+                                           Gtk.Widget? title=null);
         /**
          * If this NodeRenderer-implementation renderes text, like the
          * nodes name, this method is executed everytime the namestring of

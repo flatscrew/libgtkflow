@@ -33,14 +33,21 @@ namespace GtkFlow {
         }
 
 
-        private uint get_title_line_height() {
+        private uint get_title_line_height(Gtk.Widget? title=null) {
             // FIXME: this is a bad solution. it should not happen in the first place
             //        probably related to the remaining Pango-CRITICALs. but it works.
-            if (this.layout == null)
+            if (this.layout == null) {
                 return 25;
-            int width, height;
-            this.layout.get_pixel_size(out width, out height);
-            return (uint)Math.fmax(height, delete_btn_size) + title_spacing;
+            } else if (title != null) {
+                int min_height = 1;
+                int natural_height = 1;
+                title.get_preferred_height(out min_height, out natural_height);
+                return natural_height + 10;
+            } else {
+                int width, height;
+                this.layout.get_pixel_size(out width, out height);
+                return (uint)Math.fmax(height, delete_btn_size) + title_spacing;
+            }
         }
 
         /**
@@ -48,9 +55,10 @@ namespace GtkFlow {
          */
         public override uint get_min_height(List<DockRenderer> dock_renderers,
                                             List<Gtk.Widget> children,
-                                            int border_width) {
+                                            int border_width,
+                                            Gtk.Widget? title=null) {
             uint mh = border_width*2;
-            mh += this.get_title_line_height();
+            mh += this.get_title_line_height(title);
             uint source_height = 0;
             uint sink_height = 0;
             foreach (DockRenderer dock_renderer in dock_renderers) {
@@ -163,11 +171,12 @@ namespace GtkFlow {
                                                     int border_width,
                                                     Gtk.Allocation alloc,
                                                     out int x,
-                                                    out int y) {
+                                                    out int y,
+                                                    Gtk.Widget? title=null) {
             int i = 0;
             x = y = 0;
 
-            uint title_offset = this.get_title_line_height();
+            uint title_offset = this.get_title_line_height(title);
 
             foreach(DockRenderer dock_renderer in dock_renderers) {
                 GFlow.Dock s = dock_renderer.get_dock();
@@ -219,7 +228,8 @@ namespace GtkFlow {
         public override GFlow.Dock? get_dock_on_position(Gdk.Point p,
                                                     List<DockRenderer> dock_renderers,
                                                     uint border_width,
-                                                    Gtk.Allocation alloc ) {
+                                                    Gtk.Allocation alloc,
+                                                    Gtk.Widget? title=null) {
             int x = p.x;
             int y = p.y;
 
@@ -228,7 +238,7 @@ namespace GtkFlow {
 
             int dock_x, dock_y, mh;
             uint title_offset;
-            title_offset = this.get_title_line_height();
+            title_offset = this.get_title_line_height(title);
 
             foreach (DockRenderer dock_renderer in dock_renderers) {
                 GFlow.Dock s = dock_renderer.get_dock();
@@ -294,7 +304,8 @@ namespace GtkFlow {
                                        List<DockRenderer> dock_renderers,
                                        List<Gtk.Widget> children,
                                        int border_width,
-                                       NodeProperties node_properties) {
+                                       NodeProperties node_properties,
+                                       Gtk.Widget? title=null) {
             bool editable = node_properties.editable;
             bool deletable = node_properties.deletable;
             bool resizable = node_properties.resizable;
@@ -307,7 +318,17 @@ namespace GtkFlow {
 
             int y_offset = 0;
 
-            if (this.layout.get_text() != "") {
+            if (title != null) {
+                int pref_title_height,  _;
+                title.get_preferred_height(out _, out pref_title_height);
+                Gtk.Allocation title_alloc = {0,0,0,0};
+                title_alloc.x = (int)border_width;
+                title_alloc.y = (int)border_width;
+                title_alloc.width = alloc.width - 3 * (int)border_width - delete_btn_size;
+                title_alloc.height = pref_title_height;
+                title.size_allocate(title_alloc);
+                this.child_redraw(title);
+            } else if (this.layout.get_text() != "") {
                 sc.save();
                 cr.save();
                 sc.add_class(Gtk.STYLE_CLASS_BUTTON);
@@ -349,7 +370,7 @@ namespace GtkFlow {
                     cr.restore();
                 }
             }
-            y_offset += (int)this.get_title_line_height();
+            y_offset += (int)this.get_title_line_height(title);
             int y_offset_sources = y_offset;
 
             int x_offset_sources = 0;

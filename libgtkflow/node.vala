@@ -38,6 +38,8 @@ namespace GtkFlow {
 
         public GFlow.Node gnode {public get; private set; default = null;}
 
+        public Gtk.Widget? title {public get; private set; default = null;}
+
         public NodeView? node_view {get; internal set; default=null;}
 
         internal bool selected {get; set; default=false;}
@@ -82,7 +84,7 @@ namespace GtkFlow {
         private List<Gtk.Widget> childlist = new List<Gtk.Widget>();
         private HashTable<weak Gtk.Widget, ulong> childlist_alloc_handles = new HashTable<weak Gtk.Widget, ulong>(direct_hash, direct_equal);
 
-        public Node (GFlow.Node n) {
+        public Node (GFlow.Node n, Gtk.Widget? title=null) {
             this.gnode = n;
             this.node_renderer = new DefaultNodeRenderer(this);
             foreach (GFlow.Dock d in this.gnode.get_sources())
@@ -164,9 +166,14 @@ namespace GtkFlow {
                 this.render();
         }
 
-        public Node.with_child(GFlow.Node n, Gtk.Widget c) {
+        public Node.with_child(GFlow.Node n, Gtk.Widget c, Gtk.Widget? title=null) {
             this(n);
             this.add(c);
+            if (title != null) {
+                this.title = title;
+                this.add(title);
+                title.show();
+            }
             this.realize.connect(()=>{
                 // Bad fix for the wigglebug: Find more elegant solution than this.
                 // key is that the children will only render correctly if the node they

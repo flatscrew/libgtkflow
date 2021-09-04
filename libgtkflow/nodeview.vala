@@ -160,8 +160,8 @@ namespace GtkFlow {
         /**
          * This methods adds a {@link GFlow.Node} to this NodeView
          */
-        public void add_node(GFlow.Node gn) {
-            Node n = new Node(gn);
+        public void add_node(GFlow.Node gn, Gtk.Widget? title=null) {
+            Node n = new Node(gn, title);
             n.set_allocation({1,1,0,0});
             this.add_common(n);
             node_added(gn);
@@ -171,8 +171,8 @@ namespace GtkFlow {
          * This method adds a {@link GFlow.Node} to this nodeview and
          * assigns an arbitrary {@link Gtk.Widget} as its child.
          */
-        public void add_with_child(GFlow.Node gn, Gtk.Widget child) {
-            Node n = new Node.with_child(gn, child);
+        public void add_with_child(GFlow.Node gn, Gtk.Widget child, Gtk.Widget? title=null) {
+            Node n = new Node.with_child(gn, child, title);
             this.add_common(n);
             node_added(gn);
         }
@@ -333,7 +333,7 @@ namespace GtkFlow {
                 }
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    n.border_width, alloc
+                    n.border_width, alloc, n.title
                 );
                 if (targeted_dock != null) {
                     this.drag_dock = targeted_dock;
@@ -347,7 +347,8 @@ namespace GtkFlow {
                         if (!srcnode.node_renderer.get_dock_position(
                                 s, srcnode.get_dock_renderers(),
                                 (int)srcnode.border_width, src_alloc,
-                                out startpos_x, out startpos_y )) {
+                                out startpos_x, out startpos_y,
+                                srcnode.title )) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
@@ -358,7 +359,8 @@ namespace GtkFlow {
                         if (!n.node_renderer.get_dock_position(
                                 this.drag_dock, n.get_dock_renderers(),
                                 (int)n.border_width, alloc,
-                                out startpos_x, out startpos_y )) {
+                                out startpos_x, out startpos_y,
+                                n.title )) {
                             warning("No dock on position. Aborting drag");
                             return false;
                         }
@@ -572,7 +574,7 @@ namespace GtkFlow {
                     this.get_window().set_cursor(null);
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    n.border_width, alloc
+                    n.border_width, alloc, n.title
                 );
                 if (this.drag_dock == null && targeted_dock != this.hovered_dock) {
                     this.set_hovered_dock(targeted_dock);
@@ -917,7 +919,8 @@ namespace GtkFlow {
                     n.get_dock_renderers(),
                     n.get_childlist(),
                     (int)n.border_width,
-                    node_properties
+                    node_properties,
+                    n.title
                 );
                 n.current_cairo_ctx = null;
             }
@@ -932,7 +935,8 @@ namespace GtkFlow {
                             source,
                             n.get_dock_renderers(),
                             (int)n.border_width,
-                            alloc, out source_pos_x, out source_pos_y)) {
+                            alloc, out source_pos_x, out source_pos_y,
+                            n.title)) {
                         warning("No dock on position. Ommiting connector");
                         continue;
                     }
@@ -948,7 +952,8 @@ namespace GtkFlow {
                                 sink,
                                 sink_node.get_dock_renderers(),
                                 (int)sink_node.border_width,
-                                alloc, out sink_pos_x, out sink_pos_y )) {
+                                alloc, out sink_pos_x, out sink_pos_y,
+                                sink_node.title )) {
                             warning("No dock on position. Ommiting connector");
                             continue;
                         }
