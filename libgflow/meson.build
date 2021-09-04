@@ -65,7 +65,7 @@ if get_option('enable_valadoc')
                                #        the problem is we cannot access a subfolder of the
                                #        buildtarget via the output parameter.
                                #        Find a nicer solution
-                               install_dir: '/tmp',
+                               install_dir: get_option('datadir') + '/devhelp/books',
                                command: [valadoc, '-o', 'libgflow/gflow-' + api, '--doclet', 'devhelp', '@INPUT@', '--force'],
                                output: 'gflow-' + api)
     install_subdir(meson.current_build_dir() + '/gflow-' + api + '/gflow-' + api,

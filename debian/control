@@ -1,10 +1,9 @@
 Source: libgtkflow
 Priority: optional
 Maintainer: Daniel Brendle <grindhold@skarphed.org>
-Build-Depends: debhelper (>= 11),
-               dh-autoreconf,
-               autotools-dev,
+Build-Depends: debhelper (>= 13),
                intltool (>=0.35),
+               meson,
                pkg-config,
                valac,
                libgtk-3-dev,
@@ -16,7 +15,7 @@ Build-Depends: debhelper (>= 11),
                libgirepository1.0-dev (>= 1.39.0),
                valadoc,
                gtk-doc-tools
-Standards-Version: 3.9.6
+Standards-Version: 4.5.1
 Section: libs
 Homepage: https://github.com/grindhold/libgtkflow
 
@@ -35,13 +34,13 @@ Package: libgtkflow-0.8-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libgtkflow-0.8-1 (= ${binary:Version}), ${misc:Depends},
+Depends: libgtkflow-0.8 (= ${binary:Version}), ${misc:Depends},
          libglib2.0-dev,
          libgtk-3-dev,
          libc6-dev,
          libgflow-0.8-dev,
          libcairo2-dev,
-         gir1.2-gtkflow-0.8
+         gir1.2-gtkflow-0.8 (= ${binary:Version})
 Description: Flow graph library for Gtk+-3.0 headerfiles
  This package contains development headerfiles for the 
  flow-graph-library libgtkflow. It contains c-headers 
@@ -69,10 +68,10 @@ Description: Documentation for libgflow-0.8
  documentation for libgflow. The devhelp-book can
  be read via the software devhelp.
 
-Package: libgtkflow-0.8-1
+Package: libgtkflow-0.8
 Architecture: any
 Multi-Arch: same
-Depends: libgflow-0.8-1, ${shlibs:Depends}, ${misc:Depends}
+Depends: libgflow-0.8, ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: Flow graph library for Gtk+-3.0
  This library provides an additional Gtk3-Widget that
@@ -83,10 +82,10 @@ Package: libgflow-0.8-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libgflow-0.8-1 (= ${binary:Version}), ${misc:Depends},
+Depends: libgflow-0.8 (= ${binary:Version}), ${misc:Depends},
          libglib2.0-dev,
          libc6-dev,
-         gir1.2-gflow-0.2
+         gir1.2-gflow-0.8 (= ${binary:Version})
 Description: Data flow modeling library headerfiles
  This library provides development headers for libgflow
  It contains typelib-files for gobject-introspection,
@@ -103,7 +102,7 @@ Description: Typelib (gobject-introspection)-files for libgflow
  gobject-introspection of various scripting-languages like e.g.
  Python, Perl, Lua, PHP, JS and more
 
-Package: libgflow-0.8-1
+Package: libgflow-0.8
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}

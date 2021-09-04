@@ -1,5 +1,5 @@
-libgtkflow (0.8.0-1) unstable; urgency=low
+libgtkflow (0.8.0) unstable; urgency=low
 
   * Initial release (Closes: #792885)
 
- -- Daniel Brendle <grindhold@skarphed.org>  Sun, 19 Jul 2015 16:21:35 +0200
+ -- Daniel Brendle <grindhold@skarphed.org>  Mon, 23 Aug 2021 15:46:35 +0200
