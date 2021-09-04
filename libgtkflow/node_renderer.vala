@@ -132,7 +132,8 @@ namespace GtkFlow {
          */
         public abstract uint get_min_width(List<DockRenderer> dock_renderers,
                                            List<Gtk.Widget> children,
-                                           int border_width);
+                                           int border_width,
+                                           Gtk.Widget? title=null);
         /**
          * Implementations should return the minimum height that this
          * node needs in order to be correctly rendered.

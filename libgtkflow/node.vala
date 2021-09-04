@@ -199,7 +199,8 @@ namespace GtkFlow {
                 return;
             int mw = (int)this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
-                (int)this.get_border_width()
+                (int)this.get_border_width(),
+                this.title
             );
             int mh = (int)this.node_renderer.get_min_height(
                 this.dock_renderers, this.childlist,
@@ -307,7 +308,8 @@ namespace GtkFlow {
             this.get_allocation(out alloc);
             uint mw = this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
-                (int) this.get_border_width()
+                (int) this.get_border_width(),
+                this.title
             );
             uint mh = this.node_renderer.get_min_height(
                 this.dock_renderers, this.childlist,

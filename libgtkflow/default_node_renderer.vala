@@ -76,10 +76,15 @@ namespace GtkFlow {
          */
         public override uint get_min_width(List<DockRenderer> dock_renderers,
                                            List<Gtk.Widget> children,
-                                           int border_width) {
+                                           int border_width,
+                                           Gtk.Widget? title=null) {
             uint mw = 0;
             int t = 0;
-            if (this.layout.get_text() != "") {
+            if (title != null) {
+                int min_width, _;
+                title.get_preferred_width(out min_width, out _);
+                mw = min_width + 3*border_width + delete_btn_size;
+            } else if (this.layout.get_text() != "") {
                 int width, height;
                 this.layout.get_pixel_size(out width, out height);
                 mw = width + title_spacing + delete_btn_size;
