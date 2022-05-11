@@ -1,6 +1,8 @@
 GtkFlow
 =======
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/libgtkflow.svg)](https://repology.org/project/libgtkflow/versions)
+
 Here you see libgtkflow, a universal library for drawing flow graphs with
 Gtk+ 3.
 
