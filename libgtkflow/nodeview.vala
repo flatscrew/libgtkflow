@@ -1101,6 +1101,7 @@ namespace GtkFlow {
                 return;
             }
             n.highlight_color = c;
+            this.queue_draw();
         }
     }
 
