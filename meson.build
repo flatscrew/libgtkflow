@@ -23,7 +23,7 @@ project ('gtkflow', 'vala', 'c', meson_version: '>=0.46.1')
 # If you can verify that this project also builds with a lower
 # meson version, feel free to change the meson_version kwarg
 
-api = '0.8'
+api = '0.9'
 
 pkgconfig = import('pkgconfig')
 
