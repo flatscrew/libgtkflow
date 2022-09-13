@@ -2,11 +2,13 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 gi.require_version('GFlow', '0.8')
 gi.require_version('GtkFlow', '0.8')
 
 from gi.repository import GLib
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GFlow
 from gi.repository import GtkFlow
 
@@ -152,6 +154,7 @@ class Calculator(object):
     def do_create_addnode(self, widget=None, data=None):
         n = AddNode()
         self.nv.add_with_child(n, n.btnbox)
+        self.nv.set_node_highlight(n, Gdk.RGBA(1.0,0.0,0.0,1.0))
     def do_create_numbernode(self, widget=None, data=None):
         n = NumberNode()
         self.nv.add_with_child(n, n.spinbutton)

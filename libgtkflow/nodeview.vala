@@ -922,6 +922,22 @@ namespace GtkFlow {
                     node_properties,
                     n.title
                 );
+
+                if (n.highlight_color != null) {
+                    var hl = n.highlight_color;
+                    Gtk.Allocation node_alloc;
+                    n.get_allocation(out node_alloc);
+                    cr.save();
+                    cr.set_source_rgba(hl.red, hl.green, hl.blue, 0.3);
+                    cr.rectangle(node_alloc.x, node_alloc.y, node_alloc.width, node_alloc.height);
+                    cr.fill();
+                    cr.restore();
+                    cr.save();
+                    cr.set_source_rgba(hl.red, hl.green, hl.blue, 0.9);
+                    cr.rectangle(node_alloc.x, node_alloc.y, node_alloc.width, node_alloc.height);
+                    cr.stroke();
+                    cr.restore();
+                }
                 n.current_cairo_ctx = null;
             }
             this.nodes.reverse();
@@ -1069,6 +1085,22 @@ namespace GtkFlow {
          */
         public override void forall_internal(bool include_internal, Gtk.Callback cb) {
             nodes.foreach(n => cb(n));
+        }
+
+        /**
+         * Highlight a node in a user-specified color
+         *
+         * When set to a non-null value, the node will be displayed in the tint
+         * of the given color. You can use this to convey status information
+         * or to indicate that something with this node is not allright.
+         */
+        public void set_node_highlight(GFlow.Node gn, Gdk.RGBA? c) {
+            Node? n = this.get_node_from_gflow_node(gn);
+            if (n == null) {
+                warning("Tried to set highlight color to node that does not belong to nodeview.");
+                return;
+            }
+            n.highlight_color = c;
         }
     }
 

@@ -44,6 +44,8 @@ namespace GtkFlow {
 
         internal bool selected {get; set; default=false;}
 
+        internal Gdk.RGBA? highlight_color {get; set; default=null;}
+
         private NodeRenderer? _node_renderer = null;
         public NodeRenderer? node_renderer {
             get {return this._node_renderer;}
@@ -100,6 +102,11 @@ namespace GtkFlow {
             this.gnode.notify["name"].connect(()=>{
                 this.node_renderer.update_name_layout(this.gnode.name);
                 this.recalculate_size();
+            });
+
+            this.gnode.notify["highlight-color"].connect(()=>{
+                message("changed color of node highlight");
+                this.render();
             });
 
             this.notify["node-view"].connect(()=>{
