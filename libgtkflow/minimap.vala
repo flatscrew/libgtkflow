@@ -30,6 +30,8 @@ namespace GtkFlow {
         private GtkFlow.NodeView? _nodeview = null;
         private Gtk.ScrolledWindow? _scrolledwindow = null;
         private ulong draw_signal = 0;
+        private ulong hadjustment_signal = 0;
+        private ulong vadjustment_signal = 0;
 
         private int offset_x = 0;
         private int offset_y = 0;
@@ -52,6 +54,10 @@ namespace GtkFlow {
                 if (this._nodeview != null) {
                     GLib.SignalHandler.disconnect(this._nodeview, this.draw_signal);
                 }
+                if (this._scrolledwindow != null) {
+                    GLib.SignalHandler.disconnect(this._nodeview, this.hadjustment_signal);
+                    GLib.SignalHandler.disconnect(this._nodeview, this.vadjustment_signal);
+                }
                 if (value == null) {
                     this._nodeview = null;
                     this._scrolledwindow = null;
@@ -64,6 +70,12 @@ namespace GtkFlow {
                         if (value.get_parent() is Gtk.Viewport) {
                             if (value.get_parent().get_parent() is Gtk.ScrolledWindow) {
                                 this._scrolledwindow = value.get_parent().get_parent() as Gtk.ScrolledWindow;
+                                this.hadjustment_signal = this._scrolledwindow.hadjustment.notify["value"].connect(
+                                    ()=>{this.queue_draw();}
+                                );
+                                this.vadjustment_signal = this._scrolledwindow.vadjustment.notify["value"].connect(
+                                    ()=>{this.queue_draw();}
+                                );
                             }
                         }
                     }
