@@ -1,6 +1,6 @@
-#include <gflow-0.6.h>
+#include <gflow-0.10.h>
 #include <gtk/gtk.h>
-#include <gtkflow-0.6.h>
+#include <gtkflow-0.10.h>
 
 GtkFlowNodeView *nv;
 static void on_button_clicked();

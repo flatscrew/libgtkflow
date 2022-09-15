@@ -1,5 +1,5 @@
 #********************************************************************+
-# Copyright 2016-2021 Daniel 'grindhold' Brendle
+# Copyright 2016-2022 Daniel 'grindhold' Brendle
 #
 # This file is part of libgtkflow.
 #
@@ -23,7 +23,7 @@ project ('gtkflow', 'vala', 'c', meson_version: '>=0.46.1')
 # If you can verify that this project also builds with a lower
 # meson version, feel free to change the meson_version kwarg
 
-api = '0.9'
+api = '0.10'
 
 pkgconfig = import('pkgconfig')
 

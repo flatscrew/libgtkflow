@@ -1,4 +1,4 @@
-// Compile: $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.8 --pkg gtkflow-0.8
+// Compile: $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.10 --pkg gtkflow-0.10
 
 using Gtk;
 using GFlow;

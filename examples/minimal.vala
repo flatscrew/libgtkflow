@@ -1,6 +1,6 @@
-#!/usr/bin/env -S vala --pkg gtk+-3.0 --pkg gtkflow-0.8 --pkg gflow-0.8
+#!/usr/bin/env -S vala --pkg gtk+-3.0 --pkg gtkflow-0.10 --pkg gflow-0.10
 // Run: $ ./minimal.vala
-// Compile: $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.8 --pkg gtkflow-0.8
+// Compile: $ valac minimal.vala --pkg gtk+-3.0 --pkg gflow-0.10 --pkg gtkflow-0.10
 using Gtk;
 using GFlow;
 GtkFlow.NodeView nv;
