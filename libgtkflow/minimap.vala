@@ -144,7 +144,11 @@ namespace GtkFlow {
                     Gtk.Allocation alloc;
                     n.get_allocation(out alloc);
                     cr.save();
-                    cr.set_source_rgba(0.4,0.4,0.4,0.5);
+                    if (n.highlight_color != null) {
+                        cr.set_source_rgba(n.highlight_color.red,n.highlight_color.green,n.highlight_color.blue,0.5);
+                    } else {
+                        cr.set_source_rgba(0.4,0.4,0.4,0.5);
+                    }
                     cr.rectangle(offset_x + alloc.x/ratio, offset_y + alloc.y/ratio, alloc.width/ratio, alloc.height/ratio);
                     cr.fill();
                     cr.restore();

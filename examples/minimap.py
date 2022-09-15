@@ -2,11 +2,13 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('GFlow', '0.8')
-gi.require_version('GtkFlow', '0.8')
+gi.require_version('Gdk', '3.0')
+gi.require_version('GFlow', '0.9')
+gi.require_version('GtkFlow', '0.9')
 
 from gi.repository import GLib
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GFlow
 from gi.repository import GtkFlow
 
@@ -66,7 +68,7 @@ class Calculator(object):
         create_numbernode_button = Gtk.Button.new_with_label("Create NumberNode")
         create_numbernode_button.connect("clicked", self.do_create_numbernode)
         hbox.add(create_numbernode_button)
-        create_addnode_button = Gtk.Button.new_with_label("Create OperationNode")
+        create_addnode_button = Gtk.Button.new_with_label("Uncolor nodes")
         create_addnode_button.connect("clicked", self.do_create_addnode)
         hbox.add(create_addnode_button)
         create_printnode_button = Gtk.Button.new_with_label("Create PrintNode")
@@ -82,17 +84,21 @@ class Calculator(object):
 
         self.minimap.set_nodeview(self.nv)
  
+        self.colored_nodes = []
+
         w.add(vbox)
         w.show_all()       
         w.connect("destroy", self.do_quit)
         Gtk.main()
 
     def do_create_addnode(self, widget=None, data=None):
-        n = AddNode()
-        self.nv.add_with_child(n, n.btnbox)
+        for n in self.colored_nodes:
+            self.nv.set_node_highlight(n, None)
     def do_create_numbernode(self, widget=None, data=None):
         n = NumberNode()
         self.nv.add_with_child(n, n.spinbutton)
+        self.nv.set_node_highlight(n, Gdk.RGBA(0.6,1.0,0.0, 1.0))
+        self.colored_nodes.append(n)
     def do_create_printnode(self, widget=None, data=None):
         n = PrintNode()
         self.nv.add_with_child(n, n.childlabel)
