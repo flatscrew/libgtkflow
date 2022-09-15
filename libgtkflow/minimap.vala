@@ -88,6 +88,10 @@ namespace GtkFlow {
                 || e.type == Gdk.EventType.@3BUTTON_PRESS)
                 return false;
             this.move_rubber = true;
+            double halloc = double.max(0, e.x - offset_x - rubber_width / 2) * ratio;
+            double valloc = double.max(0, e.y - offset_y - rubber_height / 2) * ratio;
+            this._scrolledwindow.hadjustment.value = halloc;
+            this._scrolledwindow.vadjustment.value = valloc;
             return true;
         }
 
