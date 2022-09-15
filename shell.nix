@@ -9,7 +9,7 @@ mkShell {
     gtk3
     glib
     gobject-introspection
-    python38
-    python38Packages.pygobject3
+    python
+    pythonPackages.pygobject3
   ];
 }
