@@ -12,6 +12,6 @@ src = files([
 test('gflow-test',
      executable('gflow_test',
                 src,
-                dependencies: [glib, gobject, gtk],
-                link_with: [gflow, gtkflow],
-                include_directories: [gflow_inc, gtkflow_inc]))
+                dependencies: [glib, gobject, gtk3],
+                link_with: [gflow, gtkflow3],
+                include_directories: [gflow_inc, gtkflow3_inc]))

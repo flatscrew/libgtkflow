@@ -7,6 +7,7 @@ mkShell {
     ninja
     pkg-config
     gtk3
+    gtk4
     glib
     gobject-introspection
     python
