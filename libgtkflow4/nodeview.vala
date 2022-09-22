@@ -172,7 +172,7 @@ namespace GtkFlow {
          */
         public void add_node(GFlow.Node gn, Gtk.Widget? title=null) {
             Node n = new Node.with_child(gn, new Gtk.Box(Gtk.Orientation.VERTICAL,0), title);
-            n.set_allocation({1,1,0,0});
+            //n.set_allocation({1,1,0,0});
             this.add_common(n);
             node_added(gn);
         }
@@ -295,7 +295,7 @@ namespace GtkFlow {
         public void remove_node(GFlow.Node n) {
             n.unlink_all();
             Node gn = this.get_node_from_gflow_node(n);
-            gn.forall_internal(true, (c)=>{c.destroy();});
+            //gn.forall_internal(true, (c)=>{c.destroy();});
             if (this.nodes.index(gn) != -1) {
                 this.nodes.remove(gn);
                 gn.node_view = null;
@@ -338,7 +338,7 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 bool cbp = n.gnode.deletable && n.node_renderer.is_on_closebutton(
                     pos, alloc,
-                    n.border_width
+                    0 // TODO ex-bw
                 );
                 if (cbp) {
                     this.close_button_pressed = true;
@@ -346,7 +346,7 @@ namespace GtkFlow {
                 }
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    n.border_width, alloc, n.title
+                    0, alloc, n.title // TODO ex-bw
                 );
                 if (targeted_dock != null) {
                     this.drag_dock = targeted_dock;
@@ -359,7 +359,7 @@ namespace GtkFlow {
                         srcnode.get_allocation(out src_alloc);
                         if (!srcnode.node_renderer.get_dock_position(
                                 s, srcnode.get_dock_renderers(),
-                                (int)srcnode.border_width, src_alloc,
+                                0, src_alloc, // TODO ex-bw
                                 out startpos_x, out startpos_y,
                                 srcnode.title )) {
                             warning("No dock on position. Aborting drag");
@@ -371,7 +371,7 @@ namespace GtkFlow {
                     } else {
                         if (!n.node_renderer.get_dock_position(
                                 this.drag_dock, n.get_dock_renderers(),
-                                (int)n.border_width, alloc,
+                                0, alloc, // TODO ex-bw
                                 out startpos_x, out startpos_y,
                                 n.title )) {
                             warning("No dock on position. Aborting drag");
@@ -390,7 +390,7 @@ namespace GtkFlow {
                 n.get_allocation(out alloc);
                 bool on_resize = n.gnode.resizable && n.node_renderer.is_on_resize_handle(
                     pos, alloc,
-                    n.border_width
+                    0 // TODO ex-bw
                 );
 
                 if (on_resize && this.resize_node == null) {
@@ -458,9 +458,9 @@ namespace GtkFlow {
          * Empty default implementation. Do not use. To remove {@link GFlow.Node}s
          * from a NodeView please use {@link NodeView.remove_node}
          */
-        public override void remove(Gtk.Widget w) {}
+        public void remove(Gtk.Widget w) {}
 
-        private bool do_button_release_event(int n, double x, double y) {
+        private bool do_button_release_event(int n_clicks, double x, double y) {
             if (!this.editable)
                 return false;
             // Determine if this was a closebutton press
@@ -472,7 +472,7 @@ namespace GtkFlow {
                     n.get_allocation(out alloc);
                     bool cbp = n.node_renderer.is_on_closebutton(
                         pos, alloc,
-                        n.border_width
+                        0 // TODO ex-bw
                     );
                     if (cbp) {
                         this.remove_node(n.gnode);
@@ -533,12 +533,15 @@ namespace GtkFlow {
             this.temp_connector = null;
             this.drag_threshold_fulfilled = false;
             this.resize_node = null;
-            this.get_window().set_cursor(null);
+            // TODO: cursor behaviour
+            //this.get_window().set_cursor(null);
         }
 
         private Gdk.Cursor resize_cursor = null;
+
+        // TODO: reimplement for gtk4
         private Gdk.Cursor? get_resize_cursor() {
-            if (resize_cursor == null && this.get_realized()) {
+            /*if (resize_cursor == null && this.get_realized()) {
                 if ((this.get_style_context().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
                     resize_cursor = new Gdk.Cursor.for_display(
                         this.get_window().get_display(),
@@ -550,8 +553,8 @@ namespace GtkFlow {
                         Gdk.CursorType.BOTTOM_LEFT_CORNER
                     );
                 }
-            }
-            return resize_cursor;
+            }*/
+            return null; //resize_cursor;
         }
 
         private bool do_motion_notify_event(double x, double y) {
@@ -571,7 +574,7 @@ namespace GtkFlow {
                 if (this.close_button_pressed) {
                     bool cbp = n.node_renderer.is_on_closebutton(
                         pos, alloc,
-                        n.border_width
+                        0 // TODO ex-bw
                     );
                     if (!cbp)
                         this.close_button_pressed = false;
@@ -579,7 +582,7 @@ namespace GtkFlow {
                 // Update cursor if we are on the resize area
                 bool on_resize = n.gnode.resizable && n.node_renderer.is_on_resize_handle(
                     pos, alloc,
-                    n.border_width
+                    0 // TODO ex-bw
                 );
                 // TODO: find replacement for cursor behaviour
                 /*if (on_resize)
@@ -589,7 +592,7 @@ namespace GtkFlow {
                     */
                 targeted_dock = n.node_renderer.get_dock_on_position(
                     pos, n.get_dock_renderers(),
-                    n.border_width, alloc, n.title
+                    0, alloc, n.title // TODO ex-bw
                 );
                 if (this.drag_dock == null && targeted_dock != this.hovered_dock) {
                     this.set_hovered_dock(targeted_dock);
@@ -610,8 +613,10 @@ namespace GtkFlow {
                 // resize handle outside of any node.
                 // The check for resize node is a cosmetical fix. If there is a
                 // Node bing resized in haste, the cursor tends to flicker
-                if (this.resize_node == null)
+                // TODO find replacement for cursor behaviour
+                /*if (this.resize_node == null)
                     this.get_window().set_cursor(null);
+                */
             }
 
             // Check if the cursor has been dragged a few pixels (defined by DRAG_THRESHOLD)
@@ -729,8 +734,8 @@ namespace GtkFlow {
          */
         private void allocate_minimum() {
             int minwidth = 0, minheight = 0, _ = 0;
-            this.get_preferred_width(out minwidth, out _);
-            this.get_preferred_height(out minheight, out _);
+            this.measure(Gtk.Orientation.HORIZONTAL, -1, out minwidth, out _, out _, out _);
+            this.measure(Gtk.Orientation.VERTICAL, -1, out minheight, out _, out _, out _);
             this.set_size_request(minwidth, minheight);
             Gtk.Allocation nv_alloc;
             this.get_allocation(out nv_alloc);
@@ -748,49 +753,49 @@ namespace GtkFlow {
         }
 
         /**
-         * Calculates the NodeView's minimum and preferred widths
+         * Calculates the NodeView's minimum and preferred extents
          */
-        public new void get_preferred_width(out int minimum_width, out int natural_width) {
-            double x_min = 0, x_max = 0;
-            Gtk.Allocation alloc;
-            foreach (Node n in this.nodes) {
-                n.get_allocation(out alloc);
-                x_min = Math.fmin(x_min, alloc.x);
-                x_max = Math.fmax(x_max, alloc.x+alloc.width);
+        public new void measure (Gtk.Orientation o, int for_size, out int min, out int pref, out int min_baseline, out int pref_baseline) {
+            switch(o) {
+                case Gtk.Orientation.HORIZONTAL:
+                    double x_min = 0, x_max = 0;
+                    Gtk.Allocation alloc;
+                    foreach (Node n in this.nodes) {
+                        n.get_allocation(out alloc);
+                        x_min = Math.fmin(x_min, alloc.x);
+                        x_max = Math.fmax(x_max, alloc.x+alloc.width);
+                    }
+                    if (this.rubber_alloc != null) {
+                        x_min = Math.fmin(x_min, rubber_alloc.x);
+                        x_max = Math.fmax(x_max, rubber_alloc.x + rubber_alloc.width);
+                    }
+                    if (this.temp_connector != null) {
+                        x_min = Math.fmin(x_min, temp_connector.x);
+                        x_max = Math.fmax(x_max, temp_connector.x + temp_connector.width);
+                    }
+                    x_min = Math.fmax(0, x_min);
+                    min = pref = (int)x_max - (int)x_min;
+                    return;
+                case Gtk.Orientation.VERTICAL:
+                    double y_min = 0, y_max = 0;
+                    Gtk.Allocation alloc;
+                    foreach (Node n in this.nodes) {
+                        n.get_allocation(out alloc);
+                        y_min = Math.fmin(y_min, alloc.y);
+                        y_max = Math.fmax(y_max, alloc.y+alloc.height);
+                    }
+                    if (this.rubber_alloc != null) {
+                        y_min = Math.fmin(y_min, rubber_alloc.y);
+                        y_max = Math.fmax(y_max, rubber_alloc.y + rubber_alloc.height);
+                    }
+                    if (this.temp_connector != null) {
+                        y_min = Math.fmin(y_min, temp_connector.y);
+                        y_max = Math.fmax(y_max, temp_connector.y + temp_connector.height);
+                    }
+                    y_min = Math.fmax(0, y_min);
+                    min = pref = (int)y_max - (int)y_min;
+                    return;
             }
-            if (this.rubber_alloc != null) {
-                x_min = Math.fmin(x_min, rubber_alloc.x);
-                x_max = Math.fmax(x_max, rubber_alloc.x + rubber_alloc.width);
-            }
-            if (this.temp_connector != null) {
-                x_min = Math.fmin(x_min, temp_connector.x);
-                x_max = Math.fmax(x_max, temp_connector.x + temp_connector.width);
-            }
-            x_min = Math.fmax(0, x_min);
-            minimum_width = natural_width = (int)x_max - (int)x_min;
-        }
-
-        /**
-         * Calculates the NodeView's minimum and preferred heights
-         */
-        public new void get_preferred_height(out int minimum_height, out int natural_height) {
-            double y_min = 0, y_max = 0;
-            Gtk.Allocation alloc;
-            foreach (Node n in this.nodes) {
-                n.get_allocation(out alloc);
-                y_min = Math.fmin(y_min, alloc.y);
-                y_max = Math.fmax(y_max, alloc.y+alloc.height);
-            }
-            if (this.rubber_alloc != null) {
-                y_min = Math.fmin(y_min, rubber_alloc.y);
-                y_max = Math.fmax(y_max, rubber_alloc.y + rubber_alloc.height);
-            }
-            if (this.temp_connector != null) {
-                y_min = Math.fmin(y_min, temp_connector.y);
-                y_max = Math.fmax(y_max, temp_connector.y + temp_connector.height);
-            }
-            y_min = Math.fmax(0, y_min);
-            minimum_height = natural_height = (int)y_max - (int)y_min;
         }
 
         /**
@@ -886,7 +891,7 @@ namespace GtkFlow {
          */
         public void set_node_allocation(GFlow.Node gn, Gtk.Allocation alloc) {
             Node n = this.get_node_from_gflow_node(gn);
-            n.set_allocation(alloc);
+            //n.set_allocation(alloc);
             this.allocate_minimum();
             this.queue_draw();
         }
@@ -910,10 +915,11 @@ namespace GtkFlow {
         }
 
         private new void snapshot(Gtk.Snapshot sn) {
-            Cairo.Context cr = sn.append_cairo();
-            Gtk.StyleContext sc = this.get_style_context();
             Gtk.Allocation nv_alloc;
             this.get_allocation(out nv_alloc);
+            var alloc_rect = Graphene.Rect.alloc().init(nv_alloc.x, nv_alloc.y, nv_alloc.width, nv_alloc.height);
+            Cairo.Context cr = sn.append_cairo(alloc_rect);
+            Gtk.StyleContext sc = this.get_style_context();
             sc.render_background(cr, 0, 0, nv_alloc.width, nv_alloc.height);
 
             // Draw nodes
@@ -934,7 +940,7 @@ namespace GtkFlow {
                     alloc,
                     n.get_dock_renderers(),
                     n.get_childlist(),
-                    (int)n.border_width,
+                    0 , //TODO ex-bw
                     node_properties,
                     n.title
                 );
@@ -966,7 +972,7 @@ namespace GtkFlow {
                     if (!n.node_renderer.get_dock_position(
                             source,
                             n.get_dock_renderers(),
-                            (int)n.border_width,
+                            0 , //TODO ex-bw
                             alloc, out source_pos_x, out source_pos_y,
                             n.title)) {
                         warning("No dock on position. Ommiting connector");
@@ -983,7 +989,7 @@ namespace GtkFlow {
                         if (!sink_node.node_renderer.get_dock_position(
                                 sink,
                                 sink_node.get_dock_renderers(),
-                                (int)sink_node.border_width,
+                                0 , //TODO ex-bw
                                 alloc, out sink_pos_x, out sink_pos_y,
                                 sink_node.title )) {
                             warning("No dock on position. Ommiting connector");
@@ -1038,8 +1044,8 @@ namespace GtkFlow {
             if (this.nodes.length() == 0) {
                 sc.save();
                 cr.save();
-                sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-                Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+                //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+                Gdk.RGBA col = sc.get_color();
                 cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
 
                 int placeholder_width, placeholder_height;
@@ -1047,11 +1053,10 @@ namespace GtkFlow {
 
                 cr.move_to(nv_alloc.width / 2 - placeholder_width / 2,
                            nv_alloc.height / 2 - placeholder_height / 2);
-                Pango.cairo_show_layout(cr, this.placeholder_layout);
+                //Pango.cairo_show_layout(cr, this.placeholder_layout);
                 cr.restore();
                 sc.restore();
             }
-            return false;
         }
 
         private void hex2col(string hex, out double r, out double g, out double b) {

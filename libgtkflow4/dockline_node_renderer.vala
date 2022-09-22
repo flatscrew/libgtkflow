@@ -41,7 +41,8 @@ namespace GtkFlow {
             } else if (title != null) {
                 int min_height = 1;
                 int natural_height = 1;
-                title.get_preferred_height(out min_height, out natural_height);
+                int _ = 1;
+                title.measure(Gtk.Orientation.VERTICAL, -1, out min_height, out natural_height, out _, out _);
                 return natural_height + 10;
             } else {
                 int width, height;
@@ -71,7 +72,7 @@ namespace GtkFlow {
             Gtk.Widget child = children.nth_data(0);
             if (child != null) {
                 int child_height, _;
-                child.get_preferred_height(out child_height, out _);
+                child.measure(Gtk.Orientation.VERTICAL, -1, out child_height, out _, out _, out _);
                 mh += child_height;
             }
             return mh;
@@ -88,7 +89,7 @@ namespace GtkFlow {
             int t = 0;
             if (title != null) {
                 int min_width, _;
-                title.get_preferred_width(out min_width, out _);
+                title.measure(Gtk.Orientation.HORIZONTAL, -1, out min_width, out _, out _, out _);
                 mw = min_width + 3*border_width + delete_btn_size;
             }
             if (this.layout.get_text() != "") {
@@ -109,7 +110,7 @@ namespace GtkFlow {
             Gtk.Widget child = children.nth_data(0);
             if (child != null) {
                 int child_width, _;
-                child.get_preferred_width(out child_width, out _);
+                child.measure(Gtk.Orientation.HORIZONTAL, -1, out child_width, out _, out _, out _);
                 if (child_width > mw)
                     mw = child_width;
             }
@@ -326,19 +327,19 @@ namespace GtkFlow {
 
             if (title != null) {
                 int pref_title_height,  _;
-                title.get_preferred_height(out _, out pref_title_height);
+                title.measure(Gtk.Orientation.VERTICAL, -1, out pref_title_height, out _, out _, out _);
                 Gtk.Allocation title_alloc = {0,0,0,0};
                 title_alloc.x = (int)border_width;
                 title_alloc.y = (int)border_width;
                 title_alloc.width = alloc.width - 3 * (int)border_width - delete_btn_size;
                 title_alloc.height = pref_title_height;
-                title.size_allocate(title_alloc.widht, title_alloc.height, -1);
+                title.size_allocate(title_alloc.width, title_alloc.height, -1);
                 this.child_redraw(title);
             } else if (this.layout.get_text() != "") {
                 sc.save();
                 cr.save();
-                sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-                Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+                //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+                Gdk.RGBA col = sc.get_color();
                 cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
                 if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
                     cr.move_to(alloc.x + border_width,
@@ -347,27 +348,33 @@ namespace GtkFlow {
                     cr.move_to(alloc.x + 2*border_width + delete_btn_size,
                                alloc.y + (int) border_width + y_offset);
                 }
-                Pango.cairo_show_layout(cr, this.layout);
+                //Pango.cairo_show_layout(cr, this.layout);
                 cr.restore();
                 sc.restore();
             }
             if (editable && deletable) {
-                Gtk.IconTheme it = Gtk.IconTheme.get_default();
+                Gtk.IconTheme it = Gtk.IconTheme.get_for_display(w.get_display());
                 try {
                     cr.save();
-                    Gdk.Pixbuf icon_pix = it.load_icon("edit-delete", delete_btn_size, 0);
                     if ((this.get_style().get_state() & Gtk.StateFlags.DIR_LTR) > 0 ){
-                        Gdk.cairo_set_source_pixbuf(
+                        var icon_pix = it.lookup_icon("edit-delete", null, delete_btn_size, 0,
+                                                Gtk.TextDirection.LTR, Gtk.IconLookupFlags.FORCE_REGULAR);
+                        //TODO: find way to paint Gtk.PaintableIcon
+                        /*Gdk.cairo_set_source_pixbuf(
                             cr, icon_pix,
                             alloc.x+alloc.width-delete_btn_size-border_width,
                             alloc.y+border_width
-                        );
+                        );*/
                     } else {
+                        var icon_pix = it.lookup_icon("edit-delete", null, delete_btn_size, 0,
+                                                Gtk.TextDirection.RTL, Gtk.IconLookupFlags.FORCE_REGULAR);
+                        //TODO: find way to paint Gtk.PaintableIcon
+                        /*
                         Gdk.cairo_set_source_pixbuf(
                             cr, icon_pix,
                             alloc.x+border_width,
                             alloc.y+border_width
-                        );
+                        );*/
                     }
                     cr.paint();
                 } catch (GLib.Error e) {

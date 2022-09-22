@@ -113,9 +113,8 @@ namespace GtkFlow {
                 this.render_all();
             });
 
-            this.set_border_width(this.node_renderer.resize_handle_size);
+            //this.set_border_width(this.node_renderer.resize_handle_size);
 
-            this.show_all();
         }
 
         public void render() {
@@ -191,7 +190,6 @@ namespace GtkFlow {
                 this.set_position(p.x,p.y);
                 this.node_view.queue_draw();
             });
-            this.show_all();
         }
 
         public void on_child_size_allocate(Gtk.Allocation _) {
@@ -202,16 +200,16 @@ namespace GtkFlow {
         }
 
         public new void size_allocate(int width, int height, int baseline) {
-            if (!this.get_visible() && !this.is_toplevel())
+            if (!this.get_visible() )
                 return;
             int mw = (int)this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
-                (int)this.get_border_width(),
+                0, // TODO ex-bw
                 this.title
             );
             int mh = (int)this.node_renderer.get_min_height(
                 this.dock_renderers, this.childlist,
-                (int)this.get_border_width()
+                0 // TODO ex-bw
             );
 
             if (width < mw)
@@ -244,16 +242,16 @@ namespace GtkFlow {
             return this.dock_renderers;
         }
 
-        public override void add(Gtk.Widget w) {
+        public void add(Gtk.Widget w) {
             w.set_parent(this);
             this.childlist.append(w);
             //ulong handle = w.size_allocate.connect(this.on_child_size_allocate);
-            this.childlist_alloc_handles.set(w, handle);
+            /*this.childlist_alloc_handles.set(w, handle);
             if (this.get_realized())
-                this.render();
+                this.render();*/
         }
 
-        public override void remove(Gtk.Widget w) {
+        public void remove(Gtk.Widget w) {
             w.unparent();
             ulong handle = this.childlist_alloc_handles.get(w);
             w.disconnect(handle);
@@ -265,17 +263,6 @@ namespace GtkFlow {
 
         public unowned List<Gtk.Widget> get_childlist() {
             return this.childlist;
-        }
-
-        public new void set_border_width(uint border_width) {
-            int nr = this.node_renderer.resize_handle_size;
-            if (border_width < nr) {
-                warning("Cannot set border width smaller than %d", nr);
-                return;
-            }
-            base.set_border_width(border_width);
-            if (this.get_realized())
-                this.render();
         }
 
         public override void realize() {
@@ -309,12 +296,12 @@ namespace GtkFlow {
             this.get_allocation(out alloc);
             uint mw = this.node_renderer.get_min_width(
                 this.dock_renderers, this.childlist,
-                (int) this.get_border_width(),
+                0, // TODO ex-bw
                 this.title
             );
             uint mh = this.node_renderer.get_min_height(
                 this.dock_renderers, this.childlist,
-                (int) this.get_border_width()
+                0 // TODO ex-bw
             );
             if (mw > alloc.width)
                 alloc.width = (int)mw;

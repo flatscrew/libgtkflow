@@ -145,11 +145,11 @@ namespace GtkFlow {
             draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
             sc.save();
-            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color();
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
             cr.move_to(offset_x + width - this.get_min_width(), offset_y);
-            Pango.cairo_show_layout(cr, this.layout);
+            //Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
 
@@ -173,11 +173,11 @@ namespace GtkFlow {
             draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
             sc.save();
-            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color();
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
             cr.move_to(offset_x + width - this.get_min_width() - 24, offset_y);
-            Pango.cairo_show_layout(cr, this.layout);
+            //Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
 
@@ -200,11 +200,11 @@ namespace GtkFlow {
             draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
             sc.save();
-            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color();
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
             cr.move_to(offset_x+dockpoint_height+spacing_x, offset_y);
-            Pango.cairo_show_layout(cr, this.layout);
+            //Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
 
@@ -227,11 +227,11 @@ namespace GtkFlow {
             draw_radio(w, cr, option_x, option_y,
                        flags, &option_height, &option_width);
             sc.save();
-            sc.add_class(Gtk.STYLE_CLASS_BUTTON);
-            Gdk.RGBA col = sc.get_color(Gtk.StateFlags.NORMAL);
+            //sc.add_class(Gtk.STYLE_CLASS_BUTTON);
+            Gdk.RGBA col = sc.get_color();
             cr.set_source_rgba(col.red,col.green,col.blue,col.alpha);
             cr.move_to(offset_x+dockpoint_height+spacing_x+20, offset_y);
-            Pango.cairo_show_layout(cr, this.layout);
+            //Pango.cairo_show_layout(cr, this.layout);
             sc.restore();
         }
     }
