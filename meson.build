@@ -42,8 +42,9 @@ g_ir_compiler = find_program('g-ir-compiler')
 subdir('libgflow')
 if get_option('enable_gtk3')
   subdir('libgtkflow3')
+  subdir('test')
 endif
 if get_option('enable_gtk4')
   subdir('libgtkflow4')
+  subdir('test4')
 endif
-subdir('test')
