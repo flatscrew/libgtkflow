@@ -12,42 +12,34 @@ namespace GtkFlow {
 
         public Node(GFlow.Node n) {
             this.n = n;
+
+            this.set_layout_manager(new Gtk.GridLayout());
+
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });   
             this.ctr_click.released.connect((n, x, y) => { this.release_button(n,x,y); });
-
         }
 
         private void press_button(int n_click, double x, double y) {
-            //message("cpress %u", this.ctr_click.get_current_button());
-            if (!(this.get_parent() is NodeView)) {
-                warning("Trying to move a node that is not in a NodeView!");
-                return;
-            }
-
             var nv = this.get_parent() as NodeView;
             this.click_offset_x = x;
             this.click_offset_y = y;
             nv.move_node = this;
-            /*var lc = (NodeViewLayoutChild) nv.get_layout_manager().get_layout_child(this);
-            message("lc %f %f", lc.x,lc.y);
-            message("offset %f %f", x,y);
-            x_offset = lc.x + x
-            y_offset = lc.y + y;*/
         }
 
         private void release_button(int n_click, double x, double y) {
-            //message("crelea %u", this.ctr_click.get_current_button());
-            if (!(this.get_parent() is NodeView)) {
-                warning("Trying to move a node that is not in a NodeView!");
-                return;
-            }
-
             var nv = this.get_parent() as NodeView;
             nv.move_node = null;
         }
 
+        public new void set_parent(Gtk.Widget w) {
+            if (!(w is NodeView)) {
+                warning("Trying to add a GtkFlow.Node to something that is not a GtkFlow.NodeView!");
+                return;
+            }
+            base.set_parent(w);
+        }
 
         protected override void snapshot (Gtk.Snapshot sn) {
             message("drawing node");
