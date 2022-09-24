@@ -6,8 +6,10 @@ namespace GtkFlow {
 
         private Gtk.GestureClick ctr_click;
         private Gtk.EventControllerMotion ctr_motion;
+        private GFlow.Node n;
 
-        public Node() {
+        public Node(GFlow.Node n) {
+            this.n = n;
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });   
@@ -51,8 +53,8 @@ namespace GtkFlow {
             message("lol %d", for_size);
             min = 50;
             pref = 100;
-            min_base = 50;
-            pref_base = 100;
+            min_base = -1;
+            pref_base = -1;
         }
 
         protected override void size_allocate(int height, int width, int baseline) {

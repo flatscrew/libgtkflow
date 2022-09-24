@@ -12,7 +12,8 @@ int main (string[] args) {
     var nv = new GtkFlow.NodeView();
 
     btn.clicked.connect(()=>{
-        nv.add(new GtkFlow.Node());   
+        var node = new GFlow.SimpleNode();
+        nv.add(new GtkFlow.Node(node));   
     });
 
     win.child = box;
