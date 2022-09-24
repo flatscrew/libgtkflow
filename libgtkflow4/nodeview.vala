@@ -1,4 +1,40 @@
 namespace GtkFlow {
+    private class Dock : Gtk.Widget {
+        construct {
+            set_css_name("gtkflow_dock");
+        }
+
+        public Dock() {
+            this.valign = Gtk.Align.CENTER;
+            this.halign = Gtk.Align.CENTER;
+            this.margin_start = 8;
+            this.margin_end = 8;
+            this.margin_top = 4;
+            this.margin_bottom = 4;
+        }
+
+        protected override void snapshot (Gtk.Snapshot sn) {
+            message("drawing node");
+            var rect = Graphene.Rect().init(0,0,16, 16);
+            var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
+            Gdk.RGBA color = {0.9f,0.9f,0.9f,1.0f};
+            Gdk.RGBA grey_color = {0.6f,0.6f,0.6f,1.0f};
+            Gdk.RGBA[] border_color = {color,color,color,color};
+            float[] thicc = {1f,1f,1f,1f};
+            sn.append_border(rrect, thicc, border_color);
+            sn.append_inset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
+            base.snapshot(sn);
+        }
+
+        protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
+            message("measure dock %d", for_size);
+            min = 16;
+            pref = 16;
+            min_base = -1;
+            pref_base = -1;
+        }
+    }
+
     public class Node : Gtk.Widget  {
         construct {
             set_css_name("gtkflow_node");
@@ -58,7 +94,7 @@ namespace GtkFlow {
         }
 
         private void sink_added(GFlow.Sink s) {
-            var radio = new Gtk.ToggleButton();
+            var radio = new Dock();
             var label = new Gtk.Label(s.name);
             var grid = (Gtk.GridLayout) this.layout_manager;
             radio.set_parent(this);
@@ -78,7 +114,7 @@ namespace GtkFlow {
         }
 
         private void source_added(GFlow.Source s) {
-            var radio = new Gtk.ToggleButton();
+            var radio = new Dock();
             var label = new Gtk.Label(s.name);
             var grid = (Gtk.GridLayout) this.layout_manager;
             radio.set_parent(this);
@@ -107,6 +143,7 @@ namespace GtkFlow {
         private void release_button() {
             var nv = this.get_parent() as NodeView;
             nv.move_node = null;
+            nv.queue_allocate();
         }
 
         public new void set_parent(Gtk.Widget w) {
@@ -125,6 +162,7 @@ namespace GtkFlow {
             Gdk.RGBA grey_color = {0.6f,0.6f,0.6f,0.5f};
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
+            sn.append_color(grey_color ,rect );
             sn.append_border(rrect, thicc, border_color);
             sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
             base.snapshot(sn);
@@ -132,7 +170,7 @@ namespace GtkFlow {
 
         protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
             message("lol %d", for_size);
-            min = 50;
+            min = 200;
             pref = 100;
             min_base = -1;
             pref_base = -1;
@@ -190,7 +228,6 @@ namespace GtkFlow {
                 c.measure(Gtk.Orientation.HORIZONTAL, -1, out cwidth, out _, out _, out _);
                 c.measure(Gtk.Orientation.VERTICAL, -1, out cheight, out _, out _, out _);
                 var lc = (NodeViewLayoutChild)this.get_layout_child(c);
-                message("%d %d %d %d", lc.x,lc.y,cwidth, cheight);
                 c.queue_allocate();
                 c.allocate_size({lc.x,lc.y, cwidth, cheight}, -1);
                 c = c.get_next_sibling();

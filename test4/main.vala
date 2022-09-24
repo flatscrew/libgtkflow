@@ -15,6 +15,7 @@ int main (string[] args) {
 
     var nv = new GtkFlow.NodeView();
     sw.child=nv;
+    sw.vexpand=true;
     //vp.child=nv;
 
     btn.clicked.connect(()=>{
