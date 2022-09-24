@@ -8,6 +8,10 @@ namespace GtkFlow {
         private Gtk.EventControllerMotion ctr_motion;
         private GFlow.Node n;
 
+        private bool button_pressed = false;
+        private double x_offset = 0;
+        private double y_offset = 0;
+
         public Node(GFlow.Node n) {
             this.n = n;
             this.ctr_click = new Gtk.GestureClick();
@@ -23,14 +27,30 @@ namespace GtkFlow {
 
         private void press_button(int n_click, double x, double y) {
             message("cpress %u", this.ctr_click.get_current_button());
+            x_offset = x;
+            y_offset = y;
+            this.button_pressed = true;
         }
 
         private void release_button(int n_click, double x, double y) {
             message("crelea %u", this.ctr_click.get_current_button());
+            this.button_pressed = false;
         }
 
         private void process_motion(double x, double y) {
+            if (!this.button_pressed) return;
             message("motio %f %f", x, y);
+            if (!(this.get_parent() is NodeView)) {
+                warning("Trying to move a node that is not in a NodeView!");
+                return;
+            }
+            var nv = this.get_parent() as NodeView;
+            var lc = (Gtk.FixedLayoutChild) nv.get_layout_manager().get_layout_child(this);
+            float dx, dy;
+            lc.transform.to_translate(out dx, out dy);
+            message("pos %f %f",dx,dy);
+            var transform = lc.transform.translate(Graphene.Point().init((float)(x-x_offset), (float)(y-y_offset)));
+            lc.set_transform(transform);
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
@@ -93,19 +113,27 @@ namespace GtkFlow {
     }
 
     public class NodeView : Gtk.Widget {
+        // TODO: delte these
+        private int x = 0;
+        private int y = 0;
         construct {
             set_css_name("gtkflow_nodeview");
         }
         public NodeView (){
-            this.set_layout_manager(new NodeViewLayoutManager());
+            this.set_layout_manager(new Gtk.FixedLayout());
             this.set_size_request(100,100);
             //this.queue_draw();
             message("wee %f %f",this.get_width(), this.get_height());
         }
 
         public void add(Node n) {
-            //var layout = (NodeViewLayoutManager) layout_manager;
             n.set_parent (this);
+            var cn = this.layout_manager.get_layout_child(n) as Gtk.FixedLayoutChild;
+            x+=10;
+            y+=10;
+            message("got cn");
+            var transform = cn.transform.translate(Graphene.Point().init(x,y));
+            cn.set_transform(transform);
         }
 
         public void remove(Node n) {
