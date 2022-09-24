@@ -31,7 +31,7 @@ namespace GtkFlow {
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });   
-            this.ctr_click.released.connect((n, x, y) => { this.release_button(n,x,y); });
+            this.ctr_click.end.connect(() => { this.release_button(); });
 
             this.title_label = new Gtk.Label(n.name);
             this.title_label.set_parent(this);
@@ -104,7 +104,7 @@ namespace GtkFlow {
             nv.move_node = this;
         }
 
-        private void release_button(int n_click, double x, double y) {
+        private void release_button() {
             var nv = this.get_parent() as NodeView;
             nv.move_node = null;
         }
