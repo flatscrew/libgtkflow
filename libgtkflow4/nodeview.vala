@@ -7,18 +7,94 @@ namespace GtkFlow {
         private Gtk.GestureClick ctr_click;
         private GFlow.Node n;
 
+        public Gtk.Widget title_widget {get; set;}
+        private Gtk.Label title_label;
+        private Gtk.Button delete_button;
+
         public double click_offset_x {get; private set; default=0;}
         public double click_offset_y {get; private set; default=0;}
+
+        private HashTable<GFlow.Dock, Gtk.Widget> widgets;
+
+        private int n_docks = 0;
 
         public Node(GFlow.Node n) {
             this.n = n;
 
-            this.set_layout_manager(new Gtk.GridLayout());
+            var grid = new Gtk.GridLayout();
+            grid.column_homogeneous = false;
+            grid.column_spacing = 5;
+            grid.row_homogeneous = false;
+            grid.row_spacing = 5;
+            this.set_layout_manager(grid);
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });   
             this.ctr_click.released.connect((n, x, y) => { this.release_button(n,x,y); });
+
+            this.title_label = new Gtk.Label(n.name);
+            this.title_label.set_parent(this);
+            var title_label_lc = (Gtk.GridLayoutChild) grid.get_layout_child(this.title_label);
+            title_label_lc.row = 0;
+            title_label_lc.row_span = 1;
+            title_label_lc.column = 0;
+            title_label_lc.column_span = 2;
+
+            this.delete_button = new Gtk.Button();
+            this.delete_button.set_parent(this);
+            var delete_button_lc = (Gtk.GridLayoutChild) grid.get_layout_child(this.delete_button);
+            delete_button_lc.row = 0;
+            delete_button_lc.row_span = 1;
+            delete_button_lc.column = 2;
+            delete_button_lc.column_span = 1;
+
+            foreach (GFlow.Source s in n.get_sources()) {
+                this.source_added(s);
+            }
+            foreach (GFlow.Sink s in n.get_sinks()) {
+                this.sink_added(s);
+            }
+        }
+
+        private void sink_added(GFlow.Sink s) {
+            var radio = new Gtk.ToggleButton();
+            var label = new Gtk.Label(s.name);
+            var grid = (Gtk.GridLayout) this.layout_manager;
+            radio.set_parent(this);
+            label.set_parent(this);
+
+            var radio_lc = (Gtk.GridLayoutChild)grid.get_layout_child(radio);
+            radio_lc.row = 1 + ++n_docks;
+            radio_lc.row_span = 1;
+            radio_lc.column = 0;
+            radio_lc.column_span = 1;
+
+            var label_lc = (Gtk.GridLayoutChild)grid.get_layout_child(label);
+            label_lc.row = 1 + n_docks;
+            label_lc.row_span = 1;
+            label_lc.column = 1;
+            label_lc.column_span = 1;
+        }
+
+        private void source_added(GFlow.Source s) {
+            var radio = new Gtk.ToggleButton();
+            var label = new Gtk.Label(s.name);
+            var grid = (Gtk.GridLayout) this.layout_manager;
+            radio.set_parent(this);
+            label.set_parent(this);
+
+            var radio_lc = (Gtk.GridLayoutChild) grid.get_layout_child(radio);
+            radio_lc.row = 1 + ++n_docks;
+            radio_lc.row_span = 1;
+            radio_lc.column = 2;
+            radio_lc.column_span = 1;
+
+            var label_lc = (Gtk.GridLayoutChild)grid.get_layout_child(label);
+            label_lc.row = 1 + n_docks;
+            label_lc.row_span = 1;
+            label_lc.column = 1;
+            label_lc.column_span = 1;
         }
 
         private void press_button(int n_click, double x, double y) {
@@ -51,6 +127,7 @@ namespace GtkFlow {
             float[] thicc = {1f,1f,1f,1f};
             sn.append_border(rrect, thicc, border_color);
             sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
+            base.snapshot(sn);
         }
 
         protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
@@ -61,9 +138,9 @@ namespace GtkFlow {
             pref_base = -1;
         }
 
-        protected override void size_allocate(int height, int width, int baseline) {
+        /*protected override void size_allocate(int height, int width, int baseline) {
             message("LELL");
-        }
+        }*/
         
     }
 
@@ -75,8 +152,32 @@ namespace GtkFlow {
 
         protected override  void measure(Gtk.Widget w, Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
             message("nvl measure");
-            min = 50;
-            pref = 100;
+            int lower_bound = 0;
+            int upper_bound = 0;
+            var c = w.get_first_child();
+            while (c != null) {
+                var lc = (NodeViewLayoutChild)this.get_layout_child(c);
+                switch (o) {
+                    case Gtk.Orientation.HORIZONTAL:
+                        if (lc.x < 0) {
+                            lower_bound = int.min(lc.x, lower_bound);
+                        } else {
+                            upper_bound = int.max(lc.x + c.get_width(), upper_bound);
+                        }
+                        break;
+                    case Gtk.Orientation.VERTICAL:
+                        if (lc.y < 0) {
+                            lower_bound = int.min(lc.y, lower_bound);
+                        } else {
+                            upper_bound = int.max(lc.y + c.get_height(), upper_bound);
+                        }
+                        break;
+                }
+
+                c = c.get_next_sibling();
+            }
+            min = upper_bound - lower_bound;
+            pref = upper_bound - lower_bound;
             min_base = -1;
             pref_base = -1;
         }
@@ -85,9 +186,13 @@ namespace GtkFlow {
             message("nvl allocate");
             var c = w.get_first_child();
             while (c != null) {
+                int cwidth, cheight, _;
+                c.measure(Gtk.Orientation.HORIZONTAL, -1, out cwidth, out _, out _, out _);
+                c.measure(Gtk.Orientation.VERTICAL, -1, out cheight, out _, out _, out _);
                 var lc = (NodeViewLayoutChild)this.get_layout_child(c);
-                message("%d %d %d %d", lc.x,lc.y,c.get_width(), c.get_height());
-                c.allocate_size({lc.x,lc.y, 50, 50}, -1);
+                message("%d %d %d %d", lc.x,lc.y,cwidth, cheight);
+                c.queue_allocate();
+                c.allocate_size({lc.x,lc.y, cwidth, cheight}, -1);
                 c = c.get_next_sibling();
             }
             message("LELL");
