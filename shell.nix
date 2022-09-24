@@ -10,6 +10,7 @@ mkShell {
     gtk4
     glib
     gobject-introspection
+    gdb
     python
     pythonPackages.pygobject3
   ];
