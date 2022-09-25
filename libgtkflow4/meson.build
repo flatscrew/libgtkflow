@@ -16,7 +16,7 @@ custom_target('gtkflow4-typelib',
               command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + api + '.gir',
                        '--includedir', gflow_girdir,
                        '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ api +'.so'],
-              output: 'GtkFlow3-' + api + '.typelib',
+              output: 'GtkFlow4-' + api + '.typelib',
               depends: gtkflow4,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
