@@ -1,4 +1,7 @@
 namespace GtkFlow {
+    public interface NodeRenderer : Gtk.Widget {
+    }
+
     private class Dock : Gtk.Widget {
         construct {
             set_css_name("gtkflow_dock");
@@ -35,7 +38,7 @@ namespace GtkFlow {
         }
     }
 
-    public class Node : Gtk.Widget  {
+    public class Node : Gtk.Widget, NodeRenderer  {
         construct {
             set_css_name("gtkflow_node");
         }
@@ -77,7 +80,9 @@ namespace GtkFlow {
             title_label_lc.column = 0;
             title_label_lc.column_span = 2;
 
+            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
             this.delete_button = new Gtk.Button();
+            this.delete_button.child = delete_icon;
             this.delete_button.set_parent(this);
             var delete_button_lc = (Gtk.GridLayoutChild) grid.get_layout_child(this.delete_button);
             delete_button_lc.row = 0;
@@ -134,6 +139,18 @@ namespace GtkFlow {
         }
 
         private void press_button(int n_click, double x, double y) {
+            var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
+
+            bool do_processing = false;
+            if (picked_widget == this) {
+                do_processing = true;
+            } else if (picked_widget.get_parent() == this) {
+                if (picked_widget is Gtk.Label || picked_widget is Gtk.Image) {
+                    do_processing = true;
+                }
+            }
+            if (!do_processing) return;
+
             var nv = this.get_parent() as NodeView;
             this.click_offset_x = x;
             this.click_offset_y = y;
@@ -155,7 +172,7 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            message("drawing node");
+            //message("drawing node");
             var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 5f);
             Gdk.RGBA color = {0.6f,1.0f,0.0f,1.0f};
@@ -221,7 +238,6 @@ namespace GtkFlow {
         }
 
         protected override void allocate(Gtk.Widget w, int height, int width, int baseline) {
-            message("nvl allocate");
             var c = w.get_first_child();
             while (c != null) {
                 int cwidth, cheight, _;
@@ -232,7 +248,6 @@ namespace GtkFlow {
                 c.allocate_size({lc.x,lc.y, cwidth, cheight}, -1);
                 c = c.get_next_sibling();
             }
-            message("LELL");
         }
         public override Gtk.LayoutChild create_layout_child (Gtk.Widget widget, Gtk.Widget for_child)  {
             return new NodeViewLayoutChild(for_child, this);
@@ -294,7 +309,7 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            message("drawing");
+            //message("drawing");
             //var cr = sn.append_cairo();
             Gdk.RGBA color = {0.6f,1.0f,0.0f,1.0f};
             var rect = Graphene.Rect().init(0,0,(float)(this.get_width()/2.0), (float)(this.get_height()/2.0));
