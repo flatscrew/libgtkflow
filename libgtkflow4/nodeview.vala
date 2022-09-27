@@ -1,32 +1,94 @@
+/********************************************************************
+# Copyright 2014-2022 Daniel 'grindhold' Brendle
+#
+# This file is part of libgtkflow.
+#
+# libgtkflow is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later
+# version.
+#
+# libgtkflow is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with libgtkflow.
+# If not, see http://www.gnu.org/licenses/.
+*********************************************************************/
+
 namespace GtkFlow {
     public interface NodeRenderer : Gtk.Widget {
+        public abstract GFlow.Node n {get; protected set;}
+        public abstract Dock? retrieve_dock(GFlow.Dock d);
     }
 
-    private class Dock : Gtk.Widget {
+    public class Dock : Gtk.Widget {
         construct {
             set_css_name("gtkflow_dock");
         }
 
-        public Dock() {
+        public GFlow.Dock d {get; protected set;}
+        private Gtk.GestureClick ctr_click;
+
+        public Dock(GFlow.Dock d) {
+            this.d = d;
+            this.d.unlinked.connect(()=>{this.queue_draw();});
+            this.d.linked.connect(()=>{this.queue_draw();});
+
             this.valign = Gtk.Align.CENTER;
             this.halign = Gtk.Align.CENTER;
             this.margin_start = 8;
             this.margin_end = 8;
             this.margin_top = 4;
             this.margin_bottom = 4;
+
+            this.ctr_click = new Gtk.GestureClick();
+            this.add_controller(this.ctr_click);
+            this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            message("drawing node");
+            message("drawing dock %s",this.d.name);
             var rect = Graphene.Rect().init(0,0,16, 16);
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
-            Gdk.RGBA color = {0.9f,0.9f,0.9f,1.0f};
-            Gdk.RGBA grey_color = {0.6f,0.6f,0.6f,1.0f};
+            Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
             sn.append_border(rrect, thicc, border_color);
-            sn.append_inset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
             base.snapshot(sn);
+            var cr = sn.append_cairo(rect);
+            cr.save();
+            cr.set_source_rgba(0.0,0.0,0.0,0.0);
+            cr.set_operator(Cairo.Operator.SOURCE);
+            cr.paint();
+            cr.restore();
+            if (this.d.is_linked()) {
+                Gdk.RGBA black_color = {0.0f,0.0f,0.0f,1.0f};
+                thicc = {8f, 8f, 8f, 8f};
+                border_color = {black_color,black_color,black_color,black_color};
+                cr.save();
+                cr.set_source_rgba(0.0,0.0,0.0,1.0);
+                cr.arc(8d,8d,4d,0.0,2*Math.PI);
+                cr.fill();
+                cr.restore();
+            }
+        }
+
+        private void press_button(int n_clicked, double x, double y) {
+            var nv = this.get_parent().get_parent() as NodeView;
+            if (this.d is GFlow.Source) {
+                nv.start_temp_connector(this);
+            } else if (this.d.is_linked()){
+                var sink = (GFlow.Sink)d;
+                var sourcedock = nv.retrieve_dock(sink.sources.nth_data(0));
+                nv.start_temp_connector(sourcedock, true);
+            } else {
+                nv.start_temp_connector(this, true);
+            }
+            nv.queue_allocate();
         }
 
         protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
@@ -44,7 +106,7 @@ namespace GtkFlow {
         }
 
         private Gtk.GestureClick ctr_click;
-        private GFlow.Node n;
+        public GFlow.Node n {get; protected set;}
 
         public Gtk.Widget title_widget {get; set;}
         private Gtk.Label title_label;
@@ -98,8 +160,29 @@ namespace GtkFlow {
             }
         }
 
+        /**
+         * Retrieve a Dock-Widget from this node.
+         *
+         * Gives you the GtkFlow.Dock-object that corresponds to the given
+         * GFlow.Dock. Returns null if the searched Dock is not associated
+         * with any of the Dock-Widgets in this node.
+         */
+        public Dock? retrieve_dock (GFlow.Dock d) {
+            var c = this.get_first_child();
+            while (c != null) {
+                if (!(c is Dock)) {
+                    c = c.get_next_sibling();
+                    continue;
+                }
+                var dw = (Dock)c;
+                if (dw.d == d) return dw;
+                c = c.get_next_sibling();
+            }
+            return null;
+        }
+
         private void sink_added(GFlow.Sink s) {
-            var radio = new Dock();
+            var radio = new Dock(s);
             var label = new Gtk.Label(s.name);
             var grid = (Gtk.GridLayout) this.layout_manager;
             radio.set_parent(this);
@@ -119,7 +202,7 @@ namespace GtkFlow {
         }
 
         private void source_added(GFlow.Source s) {
-            var radio = new Dock();
+            var radio = new Dock(s);
             var label = new Gtk.Label(s.name);
             var grid = (Gtk.GridLayout) this.layout_manager;
             radio.set_parent(this);
@@ -172,10 +255,9 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            //message("drawing node");
             var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 5f);
-            Gdk.RGBA color = {0.6f,1.0f,0.0f,1.0f};
+            Gdk.RGBA color = {0.5f,0.5f,0.5f,0.8f};
             Gdk.RGBA grey_color = {0.6f,0.6f,0.6f,0.5f};
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
@@ -269,6 +351,10 @@ namespace GtkFlow {
         }
 
         private Gtk.EventControllerMotion ctr_motion;
+        private Gtk.GestureClick ctr_click;
+        private Gdk.Rectangle? temp_connector = null;
+        private Dock? temp_connected_dock = null;
+        private bool grabbed_target = false;
         internal Node? move_node {get; set; default=null;}
 
         public NodeView (){
@@ -278,18 +364,59 @@ namespace GtkFlow {
             this.ctr_motion = new Gtk.EventControllerMotion();
             this.add_controller(this.ctr_motion);
             this.ctr_motion.motion.connect((x,y)=> { this.process_motion(x,y); });
+
+            this.ctr_click = new Gtk.GestureClick();
+            this.add_controller(this.ctr_click);
+            this.ctr_click.released.connect((n,x,y) => { this.end_temp_connector(n,x,y); });
         }
 
         private void process_motion(double x, double y) {
-            if (this.move_node == null) {
-                return;
+            if (this.move_node != null) {
+                var lc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(this.move_node);
+                lc.x = (int)(x-this.move_node.click_offset_x);
+                lc.y = (int)(y-this.move_node.click_offset_y);
             }
 
-            var lc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(this.move_node);
-            lc.x = (int)(x-this.move_node.click_offset_x);
-            lc.y = (int)(y-this.move_node.click_offset_y);
+            if (this.temp_connector != null) {
+                this.temp_connector.width = (int)(x - this.temp_connector.x);
+                this.temp_connector.height = (int)(y - this.temp_connector.y);
+            }
+
 
             this.queue_allocate();
+        }
+
+        internal void start_temp_connector(Dock d, bool grabbed_target=false) {
+            this.grabbed_target = false;
+            this.temp_connected_dock = d;
+            var node = this.retrieve_node(d.d.node);
+            Gtk.Allocation node_alloc, dock_alloc;
+            node.get_allocation(out node_alloc);
+            d.get_allocation(out dock_alloc);
+            var x = node_alloc.x + dock_alloc.x + 8;
+            var y = node_alloc.y + dock_alloc.y + 8;
+            this.temp_connector = {x, y, 0, 0};
+        }
+
+        internal void end_temp_connector(int n_clicks, double x, double y) {
+            if (this.temp_connector != null) {
+                var w = this.pick(x,y,Gtk.PickFlags.DEFAULT);
+                if (w is Dock) {
+                    var d = (Dock) w;
+                    try {
+                        d.d.link(this.temp_connected_dock.d);
+                    } catch (Error e) {
+                        warning("Could not link: "+e.message);
+                    }
+                    this.temp_connected_dock.queue_draw();
+                    d.queue_draw();
+                } else {
+                    //this.temp_connected_dock.d.unlink();
+                }
+                this.temp_connected_dock = null;
+                this.temp_connector = null;
+            }
+
         }
 
         public void add(Node n) {
@@ -308,16 +435,98 @@ namespace GtkFlow {
             warning("Tried to remove a node that is not a child of nodeview");
         }
 
-        protected override void snapshot (Gtk.Snapshot sn) {
-            //message("drawing");
-            //var cr = sn.append_cairo();
-            Gdk.RGBA color = {0.6f,1.0f,0.0f,1.0f};
-            var rect = Graphene.Rect().init(0,0,(float)(this.get_width()/2.0), (float)(this.get_height()/2.0));
-            sn.append_color(color, rect);
-            
-            base.snapshot(sn);
+        /**
+         * Retrieve a Node-Widget from this node.
+         *
+         * Gives you the GtkFlow.Node-object that corresponds to the given
+         * GFlow.Node. Returns null if the searched Node is not associated
+         * with any of the Node-Widgets in this node.
+         */
+        private NodeRenderer? retrieve_node (GFlow.Node n) {
+            var c = (NodeRenderer)this.get_first_child();
+            while (c != null) {
+                if (!(c is NodeRenderer )) continue;
+                if (c.n == n) return c;
+                c = (NodeRenderer)c.get_next_sibling();
+            }
+            return null;
         }
 
+        internal Dock? retrieve_dock (GFlow.Dock d) {
+            var c = (NodeRenderer)this.get_first_child();
+            Dock? found = null;
+            while (c != null) {
+                if (!(c is NodeRenderer )) {
+                    c = (NodeRenderer)c.get_next_sibling();
+                    continue;
+                }
+                found = c.retrieve_dock(d);
+                if (found != null) return found;
+                c = (NodeRenderer)c.get_next_sibling();
+            }
+            return null;
+        }
+
+        protected override void snapshot (Gtk.Snapshot sn) {
+            base.snapshot(sn);
+            var rect = Graphene.Rect().init(0,0,(float)this.get_width(), (float)this.get_height());
+            var cr = sn.append_cairo(rect);
+
+            Gdk.RGBA color = {0.0f,0.0f,0.0f,1.0f};
+
+            var c = this.get_first_child();
+            while (c != null) {
+                var nr = (NodeRenderer)c;
+                int tgt_x, tgt_y, src_x, src_y, w, h;
+                foreach (GFlow.Sink snk in nr.n.get_sinks()) {
+                    var target_widget = this.retrieve_dock(snk);
+                    Gtk.Allocation tgt_alloc, tgt_node_alloc;
+                    target_widget.get_allocation(out tgt_alloc);
+                    nr.get_allocation(out tgt_node_alloc);
+                    foreach (GFlow.Source src in snk.sources) {
+                        var source_widget = this.retrieve_dock(src);
+                        var source_node = this.retrieve_node(src.node);
+                        Gtk.Allocation src_alloc, src_node_alloc;
+                        source_widget.get_allocation(out src_alloc);
+                        source_node.get_allocation(out src_node_alloc);
+
+                        src_x = src_alloc.x+src_node_alloc.x+8;
+                        src_y = src_alloc.y+src_node_alloc.y+8;
+                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8;
+                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8;
+                        w = tgt_x - src_x;
+                        h = tgt_y - src_y;
+
+                        cr.save();
+                        cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
+                        cr.move_to(src_x, src_y);
+                        if (w > 0) {
+                            cr.rel_curve_to(w/3,0,2*w/3,h,w,h);
+                        } else {
+                            cr.rel_curve_to(-w/3,0,1.3*w,h,w,h);
+                        }
+                        cr.stroke();
+                        cr.restore();
+                    }
+                }
+                c = c.get_next_sibling();
+            }
+            if (this.temp_connector != null) {
+                cr.save();
+                cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
+                cr.move_to(this.temp_connector.x, this.temp_connector.y);
+                cr.rel_curve_to(
+                    this.temp_connector.width/3,
+                    0,
+                    2*this.temp_connector.width/3,
+                    this.temp_connector.height,
+                    this.temp_connector.width,
+                    this.temp_connector.height
+                );
+                cr.stroke();
+                cr.restore();
+            }
+        }
     }
 }
 

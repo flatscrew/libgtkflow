@@ -1,3 +1,29 @@
+class TestNode : GFlow.SimpleNode {
+    public GFlow.Source source1;
+    public GFlow.Source source2;
+    public GFlow.Sink sink1;
+
+    public TestNode(string name) {
+        this.name = name;
+
+        try {
+            this.source1 = new GFlow.SimpleSource(typeof(int));
+            this.source1.name = "%s quelle 1".printf(name);
+            this.add_source(source1);
+
+            this.source2 = new GFlow.SimpleSource(typeof(int));
+            this.source2.name = "%s quelle 2".printf(name);
+            this.add_source(source2);
+
+            this.sink1 = new GFlow.SimpleSink(1);
+            this.sink1.name = "%s abfluss 2".printf(name);
+            this.add_sink(sink1);
+        } catch (GFlow.NodeError e) {
+            warning("Couldn't build node");
+        }
+    }
+}
+
 int main (string[] args) {
   var app = new Gtk.Application(
     "de.grindhold.GtkFlow4Example",
@@ -10,37 +36,30 @@ int main (string[] args) {
     var btn = new Gtk.Button.with_label("Spawn Node");
     var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
     var sw = new Gtk.ScrolledWindow();
-    //var va = new Gtk.Adjustment(Gtk.Orientation.VERTICAL);
-    //var ha = new Gtk.Adjustment(Gtk.Orientation.HORIZONTAL);
 
     var nv = new GtkFlow.NodeView();
     sw.child=nv;
     sw.vexpand=true;
-    //vp.child=nv;
 
     btn.clicked.connect(()=>{
-        var node = new GFlow.SimpleNode();
-        node.name = "Testnode";
-        try {
-            var source1 = new GFlow.SimpleSource(1);
-            source1.name = "quelle 1";
-            node.add_source(source1);
-            var source2 = new GFlow.SimpleSource(1);
-            source2.name = "qualle 2";
-            node.add_source(source2);
-            var sink1 = new GFlow.SimpleSink(1);
-            sink1.name = "abfluss 1";
-            node.add_sink(sink1);
-        } catch (GFlow.NodeError e) {
-            warning("Couldn't build node");
-        }
-            
+        var node = new TestNode("TestNode");
         nv.add(new GtkFlow.Node(node));   
     });
 
+    var n1 = new TestNode("foo");
+    var n2 = new TestNode("bar");
+
+    nv.add(new GtkFlow.Node(n1));
+    nv.add(new GtkFlow.Node(n2));
+
+    try {
+        n1.source1.link(n2.sink1);
+    } catch (Error e) {
+        warning("could not link nodees:"+ e.message);
+    }
+
     win.child = box;
     box.append(btn);
-    //box.homogeneous = true;
     box.append(sw);
     win.present();
   });
