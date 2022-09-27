@@ -48,8 +48,9 @@ int main (string[] args) {
 
     var n1 = new TestNode("foo");
     var n2 = new TestNode("bar");
-
-    nv.add(new GtkFlow.Node(n1));
+    var gn1 = new GtkFlow.Node(n1);
+    gn1.add_child(new Gtk.Button.with_label("EEEEEE!"));
+    nv.add(gn1);
     nv.add(new GtkFlow.Node(n2));
 
     try {

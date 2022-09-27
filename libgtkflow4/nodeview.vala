@@ -23,6 +23,7 @@ namespace GtkFlow {
     private errordomain InternalError {
         DOCKS_NOT_SUITABLE
     }
+
     public interface NodeRenderer : Gtk.Widget {
         public abstract GFlow.Node n {get; protected set;}
         public abstract Dock? retrieve_dock(GFlow.Dock d);
@@ -174,6 +175,24 @@ namespace GtkFlow {
                 c = c.get_next_sibling();
             }
             return null;
+        }
+
+        public void add_child(Gtk.Widget child) {
+            child.set_parent(this);
+            child.margin_top = 10;
+            child.margin_bottom = 10;
+            child.margin_start = 10;
+            child.margin_end = 10;
+            var grid = (Gtk.GridLayout) this.layout_manager;
+            var lc = (Gtk.GridLayoutChild)grid.get_layout_child(child);
+            lc.row = 2 + n_docks;
+            lc.row_span = 1;
+            lc.column = 0;
+            lc.column_span = 3;
+        }
+
+        public void remove_child(Gtk.Widget child) {
+            child.unparent();
         }
 
         private void sink_added(GFlow.Sink s) {
@@ -509,7 +528,7 @@ namespace GtkFlow {
          * GFlow.Node. Returns null if the searched Node is not associated
          * with any of the Node-Widgets in this node.
          */
-        private NodeRenderer? retrieve_node (GFlow.Node n) {
+        public NodeRenderer? retrieve_node (GFlow.Node n) {
             var c = (NodeRenderer)this.get_first_child();
             while (c != null) {
                 if (!(c is NodeRenderer )) continue;
