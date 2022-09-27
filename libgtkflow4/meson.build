@@ -21,7 +21,7 @@ custom_target('gtkflow4-typelib',
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-girfilename4 = meson.current_build_dir() + '/GtkFlow-' + api + '.gir'
+girfilename4 = meson.current_build_dir() + '/GtkFlow4-' + api + '.gir'
 run_command('touch', girfilename4)
 install_data(sources: girfilename4,
              install_dir: get_option('datadir') + '/gir-1.0')
