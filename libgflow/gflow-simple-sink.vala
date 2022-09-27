@@ -145,6 +145,7 @@ namespace GFlow {
             if (dock is Source) {
                 this.remove_source((Source) dock);
                 this.do_source_changed();
+                dock.unlinked(this, this.sources.length() == 0);
                 dock.changed.disconnect(this.do_source_changed);
                 changed();
             }
