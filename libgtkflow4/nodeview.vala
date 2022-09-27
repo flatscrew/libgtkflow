@@ -20,6 +20,9 @@
 *********************************************************************/
 
 namespace GtkFlow {
+    private errordomain InternalError {
+        DOCKS_NOT_SUITABLE
+    }
     public interface NodeRenderer : Gtk.Widget {
         public abstract GFlow.Node n {get; protected set;}
         public abstract Dock? retrieve_dock(GFlow.Dock d);
@@ -79,15 +82,7 @@ namespace GtkFlow {
 
         private void press_button(int n_clicked, double x, double y) {
             var nv = this.get_parent().get_parent() as NodeView;
-            if (this.d is GFlow.Source) {
-                nv.start_temp_connector(this);
-            } else if (this.d.is_linked()){
-                var sink = (GFlow.Sink)d;
-                var sourcedock = nv.retrieve_dock(sink.sources.nth_data(0));
-                nv.start_temp_connector(sourcedock, true);
-            } else {
-                nv.start_temp_connector(this, true);
-            }
+            nv.start_temp_connector(this);
             nv.queue_allocate();
         }
 
@@ -131,7 +126,7 @@ namespace GtkFlow {
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });   
+            this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
             this.ctr_click.end.connect(() => { this.release_button(); });
 
             this.title_label = new Gtk.Label(n.name);
@@ -278,13 +273,13 @@ namespace GtkFlow {
         /*protected override void size_allocate(int height, int width, int baseline) {
             message("LELL");
         }*/
-        
+
     }
 
     private class NodeViewLayoutManager : Gtk.LayoutManager {
         protected override Gtk.SizeRequestMode get_request_mode (Gtk.Widget widget) {
             message("nvl reqmode");
-            return Gtk.SizeRequestMode.CONSTANT_SIZE; 
+            return Gtk.SizeRequestMode.CONSTANT_SIZE;
         }
 
         protected override  void measure(Gtk.Widget w, Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
@@ -350,11 +345,39 @@ namespace GtkFlow {
             set_css_name("gtkflow_nodeview");
         }
 
+        /**
+         * If this property is set to true, the nodeview will not perform
+         * any check wheter newly created connections will result in cycles
+         * in the graph. It's completely up to the application programmer
+         * to make sure that the logic inside the nodes he uses avoids
+         * endlessly backpropagated loops
+         */
+        public bool allow_recursion {get; set; default=false;}
+
+        /**
+         * The eventcontrollers to receive events
+         */
         private Gtk.EventControllerMotion ctr_motion;
         private Gtk.GestureClick ctr_click;
+        /**
+         * The current extents of the temporary connector
+         * if null, there is no temporary connector drawn at the moment
+         */
         private Gdk.Rectangle? temp_connector = null;
+
+        /**
+         * The dock that the temporary connector will be attched to
+         */
         private Dock? temp_connected_dock = null;
-        private bool grabbed_target = false;
+        /**
+         * The dock that was clicked to invoke the temporary connector
+         */
+        private Dock? clicked_dock = null;
+        /**
+         * The node that is being moved right now via mouse drag.
+         * The node that receives the button press event registers
+         * itself with this property
+         */
         internal Node? move_node {get; set; default=null;}
 
         public NodeView (){
@@ -386,13 +409,20 @@ namespace GtkFlow {
             this.queue_allocate();
         }
 
-        internal void start_temp_connector(Dock d, bool grabbed_target=false) {
-            this.grabbed_target = false;
-            this.temp_connected_dock = d;
-            var node = this.retrieve_node(d.d.node);
+        internal void start_temp_connector(Dock d) {
+            this.clicked_dock = d;
+            if (d.d is GFlow.Sink) {
+                var sink = (GFlow.Sink)d.d;
+                this.temp_connected_dock = this.retrieve_dock(sink.sources.last().nth_data(0));
+            } else {
+                this.temp_connected_dock = d;
+            }
+            message("start: "+this.temp_connected_dock.d.get_type().name());
+            var node = this.retrieve_node(this.temp_connected_dock.d.node);
+
             Gtk.Allocation node_alloc, dock_alloc;
             node.get_allocation(out node_alloc);
-            d.get_allocation(out dock_alloc);
+            this.temp_connected_dock.get_allocation(out dock_alloc);
             var x = node_alloc.x + dock_alloc.x + 8;
             var y = node_alloc.y + dock_alloc.y + 8;
             this.temp_connector = {x, y, 0, 0};
@@ -402,17 +432,54 @@ namespace GtkFlow {
             if (this.temp_connector != null) {
                 var w = this.pick(x,y,Gtk.PickFlags.DEFAULT);
                 if (w is Dock) {
-                    var d = (Dock) w;
-                    try {
-                        d.d.link(this.temp_connected_dock.d);
-                    } catch (Error e) {
-                        warning("Could not link: "+e.message);
+                    var pd = (Dock)w;
+                    if (pd.d is GFlow.Source && this.temp_connected_dock.d is GFlow.Sink
+                     || pd.d is GFlow.Sink && this.temp_connected_dock.d is GFlow.Source) {
+                        try {
+                            if (!this.is_suitable_target(pd.d, this.temp_connected_dock.d)) {
+                                throw new InternalError.DOCKS_NOT_SUITABLE("Can't link because is no good");
+                            }
+                            pd.d.link(this.temp_connected_dock.d);
+                        } catch (Error e) {
+                            warning("Could not link: "+e.message);
+                        }
                     }
-                    this.temp_connected_dock.queue_draw();
-                    d.queue_draw();
+                    else if (pd.d is GFlow.Sink && this.clicked_dock != null
+                      && this.clicked_dock.d is GFlow.Sink
+                      && this.temp_connected_dock is GFlow.Source) {
+                        try {
+                            if (!this.is_suitable_target(pd.d, this.temp_connected_dock.d)) {
+                                throw new InternalError.DOCKS_NOT_SUITABLE("Can't link because is no good");
+                            }
+                            this.clicked_dock.d.unlink(this.temp_connected_dock.d);
+                            pd.d.link(this.temp_connected_dock.d);
+                        } catch (Error e) {
+                            warning("Could not edit links: "+e.message);
+                        }
+
+                    }
+                    pd.queue_draw();
                 } else {
-                    //this.temp_connected_dock.d.unlink();
+                    message(this.temp_connected_dock.d.get_type().name());
+                    message(this.clicked_dock.d.get_type().name());
+                    if (this.temp_connected_dock.d is GFlow.Source
+                     && this.clicked_dock != null) {
+                     //&& this.clicked_dock.d is GFlow.Sink) {
+                        message("leleleeeee2");
+                        try {
+                            this.clicked_dock.d.unlink(this.temp_connected_dock.d);
+                        } catch (Error e) {
+                            warning("Could not unlink: "+e.message);
+                        }
+                     }
                 }
+
+                this.queue_draw();
+                this.temp_connected_dock.queue_draw();
+                if (this.clicked_dock != null) {
+                    this.clicked_dock.queue_draw();
+                }
+                this.clicked_dock = null;
                 this.temp_connected_dock = null;
                 this.temp_connector = null;
             }
@@ -467,6 +534,59 @@ namespace GtkFlow {
             return null;
         }
 
+        /**
+         * Determines wheter one dock can be dropped on another
+         */
+        private bool is_suitable_target (GFlow.Dock from, GFlow.Dock to) {
+            // Check whether the docks have the same type
+            if (!from.has_same_type(to))
+                return false;
+            // Check if the target would lead to a recursion
+            // If yes, return the value of allow_recursion. If this
+            // value is set to true, it's completely fine to have
+            // a recursive graph
+            if (to is GFlow.Source && from is GFlow.Sink) {
+                if (!this.allow_recursion)
+                    if (from.node.is_recursive_forward(to.node) ||
+                           to.node.is_recursive_backward(from.node))
+                        return false;
+            }
+            if (to is GFlow.Sink && from is GFlow.Source) {
+                if (!this.allow_recursion)
+                    if (to.node.is_recursive_forward(from.node) ||
+                           from.node.is_recursive_backward(to.node))
+                        return false;
+            }
+            if (to is GFlow.Sink && from is GFlow.Sink) {
+                GFlow.Source? s = ((GFlow.Sink)from).sources.last().nth_data(0);
+                if (s == null)
+                    return false;
+                if (!this.allow_recursion)
+                    if (to.node.is_recursive_forward(s.node) ||
+                           s.node.is_recursive_backward(to.node))
+                        return false;
+            }
+            // If the from from-target is a sink, check if the
+            // to target is either a source which does not belong to the own node
+            // or if the to target is another sink (this is valid as we can
+            // move a connection from one sink to another
+            if (from is GFlow.Sink
+                    && ((to is GFlow.Sink
+                    && to != from)
+                    || (to is GFlow.Source
+                    && (!to.node.has_dock(from) || this.allow_recursion)))) {
+                return true;
+            }
+            // Check if the from-target is a source. if yes, make sure the
+            // to-target is a sink and it does not belong to the own node
+            else if (from is GFlow.Source
+                    && to is GFlow.Sink
+                    && (!to.node.has_dock(from) || this.allow_recursion)) {
+                return true;
+            }
+            return false;
+        }
+
         protected override void snapshot (Gtk.Snapshot sn) {
             base.snapshot(sn);
             var rect = Graphene.Rect().init(0,0,(float)this.get_width(), (float)this.get_height());
@@ -484,6 +604,10 @@ namespace GtkFlow {
                     target_widget.get_allocation(out tgt_alloc);
                     nr.get_allocation(out tgt_node_alloc);
                     foreach (GFlow.Source src in snk.sources) {
+                        if (this.temp_connected_dock != null && src == this.temp_connected_dock.d
+                         && this.clicked_dock != null && snk == this.clicked_dock.d) {
+                            continue;
+                        }
                         var source_widget = this.retrieve_dock(src);
                         var source_node = this.retrieve_node(src.node);
                         Gtk.Allocation src_alloc, src_node_alloc;
