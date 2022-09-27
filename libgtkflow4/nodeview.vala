@@ -55,7 +55,6 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            message("drawing dock %s",this.d.name);
             var rect = Graphene.Rect().init(0,0,16, 16);
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
             Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
@@ -88,7 +87,6 @@ namespace GtkFlow {
         }
 
         protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
-            message("measure dock %d", for_size);
             min = 16;
             pref = 16;
             min_base = -1;
@@ -430,7 +428,7 @@ namespace GtkFlow {
 
         internal void start_temp_connector(Dock d) {
             this.clicked_dock = d;
-            if (d.d is GFlow.Sink) {
+            if (d.d is GFlow.Sink && d.d.is_linked()) {
                 var sink = (GFlow.Sink)d.d;
                 this.temp_connected_dock = this.retrieve_dock(sink.sources.last().nth_data(0));
             } else {
