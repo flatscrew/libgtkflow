@@ -26,6 +26,7 @@ namespace GtkFlow {
 
     public interface NodeRenderer : Gtk.Widget {
         public abstract GFlow.Node n {get; protected set;}
+        public abstract bool marked {get; internal set;}
         public abstract Dock? retrieve_dock(GFlow.Dock d);
     }
 
@@ -102,6 +103,8 @@ namespace GtkFlow {
         private Gtk.GestureClick ctr_click;
         public GFlow.Node n {get; protected set;}
 
+        public bool marked {get; internal set;}
+
         public Gtk.Widget title_widget {get; set;}
         private Gtk.Label title_label;
         private Gtk.Button delete_button;
@@ -140,6 +143,7 @@ namespace GtkFlow {
             this.delete_button = new Gtk.Button();
             this.delete_button.child = delete_icon;
             this.delete_button.set_parent(this);
+            this.delete_button.clicked.connect(this.cb_delete);
             var delete_button_lc = (Gtk.GridLayoutChild) grid.get_layout_child(this.delete_button);
             delete_button_lc.row = 0;
             delete_button_lc.row_span = 1;
@@ -173,6 +177,11 @@ namespace GtkFlow {
                 c = c.get_next_sibling();
             }
             return null;
+        }
+
+        private void cb_delete() {
+            var nv = this.get_parent() as NodeView;
+            nv.remove(this);
         }
 
         public void add_child(Gtk.Widget child) {
@@ -269,8 +278,15 @@ namespace GtkFlow {
         protected override void snapshot (Gtk.Snapshot sn) {
             var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 5f);
-            Gdk.RGBA color = {0.5f,0.5f,0.5f,0.8f};
-            Gdk.RGBA grey_color = {0.6f,0.6f,0.6f,0.5f};
+            Gdk.RGBA color;
+            Gdk.RGBA grey_color;
+            if (this.marked) {
+                color = {0.0f,0.2f,0.5f,0.8f};
+                grey_color = {0.0f,0.2f,0.6f,0.5f};
+            } else {
+                color = {0.5f,0.5f,0.5f,0.8f};
+                grey_color = {0.6f,0.6f,0.6f,0.5f};
+            }
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
             sn.append_color(grey_color ,rect );
@@ -295,12 +311,10 @@ namespace GtkFlow {
 
     private class NodeViewLayoutManager : Gtk.LayoutManager {
         protected override Gtk.SizeRequestMode get_request_mode (Gtk.Widget widget) {
-            message("nvl reqmode");
             return Gtk.SizeRequestMode.CONSTANT_SIZE;
         }
 
         protected override  void measure(Gtk.Widget w, Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
-            message("nvl measure");
             int lower_bound = 0;
             int upper_bound = 0;
             var c = w.get_first_child();
@@ -397,6 +411,11 @@ namespace GtkFlow {
          */
         internal Node? move_node {get; set; default=null;}
 
+        /**
+         * A rectangle detailing the extents of a rubber marking
+         */
+        private Gdk.Rectangle? mark_rubberband = null;
+
         public NodeView (){
             this.set_layout_manager(new NodeViewLayoutManager());
             this.set_size_request(100,100);
@@ -407,14 +426,41 @@ namespace GtkFlow {
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
+            this.ctr_click.pressed.connect((n,x,y) => { this.start_marking(n,x,y); });
             this.ctr_click.released.connect((n,x,y) => { this.end_temp_connector(n,x,y); });
+        }
+
+        private List<unowned NodeRenderer> get_marked_nodes() {
+            var result = new List<unowned NodeRenderer>();
+            var nodewidget = this.get_first_child();
+            while (nodewidget != null) {
+                var node = (NodeRenderer)nodewidget;
+                if (node.marked) {
+                    result.append(node);
+                }
+                nodewidget = nodewidget.get_next_sibling();
+            }
+            return result;
         }
 
         private void process_motion(double x, double y) {
             if (this.move_node != null) {
                 var lc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(this.move_node);
+                int old_x = lc.x;
+                int old_y = lc.y;
                 lc.x = (int)(x-this.move_node.click_offset_x);
                 lc.y = (int)(y-this.move_node.click_offset_y);
+                if (this.move_node.marked) {
+                    int diff_x, diff_y;
+                    foreach (NodeRenderer n in this.get_marked_nodes()) {
+                        if (n == this.move_node) continue;
+                        var mlc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(n);
+                        diff_x = old_x - lc.x;
+                        diff_y = old_y - lc.y;
+                        mlc.x -= diff_x;
+                        mlc.y -= diff_y;
+                    }
+                }
             }
 
             if (this.temp_connector != null) {
@@ -422,8 +468,37 @@ namespace GtkFlow {
                 this.temp_connector.height = (int)(y - this.temp_connector.y);
             }
 
+            if (this.mark_rubberband != null) {
+                this.mark_rubberband.width = (int)(x - this.mark_rubberband.x);
+                this.mark_rubberband.height = (int)(y - this.mark_rubberband.y);
+                var nodewidget = this.get_first_child();
+                Gtk.Allocation node_alloc;
+                Gdk.Rectangle absolute_marked = this.mark_rubberband;
+                if (absolute_marked.width < 0) {
+                    absolute_marked.width *= -1;
+                    absolute_marked.x -= absolute_marked.width;
+                }
+                if (absolute_marked.height < 0) {
+                    absolute_marked.height *= -1;
+                    absolute_marked.y -= absolute_marked.height;
+                }
+                Gdk.Rectangle result;
+                while (nodewidget != null) {
+                    var node = (NodeRenderer)nodewidget;
+                    node.get_allocation(out node_alloc);
+                    node_alloc.intersect(absolute_marked, out result);
+                    node.marked = result == node_alloc;
+                    nodewidget = node.get_next_sibling();
+                }
+            }
 
             this.queue_allocate();
+        }
+
+
+        private void start_marking(int n_clicks, double x, double y) {
+            if (this.pick(x,y, Gtk.PickFlags.DEFAULT) == this)
+                this.mark_rubberband = {(int)x,(int)y,0,0};
         }
 
         internal void start_temp_connector(Dock d) {
@@ -434,7 +509,6 @@ namespace GtkFlow {
             } else {
                 this.temp_connected_dock = d;
             }
-            message("start: "+this.temp_connected_dock.d.get_type().name());
             var node = this.retrieve_node(this.temp_connected_dock.d.node);
 
             Gtk.Allocation node_alloc, dock_alloc;
@@ -477,12 +551,9 @@ namespace GtkFlow {
                     }
                     pd.queue_draw();
                 } else {
-                    message(this.temp_connected_dock.d.get_type().name());
-                    message(this.clicked_dock.d.get_type().name());
                     if (this.temp_connected_dock.d is GFlow.Source
-                     && this.clicked_dock != null) {
-                     //&& this.clicked_dock.d is GFlow.Sink) {
-                        message("leleleeeee2");
+                     && this.clicked_dock != null
+                     && this.clicked_dock.d is GFlow.Sink) {
                         try {
                             this.clicked_dock.d.unlink(this.temp_connected_dock.d);
                         } catch (Error e) {
@@ -499,8 +570,11 @@ namespace GtkFlow {
                 this.clicked_dock = null;
                 this.temp_connected_dock = null;
                 this.temp_connector = null;
+
             }
 
+            this.mark_rubberband = null;
+            this.queue_allocate();
         }
 
         public void add(Node n) {
@@ -508,13 +582,16 @@ namespace GtkFlow {
         }
 
         public void remove(Node n) {
+            n.n.unlink_all();
             var child = this.get_first_child ();
             while (child != null) {
                 if (child == n) {
-                    child.unparent ();
+                    // TODO: find out why destroy wont work as intended
+                    child.destroy ();
+                    child.hide();
                     return;
                 }
-                child = this.get_first_child ();
+                child = child.get_next_sibling();
             }
             warning("Tried to remove a node that is not a child of nodeview");
         }
@@ -666,6 +743,17 @@ namespace GtkFlow {
                 );
                 cr.stroke();
                 cr.restore();
+            }
+            if (this.mark_rubberband != null) {
+                cr.save();
+                cr.set_source_rgba(0.0, 0.2, 0.9, 0.4);
+                cr.rectangle(
+                    this.mark_rubberband.x, this.mark_rubberband.y,
+                    this.mark_rubberband.width, this.mark_rubberband.height
+                );
+                cr.fill();
+                cr.set_source_rgba(0.0, 0.2, 1.0, 1.0);
+                cr.stroke();
             }
         }
     }
