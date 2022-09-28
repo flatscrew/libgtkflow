@@ -104,6 +104,7 @@ namespace GtkFlow {
         public GFlow.Node n {get; protected set;}
 
         public bool marked {get; internal set;}
+        public bool resizable {get; set; default=true;}
 
         public Gtk.Widget title_widget {get; set;}
         private Gtk.Label title_label;
@@ -111,6 +112,8 @@ namespace GtkFlow {
 
         public double click_offset_x {get; private set; default=0;}
         public double click_offset_y {get; private set; default=0;}
+        public double resize_start_width {get; private set; default=0;}
+        public double resize_start_height {get; private set; default=0;}
 
         private HashTable<GFlow.Dock, Gtk.Widget> widgets;
 
@@ -255,15 +258,23 @@ namespace GtkFlow {
             }
             if (!do_processing) return;
 
+            Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
             var nv = this.get_parent() as NodeView;
+            if (resize_area.contains_point((int)x,(int)y)) {
+                nv.resize_node = this;
+                this.resize_start_width = this.get_width();
+                this.resize_start_height = this.get_height();
+            } else {
+                nv.move_node = this;
+            }
             this.click_offset_x = x;
             this.click_offset_y = y;
-            nv.move_node = this;
         }
 
         private void release_button() {
             var nv = this.get_parent() as NodeView;
             nv.move_node = null;
+            nv.resize_node = null;
             nv.queue_allocate();
         }
 
@@ -292,6 +303,16 @@ namespace GtkFlow {
             sn.append_color(grey_color ,rect );
             sn.append_border(rrect, thicc, border_color);
             sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
+            if (this.resizable) {
+                var cr = sn.append_cairo(rect);
+                cr.save();
+                cr.set_source_rgba(0.6,0.6,0.6,0.9);
+                cr.set_line_width(8.0);
+                cr.move_to(this.get_width()+2,this.get_height()-6);
+                cr.line_to(this.get_width()-6,this.get_height()+2);
+                cr.stroke();
+                cr.restore();
+            }
             base.snapshot(sn);
         }
 
@@ -410,6 +431,7 @@ namespace GtkFlow {
          * itself with this property
          */
         internal Node? move_node {get; set; default=null;}
+        internal Node? resize_node {get; set; default=null;}
 
         /**
          * A rectangle detailing the extents of a rubber marking
@@ -461,6 +483,18 @@ namespace GtkFlow {
                         mlc.y -= diff_y;
                     }
                 }
+            }
+
+            if (this.resize_node != null) {
+                int d_x, d_y;
+                Gtk.Allocation node_alloc;
+                this.resize_node.get_allocation(out node_alloc);
+                d_x = (int)(x-this.resize_node.click_offset_x-node_alloc.x);
+                d_y = (int)(y-this.resize_node.click_offset_y-node_alloc.y);
+                int new_width = (int)this.resize_node.resize_start_width+d_x;
+                int new_height = (int)this.resize_node.resize_start_height+d_y;
+                this.resize_node.set_size_request(new_width, new_height);
+                message("resze %d %d", new_width, new_height);
             }
 
             if (this.temp_connector != null) {
