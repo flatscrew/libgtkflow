@@ -308,8 +308,43 @@ namespace GtkFlow {
 
             }
 
+            this.update_extents();
+            this.queue_resize();
             this.mark_rubberband = null;
             this.queue_allocate();
+        }
+
+        private void update_extents() {
+            int min_x=0, min_y = 0;
+            NodeViewLayoutChild lc;
+            var child = this.get_first_child();
+            while (child != null) {
+                lc = (NodeViewLayoutChild)this.layout_manager.get_layout_child(child);
+                min_x = int.min(min_x, lc.x);
+                min_y = int.min(min_y, lc.y);
+                child = child.get_next_sibling();
+            }
+            if (min_x >= 0 && min_y >= 0) {
+                return;
+            }
+            child = this.get_first_child();
+            while (child != null) {
+                lc = (NodeViewLayoutChild)this.layout_manager.get_layout_child(child);
+                if (min_x < 0)
+                lc.x += -min_x;
+                if (min_y < 0)
+                lc.y += -min_y;
+                child = child.get_next_sibling();
+            }
+            var parent = this.get_parent();
+            if (parent!=null && parent is Gtk.Viewport) {
+                var scrollwidget = parent.get_parent();
+                if (parent != null && parent is Gtk.ScrolledWindow) {
+                    var sw = (Gtk.ScrolledWindow)scrollwidget;
+                    sw.hadjustment.value += (double)(-min_x);
+                    sw.vadjustment.value += (double)(-min_y);
+                }
+            }
         }
 
         public void add(Node n) {
