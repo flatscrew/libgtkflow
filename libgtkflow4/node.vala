@@ -38,6 +38,8 @@ namespace GtkFlow {
         public bool marked {get; internal set;}
         public bool resizable {get; set; default=true;}
 
+        public Gdk.RGBA? highlight_color {get; set; default=null;}
+
         public Gtk.Widget title_widget {get; set;}
         private Gtk.Label title_label;
         private Gtk.Button delete_button;

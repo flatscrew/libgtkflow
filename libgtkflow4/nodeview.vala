@@ -409,6 +409,8 @@ namespace GtkFlow {
             return false;
         }
 
+        internal signal void draw_minimap();
+
         protected override void snapshot (Gtk.Snapshot sn) {
             base.snapshot(sn);
             var rect = Graphene.Rect().init(0,0,(float)this.get_width(), (float)this.get_height());
@@ -462,6 +464,7 @@ namespace GtkFlow {
                 }
                 c = c.get_next_sibling();
             }
+            this.draw_minimap();
             if (this.temp_connector != null) {
                 color = this.temp_connected_dock.resolve_color(
                     this.temp_connected_dock, this.temp_connected_dock.last_value

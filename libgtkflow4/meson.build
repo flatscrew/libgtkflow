@@ -20,9 +20,10 @@
 #********************************************************************
 
 src = files([
-    'nodeview.vala',
-    'node.vala',
     'dock.vala',
+    'minimap.vala',
+    'node.vala',
+    'nodeview.vala',
 ])
 
 gtkflow4 = library('gtkflow4-' + api,

@@ -26,7 +26,6 @@ class TestNode : GFlow.SimpleNode {
     }
 
     public void register_colors(GtkFlow.NodeView nv) {
-        message("MOIN");
         var src_widget1 = nv.retrieve_dock(this.source1);
         var src_widget2 = nv.retrieve_dock(this.source2);
         var snk_widget1 = nv.retrieve_dock(this.sink1);
@@ -50,8 +49,11 @@ int main (string[] args) {
     var sw = new Gtk.ScrolledWindow();
 
     var nv = new GtkFlow.NodeView();
+    var mm = new GtkFlow.Minimap();
     sw.child=nv;
     sw.vexpand=true;
+
+    mm.nodeview = nv;
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
@@ -75,6 +77,7 @@ int main (string[] args) {
 
     win.child = box;
     box.append(btn);
+    box.append(mm);
     box.append(sw);
     win.present();
   });
