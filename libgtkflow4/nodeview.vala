@@ -177,14 +177,11 @@ namespace GtkFlow {
                 lc.x = (int)(x-this.move_node.click_offset_x);
                 lc.y = (int)(y-this.move_node.click_offset_y);
                 if (this.move_node.marked) {
-                    int diff_x, diff_y;
                     foreach (NodeRenderer n in this.get_marked_nodes()) {
                         if (n == this.move_node) continue;
                         var mlc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(n);
-                        diff_x = old_x - lc.x;
-                        diff_y = old_y - lc.y;
-                        mlc.x -= diff_x;
-                        mlc.y -= diff_y;
+                        mlc.x -= old_x - lc.x;
+                        mlc.y -= old_y - lc.y;
                     }
                 }
             }
