@@ -29,11 +29,22 @@ pkgconfig = import('pkgconfig')
 
 glib = dependency('glib-2.0')
 gobject = dependency('gobject-2.0')
-gtk = dependency('gtk+-3.0', version: '>=3.20.0')
 math = meson.get_compiler('c').find_library('m', required: true)
+if get_option('enable_gtk3')
+  gtk3 = dependency('gtk+-3.0', version: '>=3.20.0')
+endif
+if get_option('enable_gtk4')
+  gtk4 = dependency('gtk4')
+endif
 
 g_ir_compiler = find_program('g-ir-compiler')
 
 subdir('libgflow')
-subdir('libgtkflow')
-subdir('test')
+if get_option('enable_gtk3')
+  subdir('libgtkflow3')
+  subdir('test')
+endif
+if get_option('enable_gtk4')
+  subdir('libgtkflow4')
+  subdir('test4')
+endif

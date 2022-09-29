@@ -10,53 +10,53 @@ src = files([
     'drawinghelper.c'
 ])
 
-gtkflow = library('gtkflow-' + api,
+gtkflow3 = library('gtkflow3-' + api,
                   src,
-                  dependencies: [glib, gobject, gtk, math],
+                  dependencies: [glib, gobject, gtk3, math],
                   link_with: gflow,
                   include_directories: gflow_inc,
-                  vala_gir: 'GtkFlow-' + api + '.gir',
+                  vala_gir: 'GtkFlow3-' + api + '.gir',
                   install: true)
 
-gtkflow_inc = include_directories('.')
+gtkflow3_inc = include_directories('.')
 
-custom_target('gtkflow-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow-' + api + '.gir',
+custom_target('gtkflow3-typelib',
+              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow3-' + api + '.gir',
                        '--includedir', gflow_girdir,
-                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow-'+ api +'.so'],
-              output: 'GtkFlow-' + api + '.typelib',
-              depends: gtkflow,
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow3-'+ api +'.so'],
+              output: 'GtkFlow3-' + api + '.typelib',
+              depends: gtkflow3,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-girfilename = meson.current_build_dir() + '/GtkFlow-' + api + '.gir'
-run_command('touch', girfilename)
-install_data(sources: girfilename,
+girfilename3 = meson.current_build_dir() + '/GtkFlow-' + api + '.gir'
+run_command('touch', girfilename3)
+install_data(sources: girfilename3,
              install_dir: get_option('datadir') + '/gir-1.0')
 
-vapifilename = meson.current_build_dir() + '/gtkflow-' + api + '.vapi'
-run_command('touch', vapifilename)
-install_data(sources: vapifilename,
+vapifilename3 = meson.current_build_dir() + '/gtkflow3-' + api + '.vapi'
+run_command('touch', vapifilename3)
+install_data(sources: vapifilename3,
              install_dir: get_option('datadir') + '/vala/vapi')
 
-headerfilename = meson.current_build_dir () + '/gtkflow-' + api + '.h'
-run_command('touch', headerfilename)
-install_headers(headerfilename,
-                subdir: 'gtkflow-' + api)
-install_data(sources: [meson.current_source_dir() + '/gtkflow-' + api + '.deps'],
+headerfilename3 = meson.current_build_dir () + '/gtkflow3-' + api + '.h'
+run_command('touch', headerfilename3)
+install_headers(headerfilename3,
+                subdir: 'gtkflow3-' + api)
+install_data(sources: [meson.current_source_dir() + '/gtkflow3-' + api + '.deps'],
              install_dir: get_option('datadir') + '/vala/vapi')
 
-pkgconfig.generate(libraries: [gflow, gtkflow],
-                   subdirs: 'gtkflow-' + api,
+pkgconfig.generate(libraries: [gflow, gtkflow3],
+                   subdirs: 'gtkflow3-' + api,
                    version: api,
-                   name: 'gtkflow',
-                   filebase: 'gtkflow-' + api,
+                   name: 'gtkflow3',
+                   filebase: 'gtkflow3-' + api,
                    requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + api],
                    description: 'A library to create flowgraphs in GTK+')
 
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
-    gtkflow_docs = custom_target('gtkflow_apidocs',
+    gtkflow3_docs = custom_target('gtkflow_apidocs',
                                  depends: gflow,
                                  input: src,
                                  install: true,
@@ -65,11 +65,11 @@ if get_option('enable_valadoc')
                                  #        buildtarget via the output parameter.
                                  #        Find a nicer solution
                                  install_dir: '/tmp',
-                                 command: [valadoc, '-o', 'libgtkflow/gtkflow-' + api, '--doclet', 'devhelp', '@INPUT@',
+                                 command: [valadoc, '-o', 'libgtkflow/gtkflow3-' + api, '--doclet', 'devhelp', '@INPUT@',
                                  '--pkg', 'gtk+-3.0', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + api,
                                  '--force'],
-                                 output: 'gtkflow-'+ api)
-    install_subdir(meson.current_build_dir() + '/gtkflow-' + api + '/gtkflow-' + api,
+                                 output: 'gtkflow3-'+ api)
+    install_subdir(meson.current_build_dir() + '/gtkflow3-' + api + '/gtkflow3-' + api,
                    install_dir: get_option('datadir') + '/devhelp/books',
                    )
 endif

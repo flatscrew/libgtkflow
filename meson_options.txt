@@ -1,2 +1,4 @@
 option('enable_valadoc', type: 'boolean', value: true)
+option('enable_gtk3', type: 'boolean', value: true)
+option('enable_gtk4', type: 'boolean', value: true)
 
