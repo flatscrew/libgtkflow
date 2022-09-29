@@ -341,7 +341,7 @@ namespace GtkFlow {
             return null;
         }
 
-        internal Dock? retrieve_dock (GFlow.Dock d) {
+        public Dock? retrieve_dock (GFlow.Dock d) {
             var c = (NodeRenderer)this.get_first_child();
             Dock? found = null;
             while (c != null) {
@@ -443,6 +443,13 @@ namespace GtkFlow {
                         w = tgt_x - src_x;
                         h = tgt_y - src_y;
 
+                        var sourcedock = this.retrieve_dock(src);
+                        if (sourcedock != null) {
+                            message("oha");
+                            color = sourcedock.resolve_color(sourcedock, sourcedock.last_value);
+                        }
+                        message("colr: %f %f %f %f",color.red, color.green, color.blue, color.alpha);
+
                         cr.save();
                         cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
                         cr.move_to(src_x, src_y);
@@ -458,6 +465,9 @@ namespace GtkFlow {
                 c = c.get_next_sibling();
             }
             if (this.temp_connector != null) {
+                color = this.temp_connected_dock.resolve_color(
+                    this.temp_connected_dock, this.temp_connected_dock.last_value
+                );
                 cr.save();
                 cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
                 cr.move_to(this.temp_connector.x, this.temp_connector.y);

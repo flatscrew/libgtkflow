@@ -3,6 +3,7 @@ class TestNode : GFlow.SimpleNode {
     public GFlow.Source source2;
     public GFlow.Sink sink1;
 
+
     public TestNode(string name) {
         this.name = name;
 
@@ -22,6 +23,16 @@ class TestNode : GFlow.SimpleNode {
             warning("Couldn't build node");
         }
     }
+
+    public void register_colors(GtkFlow.NodeView nv) {
+        message("MOIN");
+        var src_widget1 = nv.retrieve_dock(this.source1);
+        var src_widget2 = nv.retrieve_dock(this.source2);
+        var snk_widget1 = nv.retrieve_dock(this.sink1);
+        src_widget1.resolve_color.connect_after((d,v)=>{ message("mew"); return {1.0f,0.0f,0.0f,1.0f};});
+        src_widget2.resolve_color.connect_after((d,v)=>{ message("nya"); return {0.0f,1.0f,0.0f,1.0f};});
+        snk_widget1.resolve_color.connect_after((d,v)=>{ message("maw"); return {0.0f,0.0f,1.0f,1.0f};});
+    }
 }
 
 int main (string[] args) {
@@ -29,7 +40,7 @@ int main (string[] args) {
     "de.grindhold.GtkFlow4Example",
     ApplicationFlags.FLAGS_NONE
   );
-  
+
   app.activate.connect(() => {
     var win = new Gtk.ApplicationWindow(app);
 
@@ -43,7 +54,7 @@ int main (string[] args) {
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
-        nv.add(new GtkFlow.Node(node));   
+        nv.add(new GtkFlow.Node(node));
     });
 
     var n1 = new TestNode("foo");
@@ -51,7 +62,9 @@ int main (string[] args) {
     var gn1 = new GtkFlow.Node(n1);
     gn1.add_child(new Gtk.Button.with_label("EEEEEE!"));
     nv.add(gn1);
+    n1.register_colors(nv);
     nv.add(new GtkFlow.Node(n2));
+    n2.register_colors(nv);
 
     try {
         n1.source1.link(n2.sink1);
@@ -65,5 +78,5 @@ int main (string[] args) {
     win.present();
   });
   return app.run(args);
-} 
+}
 

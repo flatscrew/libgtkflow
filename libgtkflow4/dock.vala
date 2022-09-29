@@ -28,6 +28,8 @@ namespace GtkFlow {
         public GFlow.Dock d {get; protected set;}
         private Gtk.GestureClick ctr_click;
 
+        internal Value? last_value = null;
+
         public Dock(GFlow.Dock d) {
             this.d = d;
             this.d.unlinked.connect(()=>{this.queue_draw();});
@@ -43,9 +45,27 @@ namespace GtkFlow {
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
+            this.d.changed.connect(this.cb_changed);
+        }
+
+        public  void cb_changed(Value? value = null, string? flow_id = null) {
+            var nv = this.get_parent().get_parent() as NodeView;
+            if (value != null) {
+                value.copy(ref this.last_value);
+            } else {
+                this.last_value = null;
+            }
+            nv.queue_draw();
+            this.queue_draw();
+        }
+
+        public virtual signal Gdk.RGBA resolve_color(Dock d, Value? v) {
+            message("LEEL");
+            return {0.0f,0.0f,0.0f,1.0f};
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
+            var nv = this.get_parent().get_parent() as NodeView;
             var rect = Graphene.Rect().init(0,0,16, 16);
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
             Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
@@ -60,11 +80,26 @@ namespace GtkFlow {
             cr.paint();
             cr.restore();
             if (this.d.is_linked()) {
-                Gdk.RGBA black_color = {0.0f,0.0f,0.0f,1.0f};
+                Gdk.RGBA dot_color = {0.0f,0.0f,0.0f,1.0f};
+                if (this.d is GFlow.Source) {
+                    message("SOOS");
+                    dot_color = this.resolve_color(this, this.last_value);
+                } else if (this.d is GFlow.Sink && this.d.is_linked()) {
+                    var sink = (GFlow.Sink) this.d;
+                    message("SAAS");
+                    var sourcedock = nv.retrieve_dock(sink.sources.nth_data(0));
+                    if (sourcedock != null) {
+                        dot_color = sourcedock.resolve_color(this, this.last_value);
+                    }
+                }
                 thicc = {8f, 8f, 8f, 8f};
-                border_color = {black_color,black_color,black_color,black_color};
                 cr.save();
-                cr.set_source_rgba(0.0,0.0,0.0,1.0);
+                cr.set_source_rgba(
+                    dot_color.red,
+                    dot_color.green,
+                    dot_color.blue,
+                    dot_color.alpha
+                );
                 cr.arc(8d,8d,4d,0.0,2*Math.PI);
                 cr.fill();
                 cr.restore();
