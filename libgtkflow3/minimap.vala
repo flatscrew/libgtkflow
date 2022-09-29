@@ -1,5 +1,5 @@
 /********************************************************************
-# Copyright 2014-2020 Daniel 'grindhold' Brendle
+# Copyright 2014-2022 Daniel 'grindhold' Brendle
 #
 # This file is part of libgtkflow.
 #
