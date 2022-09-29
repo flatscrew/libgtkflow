@@ -146,6 +146,16 @@ namespace GtkFlow {
             this.ctr_click.released.connect((n,x,y) => { this.end_temp_connector(n,x,y); });
         }
 
+        public override void dispose() {
+            var nodewidget = this.get_first_child();
+            while (nodewidget != null) {
+                var delnode = nodewidget;
+                nodewidget = nodewidget.get_next_sibling();
+                delnode.unparent();
+            }
+            base.dispose();
+        }
+
         private List<unowned NodeRenderer> get_marked_nodes() {
             var result = new List<unowned NodeRenderer>();
             var nodewidget = this.get_first_child();

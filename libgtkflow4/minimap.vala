@@ -132,12 +132,8 @@ namespace GtkFlow {
          */
         public override void snapshot(Gtk.Snapshot sn) {
             Graphene.Rect rect;
-            //var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
-            //var cr = sn.append_cairo(rect);
-            Gtk.StyleContext sc = this.get_style_context();
             Gtk.Allocation own_alloc;
             this.get_allocation(out own_alloc);
-            //sc.render_background(cr, 0, 0, own_alloc.width, own_alloc.height);
 
             if (this._nodeview != null) {
                 Gtk.Allocation nv_alloc;

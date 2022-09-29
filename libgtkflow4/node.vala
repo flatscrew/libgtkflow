@@ -139,6 +139,17 @@ namespace GtkFlow {
             child.unparent();
         }
 
+        public override void dispose() {
+            var childwidget = this.get_first_child();
+            while (childwidget != null) {
+                var delnode = childwidget;
+                childwidget = childwidget.get_next_sibling();
+                delnode.unparent();
+            }
+            base.dispose();
+        }
+
+
         private void sink_added(GFlow.Sink s) {
             var radio = new Dock(s);
             var label = new Gtk.Label(s.name);
