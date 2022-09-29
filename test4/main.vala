@@ -1,7 +1,7 @@
 class TestNode : GFlow.SimpleNode {
-    public GFlow.Source source1;
-    public GFlow.Source source2;
-    public GFlow.Sink sink1;
+    public GFlow.SimpleSource source1;
+    public GFlow.SimpleSource source2;
+    public GFlow.SimpleSink sink1;
 
 
     public TestNode(string name) {
@@ -19,6 +19,7 @@ class TestNode : GFlow.SimpleNode {
             this.sink1 = new GFlow.SimpleSink(1);
             this.sink1.name = "%s abfluss 2".printf(name);
             this.add_sink(sink1);
+            this.sink1.max_sources = 10;
         } catch (GFlow.NodeError e) {
             warning("Couldn't build node");
         }
@@ -29,9 +30,9 @@ class TestNode : GFlow.SimpleNode {
         var src_widget1 = nv.retrieve_dock(this.source1);
         var src_widget2 = nv.retrieve_dock(this.source2);
         var snk_widget1 = nv.retrieve_dock(this.sink1);
-        src_widget1.resolve_color.connect_after((d,v)=>{ message("mew"); return {1.0f,0.0f,0.0f,1.0f};});
-        src_widget2.resolve_color.connect_after((d,v)=>{ message("nya"); return {0.0f,1.0f,0.0f,1.0f};});
-        snk_widget1.resolve_color.connect_after((d,v)=>{ message("maw"); return {0.0f,0.0f,1.0f,1.0f};});
+        src_widget1.resolve_color.connect_after((d,v)=>{ return {1.0f,0.0f,0.0f,1.0f};});
+        src_widget2.resolve_color.connect_after((d,v)=>{ return {0.0f,1.0f,0.0f,1.0f};});
+        snk_widget1.resolve_color.connect_after((d,v)=>{ return {0.0f,0.0f,1.0f,1.0f};});
     }
 }
 

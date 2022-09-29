@@ -60,7 +60,6 @@ namespace GtkFlow {
         }
 
         public virtual signal Gdk.RGBA resolve_color(Dock d, Value? v) {
-            message("LEEL");
             return {0.0f,0.0f,0.0f,1.0f};
         }
 
@@ -82,11 +81,9 @@ namespace GtkFlow {
             if (this.d.is_linked()) {
                 Gdk.RGBA dot_color = {0.0f,0.0f,0.0f,1.0f};
                 if (this.d is GFlow.Source) {
-                    message("SOOS");
                     dot_color = this.resolve_color(this, this.last_value);
                 } else if (this.d is GFlow.Sink && this.d.is_linked()) {
                     var sink = (GFlow.Sink) this.d;
-                    message("SAAS");
                     var sourcedock = nv.retrieve_dock(sink.sources.nth_data(0));
                     if (sourcedock != null) {
                         dot_color = sourcedock.resolve_color(this, this.last_value);

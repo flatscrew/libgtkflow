@@ -445,10 +445,8 @@ namespace GtkFlow {
 
                         var sourcedock = this.retrieve_dock(src);
                         if (sourcedock != null) {
-                            message("oha");
                             color = sourcedock.resolve_color(sourcedock, sourcedock.last_value);
                         }
-                        message("colr: %f %f %f %f",color.red, color.green, color.blue, color.alpha);
 
                         cr.save();
                         cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
