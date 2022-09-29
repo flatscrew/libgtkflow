@@ -324,9 +324,7 @@ namespace GtkFlow {
             var child = this.get_first_child ();
             while (child != null) {
                 if (child == n) {
-                    // TODO: find out why destroy wont work as intended
-                    child.destroy ();
-                    child.hide();
+                    child.unparent ();
                     return;
                 }
                 child = child.get_next_sibling();
