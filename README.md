@@ -119,9 +119,9 @@ three different option sets in order to get the single libraries out:
 
 | library | command               |
 |---------|-----------------------|
-| gflow  | meson -Denable_gtk3=false -Denable_gtk4=false .. |
-| gtkflow3  | meson -Denable_gflow=false -Denable_gtk4=false .. |
-| gtkflow4  | meson -Denable_gflow=false -Denable_gtk3=false .. |
+| gflow  | `meson -Denable_gtk3=false -Denable_gtk4=false ..` |
+| gtkflow3  | `meson -Denable_gflow=false -Denable_gtk4=false ..` |
+| gtkflow4  | `meson -Denable_gflow=false -Denable_gtk3=false ..` |
 
 Furthermore, this repository tracks the releases of the individual library versions
 with tags like this: `gflow_1.0.0` `gtkflow4_0.1.0`. You can use these to let
