@@ -14,7 +14,8 @@ gflow = library('gflow-' + api,
                 src,
                 dependencies: [glib, gobject],
                 vala_gir: 'GFlow-' + api + '.gir',
-                install: get_option('enable_gflow'),
+                install: get_option('enable_gflow')
+                )
 
 gflow_inc = include_directories('.')
 
