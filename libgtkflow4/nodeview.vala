@@ -124,8 +124,8 @@ namespace GtkFlow {
          * The node that receives the button press event registers
          * itself with this property
          */
-        internal Node? move_node {get; set; default=null;}
-        internal Node? resize_node {get; set; default=null;}
+        internal NodeRenderer? move_node {get; set; default=null;}
+        internal NodeRenderer? resize_node {get; set; default=null;}
 
         /**
          * A rectangle detailing the extents of a rubber marking
@@ -198,8 +198,9 @@ namespace GtkFlow {
             }
 
             if (this.temp_connector != null) {
-                this.temp_connector.width = (int)(x - this.temp_connector.x-Node.MARGIN);
-                this.temp_connector.height = (int)(y - this.temp_connector.y-Node.MARGIN);
+                var n = (NodeRenderer)this.retrieve_node(this.temp_connected_dock.d.node);
+                this.temp_connector.width = (int)(x - this.temp_connector.x-n.get_margin());
+                this.temp_connector.height = (int)(y - this.temp_connector.y-n.get_margin());
             }
 
             if (this.mark_rubberband != null) {
@@ -346,11 +347,11 @@ namespace GtkFlow {
             }
         }
 
-        public void add(Node n) {
+        public void add(NodeRenderer n) {
             n.set_parent (this);
         }
 
-        public void remove(Node n) {
+        public void remove(NodeRenderer n) {
             n.n.unlink_all();
             var child = this.get_first_child ();
             while (child != null) {
@@ -477,10 +478,10 @@ namespace GtkFlow {
                         source_widget.get_allocation(out src_alloc);
                         source_node.get_allocation(out src_node_alloc);
 
-                        src_x = src_alloc.x+src_node_alloc.x+8+Node.MARGIN;
-                        src_y = src_alloc.y+src_node_alloc.y+8+Node.MARGIN;
-                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8+Node.MARGIN;
-                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8+Node.MARGIN;
+                        src_x = src_alloc.x+src_node_alloc.x+8+nr.get_margin();
+                        src_y = src_alloc.y+src_node_alloc.y+8+nr.get_margin();
+                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8+nr.get_margin();
+                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8+nr.get_margin();
                         w = tgt_x - src_x;
                         h = tgt_y - src_y;
 
@@ -508,9 +509,10 @@ namespace GtkFlow {
                 color = this.temp_connected_dock.resolve_color(
                     this.temp_connected_dock, this.temp_connected_dock.last_value
                 );
+                var nr = this.retrieve_node(this.temp_connected_dock.d.node);
                 cr.save();
                 cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
-                cr.move_to(this.temp_connector.x+Node.MARGIN, this.temp_connector.y+Node.MARGIN);
+                cr.move_to(this.temp_connector.x+nr.get_margin(), this.temp_connector.y+nr.get_margin());
                 cr.rel_curve_to(
                     this.temp_connector.width/3,
                     0,

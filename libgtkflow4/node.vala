@@ -24,6 +24,11 @@ namespace GtkFlow {
         public abstract GFlow.Node n {get; protected set;}
         public abstract bool marked {get; internal set;}
         public abstract Dock? retrieve_dock(GFlow.Dock d);
+        public abstract int get_margin();
+        public abstract double click_offset_x {get; protected set; default=0;}
+        public abstract double click_offset_y {get; protected set; default=0;}
+        public abstract double resize_start_width {get; protected set; default=0;}
+        public abstract double resize_start_height {get; protected set; default=0;}
     }
 
 
@@ -47,10 +52,10 @@ namespace GtkFlow {
         private Gtk.Label title_label;
         private Gtk.Button delete_button;
 
-        public double click_offset_x {get; private set; default=0;}
-        public double click_offset_y {get; private set; default=0;}
-        public double resize_start_width {get; private set; default=0;}
-        public double resize_start_height {get; private set; default=0;}
+        public double click_offset_x {get; protected set; default=0;}
+        public double click_offset_y {get; protected set; default=0;}
+        public double resize_start_width {get; protected set; default=0;}
+        public double resize_start_height {get; protected set; default=0;}
 
         private HashTable<GFlow.Dock, Gtk.Widget> widgets;
 
@@ -118,6 +123,10 @@ namespace GtkFlow {
                 c = c.get_next_sibling();
             }
             return null;
+        }
+
+        public int get_margin() {
+            return Node.MARGIN;
         }
 
         private void cb_delete() {
