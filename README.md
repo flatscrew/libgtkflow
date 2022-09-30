@@ -78,9 +78,12 @@ ones.
 Building
 --------
 
+### Building for shits and giggles
+
 Make sure you get the following Dependencies:
 
   * libgtk-3-dev
+  * libgtk-4-dev
   * gobject-introspection (libgirepository1.0-dev)
   * meson
   * vala
@@ -104,6 +107,25 @@ A user of the library (thx @gavr) reported:
 ```
 meson _build --buildtype=release --prefix=/usr
 ```
+
+### Building for package maintainers
+
+This repository is the source for three different binary packages that come
+with their own respective version numbers. You can either build and subsequently
+ship them all at once, as depicted in the former chapter.
+Alas in some distributions you want the user to be able to omit software that
+he doesn't really need. for this reasons you can build this repository with
+three different option sets in order to get the single libraries out:
+
+| library | command               |
+|---------|-----------------------|
+| gflow  | meson -Denable_gtk3=false -Denable_gtk4=false .. |
+| gtkflow3  | meson -Denable_gflow=false -Denable_gtk4=false .. |
+| gflow  | meson -Denable_gflow=false -Denable_gtk3=false .. |
+
+Furthermore, this repository tracks the releases of the individual library versions
+with tags like this: `gflow_1.0.0` `gtkflow4_0.1.0`. You can use these to let
+your package point to the correct commit.
 
 Examples
 --------
