@@ -31,7 +31,7 @@ custom_target('gtkflow3-typelib',
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-girfilename3 = meson.current_build_dir() + '/GtkFlow-' + gtkflow3_api + '.gir'
+girfilename3 = meson.current_build_dir() + '/GtkFlow3-' + gtkflow3_api + '.gir'
 run_command('touch', girfilename3)
 install_data(sources: girfilename3,
              install_dir: get_option('datadir') + '/gir-1.0')
