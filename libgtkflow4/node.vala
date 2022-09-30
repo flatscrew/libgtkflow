@@ -215,6 +215,9 @@ namespace GtkFlow {
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
             sn.append_color(grey_color ,rect );
+            if (this.highlight_color != null) {
+                sn.append_color(this.highlight_color ,rect );
+            }
             sn.append_border(rrect, thicc, border_color);
             sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
             if (this.resizable) {

@@ -64,6 +64,7 @@ int main (string[] args) {
     var n2 = new TestNode("bar");
     var gn1 = new GtkFlow.Node(n1);
     gn1.add_child(new Gtk.Button.with_label("EEEEEE!"));
+    gn1.highlight_color = {0.6f,1.0f,0.0f,0.3f};
     nv.add(gn1);
     n1.register_colors(nv);
     nv.add(new GtkFlow.Node(n2));
