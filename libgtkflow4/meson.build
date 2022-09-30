@@ -83,7 +83,7 @@ if get_option('enable_valadoc')
                                  #        buildtarget via the output parameter.
                                  #        Find a nicer solution
                                  install_dir: '/tmp',
-                                 command: [valadoc, '-o', 'libgtkflow/gtkflow4-' + gtkflow4_api, '--doclet', 'devhelp', '@INPUT@',
+                                 command: [valadoc, '-o', meson.current_build_dir() + '/gtkflow4-' + gtkflow4_api, '--doclet', 'devhelp', '@INPUT@',
                                  '--pkg', 'gtk4', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_api,
                                  '--force'],
                                  output: 'gtkflow4-'+ gtkflow4_api)
