@@ -49,7 +49,7 @@ namespace GtkFlow {
         }
 
         public  void cb_changed(Value? value = null, string? flow_id = null) {
-            var nv = this.get_parent().get_parent() as NodeView;
+            var nv = this.get_parent().get_parent().get_parent() as NodeView;
             if (value != null) {
                 value.copy(ref this.last_value);
             } else {
@@ -64,7 +64,7 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            var nv = this.get_parent().get_parent() as NodeView;
+            var nv = this.get_parent().get_parent().get_parent() as NodeView;
             var rect = Graphene.Rect().init(0,0,16, 16);
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
             Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
@@ -104,7 +104,7 @@ namespace GtkFlow {
         }
 
         private void press_button(int n_clicked, double x, double y) {
-            var nv = this.get_parent().get_parent() as NodeView;
+            var nv = this.get_parent().get_parent().get_parent() as NodeView;
             nv.start_temp_connector(this);
             nv.queue_allocate();
         }

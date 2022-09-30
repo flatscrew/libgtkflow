@@ -195,12 +195,11 @@ namespace GtkFlow {
                 int new_width = (int)this.resize_node.resize_start_width+d_x;
                 int new_height = (int)this.resize_node.resize_start_height+d_y;
                 this.resize_node.set_size_request(new_width, new_height);
-                message("resze %d %d", new_width, new_height);
             }
 
             if (this.temp_connector != null) {
-                this.temp_connector.width = (int)(x - this.temp_connector.x);
-                this.temp_connector.height = (int)(y - this.temp_connector.y);
+                this.temp_connector.width = (int)(x - this.temp_connector.x-Node.MARGIN);
+                this.temp_connector.height = (int)(y - this.temp_connector.y-Node.MARGIN);
             }
 
             if (this.mark_rubberband != null) {
@@ -478,10 +477,10 @@ namespace GtkFlow {
                         source_widget.get_allocation(out src_alloc);
                         source_node.get_allocation(out src_node_alloc);
 
-                        src_x = src_alloc.x+src_node_alloc.x+8;
-                        src_y = src_alloc.y+src_node_alloc.y+8;
-                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8;
-                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8;
+                        src_x = src_alloc.x+src_node_alloc.x+8+Node.MARGIN;
+                        src_y = src_alloc.y+src_node_alloc.y+8+Node.MARGIN;
+                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8+Node.MARGIN;
+                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8+Node.MARGIN;
                         w = tgt_x - src_x;
                         h = tgt_y - src_y;
 
@@ -511,7 +510,7 @@ namespace GtkFlow {
                 );
                 cr.save();
                 cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
-                cr.move_to(this.temp_connector.x, this.temp_connector.y);
+                cr.move_to(this.temp_connector.x+Node.MARGIN, this.temp_connector.y+Node.MARGIN);
                 cr.rel_curve_to(
                     this.temp_connector.width/3,
                     0,
