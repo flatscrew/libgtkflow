@@ -26,48 +26,50 @@ src = files([
     'nodeview.vala',
 ])
 
-gtkflow4 = library('gtkflow4-' + api,
+gtkflow4_api = '0.2'
+
+gtkflow4 = library('gtkflow4-' + gtkflow4_api,
                   src,
                   dependencies: [glib, gobject, gtk4, math],
                   link_with: gflow,
                   include_directories: gflow_inc,
-                  vala_gir: 'GtkFlow4-' + api + '.gir',
+                  vala_gir: 'GtkFlow4-' + gtkflow4_api + '.gir',
                   install: true)
 
 gtkflow4_inc = include_directories('.')
 
 custom_target('gtkflow4-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + api + '.gir',
+              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + gtkflow4_api + '.gir',
                        '--includedir', gflow_girdir,
-                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ api +'.so'],
-              output: 'GtkFlow4-' + api + '.typelib',
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ gtkflow4_api +'.so'],
+              output: 'GtkFlow4-' + gtkflow4_api + '.typelib',
               depends: gtkflow4,
               install: true,
               install_dir: get_option('libdir') + '/girepository-1.0')
 
-girfilename4 = meson.current_build_dir() + '/GtkFlow4-' + api + '.gir'
+girfilename4 = meson.current_build_dir() + '/GtkFlow4-' + gtkflow4_api + '.gir'
 run_command('touch', girfilename4)
 install_data(sources: girfilename4,
              install_dir: get_option('datadir') + '/gir-1.0')
 
-vapifilename4 = meson.current_build_dir() + '/gtkflow4-' + api + '.vapi'
+vapifilename4 = meson.current_build_dir() + '/gtkflow4-' + gtkflow4_api + '.vapi'
 run_command('touch', vapifilename4)
 install_data(sources: vapifilename4,
              install_dir: get_option('datadir') + '/vala/vapi')
 
-headerfilename4 = meson.current_build_dir () + '/gtkflow4-' + api + '.h'
+headerfilename4 = meson.current_build_dir () + '/gtkflow4-' + gtkflow4_api + '.h'
 run_command('touch', headerfilename4)
 install_headers(headerfilename4,
-                subdir: 'gtkflow4-' + api)
-install_data(sources: [meson.current_source_dir() + '/gtkflow4-' + api + '.deps'],
+                subdir: 'gtkflow4-' + gtkflow4_api)
+install_data(sources: [meson.current_source_dir() + '/gtkflow4-' + gtkflow4_api + '.deps'],
              install_dir: get_option('datadir') + '/vala/vapi')
 
 pkgconfig.generate(libraries: [gflow, gtkflow4],
-                   subdirs: 'gtkflow4-' + api,
-                   version: api,
+                   subdirs: 'gtkflow4-' + gtkflow4_api,
+                   version: gtkflow4_api,
                    name: 'gtkflow4',
-                   filebase: 'gtkflow4-' + api,
-                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + api],
+                   filebase: 'gtkflow4-' + gtkflow4_api,
+                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + gflow_api],
                    description: 'A library to create flowgraphs in GTK+')
 
 if get_option('enable_valadoc')
@@ -81,11 +83,11 @@ if get_option('enable_valadoc')
                                  #        buildtarget via the output parameter.
                                  #        Find a nicer solution
                                  install_dir: '/tmp',
-                                 command: [valadoc, '-o', 'libgtkflow/gtkflow4-' + api, '--doclet', 'devhelp', '@INPUT@',
-                                 '--pkg', 'gtk4', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + api,
+                                 command: [valadoc, '-o', 'libgtkflow/gtkflow4-' + gtkflow4_api, '--doclet', 'devhelp', '@INPUT@',
+                                 '--pkg', 'gtk4', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_api,
                                  '--force'],
-                                 output: 'gtkflow4-'+ api)
-    install_subdir(meson.current_build_dir() + '/gtkflow4-' + api + '/gtkflow4-' + api,
+                                 output: 'gtkflow4-'+ gtkflow4_api)
+    install_subdir(meson.current_build_dir() + '/gtkflow4-' + gtkflow4_api + '/gtkflow4-' + gtkflow4_api,
                    install_dir: get_option('datadir') + '/devhelp/books',
                    )
 endif
