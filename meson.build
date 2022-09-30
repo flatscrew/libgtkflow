@@ -46,5 +46,5 @@ if get_option('enable_gtk3')
 endif
 if get_option('enable_gtk4')
   subdir('libgtkflow4')
-  subdir('test4')
+  subdir('gtkflow4-demo')
 endif

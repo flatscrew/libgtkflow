@@ -14,7 +14,7 @@ gflow = library('gflow-' + api,
                 src,
                 dependencies: [glib, gobject],
                 vala_gir: 'GFlow-' + api + '.gir',
-                install: true)
+                install: get_option('enable_gflow'),
 
 gflow_inc = include_directories('.')
 
@@ -27,23 +27,29 @@ custom_target('gflow-typelib',
                        '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgflow-'+ api +'.so'],
               output: 'GFlow-' + api + '.typelib',
               depends: gflow,
-              install: true,
+              install: get_option('enable_gflow'),
               install_dir: get_option('libdir') + '/girepository-1.0')
 
 girfilename = meson.current_build_dir() + '/' + 'GFlow-' + api + '.gir'
 run_command('touch', girfilename)
-install_data(sources: girfilename,
-             install_dir: get_option('datadir') + '/gir-1.0')
+if get_option('enable_gflow')
+  install_data(sources: girfilename,
+               install_dir: get_option('datadir') + '/gir-1.0')
+endif
 
 vapifilename = meson.current_build_dir() + '/' + 'gflow-' + api + '.vapi'
 run_command('touch', vapifilename)
-install_data(sources: vapifilename,
-             install_dir: get_option('datadir') + '/vala/vapi')
+if get_option('enable_gflow')
+  install_data(sources: vapifilename,
+               install_dir: get_option('datadir') + '/vala/vapi')
+endif
 
 headerfilename = meson.current_build_dir () + '/gflow-' + api + '.h'
 run_command('touch', headerfilename)
-install_headers(headerfilename,
-                subdir: 'gflow-' + api)
+if get_option('enable_gflow')
+  install_headers(headerfilename,
+                  subdir: 'gflow-' + api)
+endif
 
 install_data(sources: [meson.current_source_dir() + '/gflow-' + api + '.deps'],
              install_dir: get_option('datadir') + '/vala/vapi')
