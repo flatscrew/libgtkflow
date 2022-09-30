@@ -20,6 +20,13 @@
 *********************************************************************/
 
 namespace GtkFlow {
+    /**
+     * A widget that displays a {@link GFlow.Dock}
+     *
+     * Users may draw connections from and to this widget.
+     * These widgets are only to be used inside implementations
+     * of {@link GtkFlow.Node}
+     */
     public class Dock : Gtk.Widget {
         construct {
             set_css_name("gtkflow_dock");
@@ -30,6 +37,12 @@ namespace GtkFlow {
 
         internal Value? last_value = null;
 
+        /**
+         * Creates a new Dock
+         *
+         * Requires the programmer to pass a {@link GFlow.Dock} to
+         * the d-parameter.
+         */
         public Dock(GFlow.Dock d) {
             this.d = d;
             this.d.unlinked.connect(()=>{this.queue_draw();});
@@ -48,7 +61,7 @@ namespace GtkFlow {
             this.d.changed.connect(this.cb_changed);
         }
 
-        private GtkFlow.Nodeview? get_nodeview() {
+        private GtkFlow.NodeView? get_nodeview() {
             var parent = this.get_parent();
             while (true) {
                 if (parent == null) {
@@ -61,7 +74,7 @@ namespace GtkFlow {
             }
         }
 
-        public  void cb_changed(Value? value = null, string? flow_id = null) {
+        private void cb_changed(Value? value = null, string? flow_id = null) {
             var nv = this.get_nodeview();
             if (nv == null) {
                 warning("Could not react to dock change: no nodeview");
@@ -76,6 +89,16 @@ namespace GtkFlow {
             this.queue_draw();
         }
 
+        /**
+         * Request for the color of this dock
+         *
+         * Use {@link GLib.Signal.connect_after} to override this
+         * method and let your application decide what color to use
+         * for connections that are going off this node.
+         * Be aware that only {@link GFlow.Source}s dictate the colors of the
+         * connections. If this Dock holds a {@link GFlow.Sink} it
+         * will have no visible effect.
+         */
         public virtual signal Gdk.RGBA resolve_color(Dock d, Value? v) {
             return {0.0f,0.0f,0.0f,1.0f};
         }

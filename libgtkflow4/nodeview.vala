@@ -86,6 +86,12 @@ namespace GtkFlow {
         }
     }
 
+    /**
+     * A widget that displays flowgraphs expressed through {@link GFLow} objects
+     *
+     * This allows you to add {@link GFlow.Node}s to it in order to display
+     * A graph of these nodes and their connections.
+     */
     public class NodeView : Gtk.Widget {
         construct {
             set_css_name("gtkflow_nodeview");
@@ -132,6 +138,9 @@ namespace GtkFlow {
          */
         private Gdk.Rectangle? mark_rubberband = null;
 
+        /**
+         * Instantiate a new NodeView
+         */
         public NodeView (){
             this.set_layout_manager(new NodeViewLayoutManager());
             this.set_size_request(100,100);
@@ -146,6 +155,9 @@ namespace GtkFlow {
             this.ctr_click.released.connect((n,x,y) => { this.end_temp_connector(n,x,y); });
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public override void dispose() {
             var nodewidget = this.get_first_child();
             while (nodewidget != null) {
@@ -347,10 +359,16 @@ namespace GtkFlow {
             }
         }
 
+        /**
+         * Add a node to this nodeview
+         */
         public void add(NodeRenderer n) {
             n.set_parent (this);
         }
 
+        /**
+         * Remove a node from this nodeview
+         */
         public void remove(NodeRenderer n) {
             n.n.unlink_all();
             var child = this.get_first_child ();
@@ -367,9 +385,9 @@ namespace GtkFlow {
         /**
          * Retrieve a Node-Widget from this node.
          *
-         * Gives you the GtkFlow.Node-object that corresponds to the given
-         * GFlow.Node. Returns null if the searched Node is not associated
-         * with any of the Node-Widgets in this node.
+         * Gives you the {@link GtkFlow.Node}-object that corresponds to the given
+         * {@link GFlow.Node}. Returns null if the searched Node is not associated
+         * with any of the Node-Widgets in this nodeview.
          */
         public NodeRenderer? retrieve_node (GFlow.Node n) {
             var c = (NodeRenderer)this.get_first_child();
@@ -381,6 +399,14 @@ namespace GtkFlow {
             return null;
         }
 
+
+        /**
+         * Retrieve a Dock-Widget from this nodeview.
+         *
+         * Gives you a {@link Dock}-object that corresponds to the given
+         * {@link GFlow.Dock}. Returns null if the given Dock is not 
+         * associated with any of the Dock-Widgets in this nodeview.
+         */
         public Dock? retrieve_dock (GFlow.Dock d) {
             var c = (NodeRenderer)this.get_first_child();
             Dock? found = null;

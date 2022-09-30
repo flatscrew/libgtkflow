@@ -20,18 +20,68 @@
 *********************************************************************/
 
 namespace GtkFlow {
+    /**
+     * Defines an object that can be added to a Nodeview
+     *
+     * Implement this if you want custom nodes that have their own
+     * drawing routines and special behaviour
+     */
     public interface NodeRenderer : Gtk.Widget {
+        /**
+         * The {@link GFlow.Node} that this Node represents
+         */
         public abstract GFlow.Node n {get; protected set;}
+        /**
+         * Expresses wheter this node is marked via rubberband selection
+         */
         public abstract bool marked {get; internal set;}
+        /**
+         * Returns a {@link Dock} if the given {@link GFlow.Dock} resides
+         * in this node.
+         */
         public abstract Dock? retrieve_dock(GFlow.Dock d);
+        /**
+         * Returns the value of this node's margin
+         */
         public abstract int get_margin();
+        /**
+         * Click offset: x coordinate
+         *
+         * Holds the offset-position relative to the origin of the
+         * node at which this node has been clicked the last time.
+         */
         public abstract double click_offset_x {get; protected set; default=0;}
+        /**
+         * Click offset: y coordinate
+         *
+         * Holds the offset-position relative to the origin of the
+         * node at which this node has been clicked the last time.
+         */
         public abstract double click_offset_y {get; protected set; default=0;}
+
+        /**
+         * Resize start width
+         *
+         * Hold the original width of the node when the last resize process
+         * had been started
+         */
         public abstract double resize_start_width {get; protected set; default=0;}
+        /**
+         * Resize start height
+         *
+         * Hold the original height of the node when the last resize process
+         * had been started
+         */
         public abstract double resize_start_height {get; protected set; default=0;}
     }
 
-
+    
+    /**
+     * A Simple node representation
+     *
+     * The default {@link NodeRenderer} that comes with libgtkflow. Use this
+     * To wrap your {@link GFlow.Node}s in order to add them to a {@link NodeView}
+     */
     public class Node : Gtk.Widget, NodeRenderer  {
         construct {
             set_css_name("gtkflow_node");
@@ -43,18 +93,43 @@ namespace GtkFlow {
         private Gtk.GestureClick ctr_click;
         public GFlow.Node n {get; protected set;}
 
+        /**
+         * {@inheritDoc}
+         */
         public bool marked {get; internal set;}
+        /**
+         * User-controlled node resizability
+         *
+         * Set to true if this should be resizable
+         */
         public bool resizable {get; set; default=true;}
 
         public Gdk.RGBA? highlight_color {get; set; default=null;}
 
+        /**
+         * A widget to use for the node title instead of the name-label
+         *
+         * TODO: implement
+         */
         public Gtk.Widget title_widget {get; set;}
         private Gtk.Label title_label;
         private Gtk.Button delete_button;
 
+        /**
+         * {@inheritDoc}
+         */
         public double click_offset_x {get; protected set; default=0;}
+        /**
+         * {@inheritDoc}
+         */
         public double click_offset_y {get; protected set; default=0;}
+        /**
+         * {@inheritDoc}
+         */
         public double resize_start_width {get; protected set; default=0;}
+        /**
+         * {@inheritDoc}
+         */
         public double resize_start_height {get; protected set; default=0;}
 
         // TODO: implement individual widgets as dock labels
@@ -62,6 +137,11 @@ namespace GtkFlow {
 
         private int n_docks = 0;
 
+        /**
+         * Instantiate a new node
+         *
+         * You are required to pass a {@link GFlow.Node} to this constructor.
+         */
         public Node(GFlow.Node n) {
             this.n = n;
 
@@ -126,6 +206,9 @@ namespace GtkFlow {
             return null;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int get_margin() {
             return Node.MARGIN;
         }
@@ -135,14 +218,23 @@ namespace GtkFlow {
             nv.remove(this);
         }
 
+        /**
+         * Adds a child widget to this node
+         */
         public void add_child(Gtk.Widget child) {
             this.grid.attach(child, 0, 2 + n_docks, 3, 1);
         }
 
+        /**
+         * Removes a child widget from this node
+         */
         public void remove_child(Gtk.Widget child) {
             child.unparent();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public override void dispose() {
             this.grid.unparent();
             base.dispose();
@@ -202,6 +294,9 @@ namespace GtkFlow {
             nv.queue_allocate();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public new void set_parent(Gtk.Widget w) {
             if (!(w is NodeView)) {
                 warning("Trying to add a GtkFlow.Node to something that is not a GtkFlow.NodeView!");
