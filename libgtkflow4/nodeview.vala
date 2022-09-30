@@ -87,7 +87,7 @@ namespace GtkFlow {
     }
 
     /**
-     * A widget that displays flowgraphs expressed through {@link GFLow} objects
+     * A widget that displays flowgraphs expressed through {@link GFlow} objects
      *
      * This allows you to add {@link GFlow.Node}s to it in order to display
      * A graph of these nodes and their connections.
