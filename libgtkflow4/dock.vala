@@ -48,8 +48,25 @@ namespace GtkFlow {
             this.d.changed.connect(this.cb_changed);
         }
 
+        private GtkFlow.Nodeview? get_nodeview() {
+            var parent = this.get_parent();
+            while (true) {
+                if (parent == null) {
+                    return null;
+                } else if (parent is NodeView) {
+                    return (NodeView)parent;
+                } else {
+                    parent = parent.get_parent();
+                }
+            }
+        }
+
         public  void cb_changed(Value? value = null, string? flow_id = null) {
-            var nv = this.get_parent().get_parent().get_parent() as NodeView;
+            var nv = this.get_nodeview();
+            if (nv == null) {
+                warning("Could not react to dock change: no nodeview");
+                return;
+            }
             if (value != null) {
                 value.copy(ref this.last_value);
             } else {
@@ -64,7 +81,11 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            var nv = this.get_parent().get_parent().get_parent() as NodeView;
+            var nv = this.get_nodeview();
+            if (nv == null) {
+                warning("Dock could not snapshot: no nodeview");
+                return;
+            }
             var rect = Graphene.Rect().init(0,0,16, 16);
             var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
             Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
@@ -104,7 +125,11 @@ namespace GtkFlow {
         }
 
         private void press_button(int n_clicked, double x, double y) {
-            var nv = this.get_parent().get_parent().get_parent() as NodeView;
+            var nv = this.get_nodeview();
+            if (nv == null) {
+                warning("Dock could not process button press: no nodeview");
+                return;
+            }
             nv.start_temp_connector(this);
             nv.queue_allocate();
         }
