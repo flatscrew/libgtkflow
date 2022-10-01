@@ -27,11 +27,22 @@ src = files([
 ])
 
 gtkflow4_api = '0.2'
+gflow_dep_api = '1.0'
+
+gtkflow4_deps = [glib, gobject, gtk4, math]
+gtkflow4_links = []
+
+if get_option('enable_gflow') == false
+    gflow_dep = dependency('gflow-'+gflow_dep_api)
+    gtkflow4_deps += gflow_dep
+else
+    gtkflow4_links += gflow
+endif
 
 gtkflow4 = library('gtkflow4-' + gtkflow4_api,
                   src,
-                  dependencies: [glib, gobject, gtk4, math],
-                  link_with: gflow,
+                  dependencies: gtkflow4_deps,
+                  link_with: gtkflow4_links,
                   include_directories: gflow_inc,
                   vala_gir: 'GtkFlow4-' + gtkflow4_api + '.gir',
                   install: true)
@@ -64,12 +75,12 @@ install_headers(headerfilename4,
 install_data(sources: [meson.current_source_dir() + '/gtkflow4-' + gtkflow4_api + '.deps'],
              install_dir: get_option('datadir') + '/vala/vapi')
 
-pkgconfig.generate(libraries: [gflow, gtkflow4],
+pkgconfig.generate(libraries: [gtkflow4],
                    subdirs: 'gtkflow4-' + gtkflow4_api,
                    version: gtkflow4_api,
                    name: 'gtkflow4',
                    filebase: 'gtkflow4-' + gtkflow4_api,
-                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + gflow_api],
+                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + gflow_dep_api],
                    description: 'A library to create flowgraphs in GTK+')
 
 if get_option('enable_valadoc')
@@ -84,7 +95,7 @@ if get_option('enable_valadoc')
                                  #        Find a nicer solution
                                  install_dir: '/tmp',
                                  command: [valadoc, '-o', meson.current_build_dir() + '/gtkflow4-' + gtkflow4_api, '--doclet', 'devhelp', '@INPUT@',
-                                 '--pkg', 'gtk4', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_api,
+                                 '--pkg', 'gtk4', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_dep_api,
                                  '--force'],
                                  output: 'gtkflow4-'+ gtkflow4_api)
     install_subdir(meson.current_build_dir() + '/gtkflow4-' + gtkflow4_api + '/gtkflow4-' + gtkflow4_api,

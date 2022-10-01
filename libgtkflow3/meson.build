@@ -11,11 +11,22 @@ src = files([
 ])
 
 gtkflow3_api = '1.0'
+gflow_dep_api = '1.0'
+
+gtkflow3_deps = [glib, gobject, gtk3, math]
+gtkflow3_links = []
+
+if get_option('enable_gflow') == false
+    gflow_dep = dependency('gflow-'+gflow_dep_api)
+    gtkflow3_deps += gflow_dep
+else
+    gtkflow3_links += gflow
+endif
 
 gtkflow3 = library('gtkflow3-' + gtkflow3_api,
                   src,
-                  dependencies: [glib, gobject, gtk3, math],
-                  link_with: gflow,
+                  dependencies: gtkflow3_deps,
+                  link_with: gtkflow3_links,
                   include_directories: gflow_inc,
                   vala_gir: 'GtkFlow3-' + gtkflow3_api + '.gir',
                   install: true)
@@ -48,12 +59,12 @@ install_headers(headerfilename3,
 install_data(sources: [meson.current_source_dir() + '/gtkflow3-' + gtkflow3_api + '.deps'],
              install_dir: get_option('datadir') + '/vala/vapi')
 
-pkgconfig.generate(libraries: [gflow, gtkflow3],
+pkgconfig.generate(libraries: [gtkflow3],
                    subdirs: 'gtkflow3-' + gtkflow3_api,
                    version: gtkflow3_api,
                    name: 'gtkflow3',
                    filebase: 'gtkflow3-' + gtkflow3_api,
-                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + gflow_api],
+                   requires: ['glib-2.0', 'gobject-2.0', 'gflow-' + gflow_dep_api],
                    description: 'A library to create flowgraphs in GTK+')
 
 if get_option('enable_valadoc')
@@ -68,7 +79,7 @@ if get_option('enable_valadoc')
                                  #        Find a nicer solution
                                  install_dir: '/tmp',
                                  command: [valadoc, '-o', meson.current_build_dir() + '/gtkflow3-' + gtkflow3_api, '--doclet', 'devhelp', '@INPUT@',
-                                 '--pkg', 'gtk+-3.0', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_api,
+                                 '--pkg', 'gtk+-3.0', '--vapidir=' + meson.current_build_dir() + '/../libgflow/', '--pkg', 'gflow-' + gflow_dep_api,
                                  '--force'],
                                  output: 'gtkflow3-'+ gtkflow3_api)
     install_subdir(meson.current_build_dir() + '/gtkflow3-' + gtkflow3_api + '/gtkflow3-' + gtkflow3_api,
