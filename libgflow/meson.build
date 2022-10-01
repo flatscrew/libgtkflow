@@ -54,16 +54,20 @@ if get_option('enable_gflow')
                   subdir: 'gflow-' + gflow_api)
 endif
 
-install_data(sources: [meson.current_source_dir() + '/gflow-' + gflow_api + '.deps'],
-             install_dir: get_option('datadir') + '/vala/vapi')
+if get_option('enable_gflow')
+  install_data(sources: [meson.current_source_dir() + '/gflow-' + gflow_api + '.deps'],
+               install_dir: get_option('datadir') + '/vala/vapi')
+endif
 
-pkgconfig.generate(gflow,
-                   subdirs: 'gflow-' + gflow_api,
-                   version: gflow_api,
-                   name: 'gflow',
-                   filebase: 'gflow-' + gflow_api,
-                   requires: ['glib-2.0', 'gobject-2.0'],
-                   description: 'Flow Node Library')
+if get_option('enable_gflow')
+  pkgconfig.generate(gflow,
+                     subdirs: 'gflow-' + gflow_api,
+                     version: gflow_api,
+                     name: 'gflow',
+                     filebase: 'gflow-' + gflow_api,
+                     requires: ['glib-2.0', 'gobject-2.0'],
+                     description: 'Flow Node Library')
+endif
 
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
