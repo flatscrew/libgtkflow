@@ -51,10 +51,15 @@ gtkflow4 = library('gtkflow4-' + gtkflow4_api,
 
 gtkflow4_inc = include_directories('.')
 
+gtkflow4_typelib_cmd = [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + gtkflow4_api + '.gir',
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ gtkflow4_api +'.so']
+
+if get_option('enable_gflow')
+    gtkflow4_typelib_cmd += ['--includedir', gflow_girdir]
+endif
+
 custom_target('gtkflow4-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + gtkflow4_api + '.gir',
-                #  '--includedir', gflow_girdir,
-                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ gtkflow4_api +'.so'],
+              command: gtkflow4_typelib_cmd,
               output: 'GtkFlow4-' + gtkflow4_api + '.typelib',
               depends: gtkflow4,
               install: true,

@@ -35,9 +35,14 @@ gtkflow3 = library('gtkflow3-' + gtkflow3_api,
 
 gtkflow3_inc = include_directories('.')
 
+
+gtkflow3_typelib_cmd = [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow3-' + gtkflow3_api + '.gir',
+                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow3-'+ gtkflow3_api +'.so']
+if get_option('enable_gflow')
+    gtkflow3_typelib_cmd += ['--includedir', gflow_girdir]
+endif
 custom_target('gtkflow3-typelib',
-              command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow3-' + gtkflow3_api + '.gir',
-                       '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow3-'+ gtkflow3_api +'.so'],
+              command: gtkflow3_typelib_cmd,
               output: 'GtkFlow3-' + gtkflow3_api + '.typelib',
               depends: gtkflow3,
               install: true,
