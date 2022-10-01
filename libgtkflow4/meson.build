@@ -53,7 +53,7 @@ gtkflow4_inc = include_directories('.')
 
 custom_target('gtkflow4-typelib',
               command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow4-' + gtkflow4_api + '.gir',
-                       '--includedir', gflow_girdir,
+                #  '--includedir', gflow_girdir,
                        '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow4-'+ gtkflow4_api +'.so'],
               output: 'GtkFlow4-' + gtkflow4_api + '.typelib',
               depends: gtkflow4,
@@ -87,8 +87,8 @@ pkgconfig.generate(libraries: [gtkflow4],
 
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
-    gtkflow4_docs = custom_target('gtkflow_apidocs',
-                                 depends: gflow,
+    gtkflow4_docs = custom_target('gtkflow4_apidocs',
+                                 depends: gtkflow4,
                                  input: src,
                                  install: true,
                                  # FIXME: Installing to tmp, so the target will be built

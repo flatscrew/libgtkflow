@@ -41,9 +41,14 @@ if get_option('enable_gflow')
 endif
 if get_option('enable_gtk3')
   subdir('libgtkflow3')
-  subdir('test')
 endif
 if get_option('enable_gtk4')
   subdir('libgtkflow4')
+endif
+
+if get_option('enable_gflow') and get_option('enable_gtk3')
+  subdir('test')
+endif
+if get_option('enable_gflow') and get_option('enable_gtk4')
   subdir('gtkflow4-demo')
 endif

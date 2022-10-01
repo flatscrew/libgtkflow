@@ -37,7 +37,6 @@ gtkflow3_inc = include_directories('.')
 
 custom_target('gtkflow3-typelib',
               command: [g_ir_compiler, '--output', '@OUTPUT@', meson.current_build_dir() + '/GtkFlow3-' + gtkflow3_api + '.gir',
-                       '--includedir', gflow_girdir,
                        '--shared-library', get_option('prefix') + '/' + get_option('libdir') + '/libgtkflow3-'+ gtkflow3_api +'.so'],
               output: 'GtkFlow3-' + gtkflow3_api + '.typelib',
               depends: gtkflow3,
@@ -71,8 +70,8 @@ pkgconfig.generate(libraries: [gtkflow3],
 
 if get_option('enable_valadoc')
     valadoc = find_program('valadoc')
-    gtkflow3_docs = custom_target('gtkflow_apidocs',
-                                 depends: gflow,
+    gtkflow3_docs = custom_target('gtkflow3_apidocs',
+                                 depends: gtkflow3,
                                  input: src,
                                  install: true,
                                  # FIXME: Installing to tmp, so the target will be built
