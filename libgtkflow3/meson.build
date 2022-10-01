@@ -15,19 +15,21 @@ gflow_dep_api = '1.0'
 
 gtkflow3_deps = [glib, gobject, gtk3, math]
 gtkflow3_links = []
+gtkflow3_include_dirs = []
 
 if get_option('enable_gflow') == false
     gflow_dep = dependency('gflow-'+gflow_dep_api)
     gtkflow3_deps += gflow_dep
 else
     gtkflow3_links += gflow
+    gtkflow3_include_dirs += gflow_inc
 endif
 
 gtkflow3 = library('gtkflow3-' + gtkflow3_api,
                   src,
                   dependencies: gtkflow3_deps,
                   link_with: gtkflow3_links,
-                  include_directories: gflow_inc,
+                  include_directories: gtkflow3_include_dirs,
                   vala_gir: 'GtkFlow3-' + gtkflow3_api + '.gir',
                   install: true)
 

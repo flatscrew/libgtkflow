@@ -31,19 +31,21 @@ gflow_dep_api = '1.0'
 
 gtkflow4_deps = [glib, gobject, gtk4, math]
 gtkflow4_links = []
+gtkflow4_include_dirs = []
 
 if get_option('enable_gflow') == false
     gflow_dep = dependency('gflow-'+gflow_dep_api)
     gtkflow4_deps += gflow_dep
 else
     gtkflow4_links += gflow
+    gtkflow4_include_dirs += gflow_inc
 endif
 
 gtkflow4 = library('gtkflow4-' + gtkflow4_api,
                   src,
                   dependencies: gtkflow4_deps,
                   link_with: gtkflow4_links,
-                  include_directories: gflow_inc,
+                  include_directories: gtkflow4_include_dirs,
                   vala_gir: 'GtkFlow4-' + gtkflow4_api + '.gir',
                   install: true)
 
