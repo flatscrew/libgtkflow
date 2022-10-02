@@ -15,6 +15,11 @@ of a process to your users, flow graphs are the way to go.
 Screenshots
 -----------
 
+![Gtk4-based CSS-styled nodes](./screenshots/gtk4_fancy.png)
+
+Look at these rare fancy nodes as they get acclimated to their new home in Gtk4! These majestic creatures have travelled a long time
+to get here. Now they frolic as they can finally relax and have a good time.
+
 ![ConnectorAesthetics](./screenshots/connection_aesthetics.png)
 
 GtkFlow has been optimized to provide much nicer visual cues on the direction of connections
