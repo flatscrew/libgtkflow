@@ -83,6 +83,15 @@ namespace GtkFlow {
      * To wrap your {@link GFlow.Node}s in order to add them to a {@link NodeView}
      */
     public class Node : Gtk.Widget, NodeRenderer  {
+        private static string CSS = ".gtkflow_node { background: rgba(0.6,0.6,0.6,0.2); border-radius: 5px; }";
+        private static Gtk.CssProvider css = new Gtk.CssProvider();
+        private static bool initialized = false;
+        private static void init() {
+            if (Node.initialized) return;
+            Node.css.load_from_data(Node.CSS.data);
+            Node.initialized = true;
+        }
+
         construct {
             set_css_name("gtkflow_node");
         }
@@ -143,7 +152,11 @@ namespace GtkFlow {
          * You are required to pass a {@link GFlow.Node} to this constructor.
          */
         public Node(GFlow.Node n) {
+            Node.init();
             this.n = n;
+            
+            this.get_style_context().add_class("gtkflow_node");
+            this.get_style_context().add_provider(Node.css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
             this.grid = new Gtk.Grid();
             this.grid.column_homogeneous = false;
@@ -168,8 +181,12 @@ namespace GtkFlow {
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
             this.ctr_click.end.connect(() => { this.release_button(); });
 
-            this.title_label = new Gtk.Label(n.name);
+            this.title_label = new Gtk.Label("");
+            this.title_label.set_markup ("<b>%s</b>".printf(n.name));
             this.grid.attach(this.title_label, 0, 0, 2, 1);
+            this.n.notify["name"].connect(()=>{
+                this.title_label.set_markup("<b>%s</b>".printf(n.name));
+            });
 
             var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
             this.delete_button = new Gtk.Button();
@@ -313,13 +330,13 @@ namespace GtkFlow {
             if (this.marked) {
                 color = {0.0f,0.2f,0.5f,0.8f};
                 grey_color = {0.0f,0.2f,0.6f,0.5f};
+                sn.append_color(grey_color ,rect );
             } else {
                 color = {0.5f,0.5f,0.5f,0.8f};
                 grey_color = {0.6f,0.6f,0.6f,0.5f};
             }
             Gdk.RGBA[] border_color = {color,color,color,color};
             float[] thicc = {1f,1f,1f,1f};
-            sn.append_color(grey_color ,rect );
             if (this.highlight_color != null) {
                 sn.append_color(this.highlight_color ,rect );
             }

@@ -57,7 +57,12 @@ int main (string[] args) {
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
-        nv.add(new GtkFlow.Node(node));
+        var nn = new GtkFlow.Node(node);
+        var CSS = ".gtkflow_node { background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(175,175,222,1) 35%, rgba(0,212,255,1) 100%); }";
+        Gtk.CssProvider custom_css = new Gtk.CssProvider();
+        custom_css.load_from_data(CSS.data);
+        nn.get_style_context().add_provider(custom_css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+        nv.add(nn);
     });
 
     var n1 = new TestNode("foo");
