@@ -99,7 +99,7 @@ namespace GtkFlow {
          * connections. If this Dock holds a {@link GFlow.Sink} it
          * will have no visible effect.
          */
-        public virtual signal Gdk.RGBA resolve_color(Dock d, Value? v) {
+        public signal Gdk.RGBA resolve_color(Dock d, Value? v) {
             return {0.0f,0.0f,0.0f,1.0f};
         }
 
