@@ -191,6 +191,7 @@ namespace GtkFlow {
             var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
             this.delete_button = new Gtk.Button();
             this.delete_button.child = delete_icon;
+            this.delete_button.has_frame = false;
             this.delete_button.clicked.connect(this.cb_delete);
             this.grid.attach(this.delete_button, 2, 0, 1, 1);
 
