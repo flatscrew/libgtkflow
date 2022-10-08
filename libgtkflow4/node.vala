@@ -141,9 +141,6 @@ namespace GtkFlow {
          */
         public double resize_start_height {get; protected set; default=0;}
 
-        // TODO: implement individual widgets as dock labels
-        // private HashTable<GFlow.Dock, Gtk.Widget> widgets;
-
         private int n_docks = 0;
 
         /**
