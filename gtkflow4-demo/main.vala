@@ -58,6 +58,10 @@ int main (string[] args) {
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
         var nn = new GtkFlow.Node(node);
+        var d = nn.retrieve_dock(node.source1);
+        d.set_docklabel(new Gtk.Scale(Gtk.Orientation.HORIZONTAL, new Gtk.Adjustment(0.0,0.0,1.0,0.01,0.1,0.1)));
+        d = nn.retrieve_dock(node.source2);
+        d.set_docklabel(new Gtk.SpinButton.with_range(0.0,1.0,0.01));
         var CSS = ".gtkflow_node { background: linear-gradient(0deg, rgba(150,111,136,1) 0%, rgba(175,175,222,1) 35%, rgba(0,212,255,1) 100%); }";
         Gtk.CssProvider custom_css = new Gtk.CssProvider();
         custom_css.load_from_data(CSS.data);

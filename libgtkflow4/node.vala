@@ -261,22 +261,22 @@ namespace GtkFlow {
 
         private void sink_added(GFlow.Sink s) {
             var dock = new Dock(s);
-            var label = new Gtk.Label(s.name);
-            label.hexpand = true;
-            label.halign = Gtk.Align.FILL;
-            label.justify = Gtk.Justification.LEFT;
+            dock.notify["label"].connect(()=> {
+                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
+                this.grid.attach(dock.label, 1, lc.row, 1, 1);
+            });
             this.grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
-            this.grid.attach(label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
         }
 
         private void source_added(GFlow.Source s) {
             var dock = new Dock(s);
-            var label = new Gtk.Label(s.name);
-            label.hexpand = true;
-            label.halign = Gtk.Align.FILL;
-            label.justify = Gtk.Justification.RIGHT;
+            dock.notify["label"].connect(()=> {
+                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
+                this.grid.attach(dock.label, 1, lc.row, 1, 1);
+            });
             this.grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
-            this.grid.attach(label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
         }
 
         private void press_button(int n_click, double x, double y) {
