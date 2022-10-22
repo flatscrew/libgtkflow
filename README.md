@@ -1,16 +1,18 @@
 GtkFlow
 =======
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/libgtkflow.svg)](https://repology.org/project/libgtkflow/versions)
-
-Here you see libgtkflow, a universal library for drawing flow graphs with
-Gtk+ 3.
-
-Flow graphs are a possibility to let your user model flows of data from, through
-and into several stations.
+This is libgtkflow, a widely applicable library for drawing flow graphs with
+Gtk. (Gtk+3 and Gtk4 are supported)
 
 Whenever you have to let your users model a process or have to display the topology
 of a process to your users, flow graphs are the way to go.
+
+Downstream Status
+-----------------
+
+|  libgflow  | libgtkflow3 | libgtkflow4 |
+| ---------- |  -------- | ---------|
+| [![Packaging status](https://repology.org/badge/vertical-allrepos/libgflow.svg)](https://repology.org/project/libgflow/versions) | [![Packaging status](https://repology.org/badge/vertical-allrepos/libgtkflow3.svg)](https://repology.org/project/libgtkflow3/versions) | [![Packaging status](https://repology.org/badge/vertical-allrepos/libgtkflow4.svg)](https://repology.org/project/libgtkflow4/versions) |
 
 Screenshots
 -----------
