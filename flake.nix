@@ -4,6 +4,7 @@
   rec
   {
     system = "x86_64-linux";
+
     packages.x86_64-linux.libgtkflow3 = 
     with import nixpkgs {inherit system;};
 
@@ -27,7 +28,7 @@
       buildInputs = [
         gtk3
         glib
-        self.${system}libgflow
+        self.packages.${system}.libgflow
       ];
 
       postFixup = ''
@@ -37,7 +38,59 @@
 
       mesonFlags = [
         "-Denable_valadoc=true"
+        "-Denable_gtk3=true"
         "-Denable_gtk4=false"
+        "-Denable_gflow=false"
+      ];
+
+      postPatch = ''
+        rm -r libgflow
+      '';
+
+      meta = with lib; {
+        description = "Flow graph widget for GTK 3";
+        homepage = "https://notabug.org/grindhold/libgtkflow";
+        maintainers = with maintainers; [ grindhold ];
+        license = licenses.lgpl3Plus;
+        platforms = platforms.unix;
+      };
+    };
+
+    packages.x86_64-linux.libgtkflow4 = 
+    with import nixpkgs {inherit system;};
+
+    stdenv.mkDerivation rec {
+      pname = "libgtkflow3";
+      version = "0.2.6";
+
+      outputs = [ "out" "dev" "devdoc" ];
+      outputBin = "devdoc"; # demo app
+
+      src = ./.;
+
+      nativeBuildInputs = [
+        vala
+        meson
+        ninja
+        pkg-config
+        gobject-introspection
+      ];
+
+      buildInputs = [
+        gtk4
+        glib
+        self.packages.${system}.libgflow
+      ];
+
+      postFixup = ''
+        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
+        moveToOutput "share/doc" "$devdoc"
+      '';
+
+      mesonFlags = [
+        "-Denable_valadoc=true"
+        "-Denable_gtk3=false"
+        "-Denable_gtk4=true"
         "-Denable_gflow=false"
       ];
 
@@ -84,7 +137,8 @@
       '';
 
       mesonFlags = [
-        "-Denable_valadoc=false"
+        "-Denable_valadoc=true"
+        "-Denable_gtk3=false"
         "-Denable_gtk4=false"
         "-Denable_gflow=true"
       ];
@@ -110,7 +164,7 @@
           gobject-introspection
           gtk3
           glib
-          self.${system}.libgflow
+          self.packages.${system}.libgflow
         ];
     };
   };
