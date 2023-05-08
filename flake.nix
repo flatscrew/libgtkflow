@@ -12,9 +12,6 @@
       pname = "libgtkflow3";
       version = "1.0.6";
 
-      outputs = [ "out" "dev" "devdoc" ];
-      outputBin = "devdoc"; # demo app
-
       src = ./.;
 
       nativeBuildInputs = [
@@ -30,11 +27,6 @@
         glib
         self.packages.${system}.libgflow
       ];
-
-      postFixup = ''
-        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
-        moveToOutput "share/doc" "$devdoc"
-      '';
 
       mesonFlags = [
         "-Denable_valadoc=true"
@@ -60,11 +52,8 @@
     with import nixpkgs {inherit system;};
 
     stdenv.mkDerivation rec {
-      pname = "libgtkflow3";
+      pname = "libgtkflow4";
       version = "0.2.6";
-
-      outputs = [ "out" "dev" "devdoc" ];
-      outputBin = "devdoc"; # demo app
 
       src = ./.;
 
@@ -81,11 +70,6 @@
         glib
         self.packages.${system}.libgflow
       ];
-
-      postFixup = ''
-        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
-        moveToOutput "share/doc" "$devdoc"
-      '';
 
       mesonFlags = [
         "-Denable_valadoc=true"
@@ -114,9 +98,6 @@
       pname = "libgflow";
       version = "1.0.4";
 
-      outputs = [ "out" "dev" "devdoc" ];
-      outputBin = "devdoc"; # demo app
-
       src = ./.;
 
       nativeBuildInputs = [
@@ -130,11 +111,6 @@
       buildInputs = [
         glib
       ];
-
-      postFixup = ''
-        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
-        moveToOutput "share/doc" "$devdoc"
-      '';
 
       mesonFlags = [
         "-Denable_valadoc=true"
