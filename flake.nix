@@ -4,7 +4,7 @@
   rec
   {
     system = "x86_64-linux";
-    packages.x86_64-linux.default = 
+    packages.x86_64-linux.libgtkflow3 = 
     with import nixpkgs {inherit system;};
 
     stdenv.mkDerivation rec {
@@ -27,7 +27,7 @@
       buildInputs = [
         gtk3
         glib
-        libgflow
+        self.${system}libgflow
       ];
 
       postFixup = ''
@@ -54,6 +54,49 @@
       };
     };
 
+    packages.x86_64-linux.libgflow = 
+    with import nixpkgs {inherit system;};
+
+    stdenv.mkDerivation rec {
+      pname = "libgflow";
+      version = "1.0.4";
+
+      outputs = [ "out" "dev" "devdoc" ];
+      outputBin = "devdoc"; # demo app
+
+      src = ./.;
+
+      nativeBuildInputs = [
+        vala
+        meson
+        ninja
+        pkg-config
+        gobject-introspection
+      ];
+
+      buildInputs = [
+        glib
+      ];
+
+      postFixup = ''
+        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
+        moveToOutput "share/doc" "$devdoc"
+      '';
+
+      mesonFlags = [
+        "-Denable_valadoc=false"
+        "-Denable_gtk4=false"
+        "-Denable_gflow=true"
+      ];
+
+      meta = with lib; {
+        description = "Abstract flow graph logic for GLib";
+        homepage = "https://notabug.org/grindhold/libgtkflow";
+        maintainers = with maintainers; [ grindhold ];
+        license = licenses.lgpl3Plus;
+        platforms = platforms.unix;
+      };
+    };
 
     devShell.x86_64-linux =
       with import nixpkgs {inherit system;};
@@ -67,7 +110,7 @@
           gobject-introspection
           gtk3
           glib
-          libgflow
+          self.${system}.libgflow
         ];
     };
   };
