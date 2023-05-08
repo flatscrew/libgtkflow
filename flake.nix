@@ -1,0 +1,74 @@
+{
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+  outputs = { self, nixpkgs } : 
+  rec
+  {
+    system = "x86_64-linux";
+    packages.x86_64-linux.default = 
+    with import nixpkgs {inherit system;};
+
+    stdenv.mkDerivation rec {
+      pname = "libgtkflow3";
+      version = "1.0.6";
+
+      outputs = [ "out" "dev" "devdoc" ];
+      outputBin = "devdoc"; # demo app
+
+      src = ./.;
+
+      nativeBuildInputs = [
+        vala
+        meson
+        ninja
+        pkg-config
+        gobject-introspection
+      ];
+
+      buildInputs = [
+        gtk3
+        glib
+        libgflow
+      ];
+
+      postFixup = ''
+        # Cannot be in postInstall, otherwise _multioutDocs hook in preFixup will move right back.
+        moveToOutput "share/doc" "$devdoc"
+      '';
+
+      mesonFlags = [
+        "-Denable_valadoc=true"
+        "-Denable_gtk4=false"
+        "-Denable_gflow=false"
+      ];
+
+      postPatch = ''
+        rm -r libgflow
+      '';
+
+      meta = with lib; {
+        description = "Flow graph widget for GTK 3";
+        homepage = "https://notabug.org/grindhold/libgtkflow";
+        maintainers = with maintainers; [ grindhold ];
+        license = licenses.lgpl3Plus;
+        platforms = platforms.unix;
+      };
+    };
+
+
+    devShell.x86_64-linux =
+      with import nixpkgs {inherit system;};
+      mkShell {
+        name = "flohmarkt devshell";
+        buildInputs = [
+          vala
+          meson
+          ninja
+          pkg-config
+          gobject-introspection
+          gtk3
+          glib
+          libgflow
+        ];
+    };
+  };
+}
