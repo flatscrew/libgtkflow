@@ -139,6 +139,7 @@
           pkg-config
           gobject-introspection
           gtk3
+          gtk4
           glib
           self.packages.${system}.libgflow
         ];
