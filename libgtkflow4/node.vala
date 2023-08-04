@@ -180,6 +180,8 @@ namespace GtkFlow {
 
             this.title_label = new Gtk.Label("");
             this.title_label.set_markup ("<b>%s</b>".printf(n.name));
+            this.title_label.hexpand = true;
+            this.title_label.halign = Gtk.Align.START;
             this.grid.attach(this.title_label, 0, 0, 2, 1);
             this.n.notify["name"].connect(()=>{
                 this.title_label.set_markup("<b>%s</b>".printf(n.name));
