@@ -259,7 +259,7 @@ namespace GtkFlow {
 
 
         private void sink_added(GFlow.Sink s) {
-            var dock = new Dock(s);
+            var dock = new Dock(s, Gtk.Align.START);
             dock.notify["label"].connect(()=> {
                 var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
                 this.grid.attach(dock.label, 1, lc.row, 1, 1);
@@ -269,7 +269,7 @@ namespace GtkFlow {
         }
 
         private void source_added(GFlow.Source s) {
-            var dock = new Dock(s);
+            var dock = new Dock(s, Gtk.Align.END);
             dock.notify["label"].connect(()=> {
                 var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
                 this.grid.attach(dock.label, 1, lc.row, 1, 1);

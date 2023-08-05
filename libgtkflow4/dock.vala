@@ -44,7 +44,7 @@ namespace GtkFlow {
          * Requires the programmer to pass a {@link GFlow.Dock} to
          * the d-parameter.
          */
-        public Dock(GFlow.Dock d) {
+        public Dock(GFlow.Dock d, Gtk.Align label_alignment) {
             this.d = d;
             this.d.unlinked.connect(()=>{this.queue_draw();});
             this.d.linked.connect(()=>{this.queue_draw();});
@@ -52,7 +52,7 @@ namespace GtkFlow {
             l.justify = Gtk.Justification.LEFT;
             this.label = l;
             this.label.hexpand = true;
-            this.label.halign = Gtk.Align.FILL;
+            this.label.halign = label_alignment;
 
             this.valign = Gtk.Align.CENTER;
             this.halign = Gtk.Align.CENTER;
