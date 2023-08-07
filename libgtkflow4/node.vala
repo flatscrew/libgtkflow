@@ -20,6 +20,9 @@
 *********************************************************************/
 
 namespace GtkFlow {
+
+    public delegate Gtk.Widget NodeTitleFactory(Node node);
+
     /**
      * Defines an object that can be added to a Nodeview
      *
@@ -116,15 +119,6 @@ namespace GtkFlow {
         public Gdk.RGBA? highlight_color {get; set; default=null;}
 
         /**
-         * A widget to use for the node title instead of the name-label
-         *
-         * TODO: implement
-         */
-        public Gtk.Widget title_widget {get; set;}
-        private Gtk.Label title_label;
-        private Gtk.Button delete_button;
-
-        /**
          * {@inheritDoc}
          */
         public double click_offset_x {get; protected set; default=0;}
@@ -149,6 +143,10 @@ namespace GtkFlow {
          * You are required to pass a {@link GFlow.Node} to this constructor.
          */
         public Node(GFlow.Node n) {
+            this.with_title_factory(n, Node.default_title_widget);
+        }
+
+        public Node.with_title_factory(GFlow.Node n, NodeTitleFactory title_factory) {
             Node.init();
             this.n = n;
             
@@ -182,21 +180,8 @@ namespace GtkFlow {
             motion_controller.motion.connect(this.hover_over);
             this.add_controller(motion_controller);
 
-            this.title_label = new Gtk.Label("");
-            this.title_label.set_markup ("<b>%s</b>".printf(n.name));
-            this.title_label.hexpand = true;
-            this.title_label.halign = Gtk.Align.START;
-            this.grid.attach(this.title_label, 0, 0, 2, 1);
-            this.n.notify["name"].connect(()=>{
-                this.title_label.set_markup("<b>%s</b>".printf(n.name));
-            });
-
-            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
-            this.delete_button = new Gtk.Button();
-            this.delete_button.child = delete_icon;
-            this.delete_button.has_frame = false;
-            this.delete_button.clicked.connect(this.cb_delete);
-            this.grid.attach(this.delete_button, 2, 0, 1, 1);
+            var factored_title_widget = title_factory(this);
+            this.grid.attach (factored_title_widget, 0, 0, 3, 1);
 
             foreach (GFlow.Source s in n.get_sources()) {
                 this.source_added(s);
@@ -204,6 +189,31 @@ namespace GtkFlow {
             foreach (GFlow.Sink s in n.get_sinks()) {
                 this.sink_added(s);
             }
+        }
+
+        /*
+         * Provides a default factory method for node title.
+         */
+        private static Gtk.Widget default_title_widget(Node n) {
+            var title_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
+
+            var title_label = new Gtk.Label("");
+            title_label.set_markup ("<b>%s</b>".printf(n.n.name));
+            title_label.hexpand = true;
+            title_label.halign = Gtk.Align.START;
+            n.n.notify["name"].connect(()=>{
+                title_label.set_markup("<b>%s</b>".printf(n.n.name));
+            });
+            title_box.append(title_label);
+
+            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
+            var delete_button = new Gtk.Button();
+            delete_button.child = delete_icon;
+            delete_button.has_frame = false;
+            delete_button.clicked.connect(n.remove);
+            title_box.append(delete_button);
+
+            return title_box;
         }
 
         /**
@@ -234,7 +244,7 @@ namespace GtkFlow {
             return Node.MARGIN;
         }
 
-        private void cb_delete() {
+        public void remove() {
             var nv = this.get_parent() as NodeView;
             nv.remove(this);
         }
@@ -261,7 +271,6 @@ namespace GtkFlow {
             base.dispose();
         }
 
-
         private void sink_added(GFlow.Sink s) {
             var dock = new Dock(s, Gtk.Align.START);
             dock.notify["label"].connect(()=> {
@@ -284,14 +293,9 @@ namespace GtkFlow {
 
         private void press_button(int n_click, double x, double y) {
             var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
-
-            bool do_processing = false;
-            if (picked_widget == this || picked_widget == this.grid) {
-                do_processing = true;
-            } else if (picked_widget.get_parent() == this.grid) {
-                if (picked_widget is Gtk.Label || picked_widget is Gtk.Image) {
-                    do_processing = true;
-                }
+            bool do_processing = true;
+            if (picked_widget is GtkFlow.Dock ) {
+                do_processing = false;
             }
             if (!do_processing) return;
 

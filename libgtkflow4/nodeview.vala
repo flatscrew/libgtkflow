@@ -24,6 +24,32 @@ namespace GtkFlow {
         DOCKS_NOT_SUITABLE
     }
 
+    private interface MotionQueuedNodeOperation : Object {
+        public abstract void do_on_nodeview(NodeView nv);
+    }
+
+    private class RemoveNodeOperation : MotionQueuedNodeOperation, Object {
+
+        private NodeRenderer n;
+
+        public RemoveNodeOperation(NodeRenderer n) {
+            this.n = n;
+        }
+
+        public void do_on_nodeview(NodeView nv) {
+            n.n.unlink_all();
+            var child = nv.get_first_child ();
+            while (child != null) {
+                if (child == n) {
+                    child.unparent ();
+                    return;
+                }
+                child = child.get_next_sibling();
+            }
+            warning("Tried to remove a node that is not a child of nodeview");
+        }
+    }
+
     private class NodeViewLayoutManager : Gtk.LayoutManager {
         protected override Gtk.SizeRequestMode get_request_mode (Gtk.Widget widget) {
             return Gtk.SizeRequestMode.CONSTANT_SIZE;
@@ -139,6 +165,11 @@ namespace GtkFlow {
         private Gdk.Rectangle? mark_rubberband = null;
 
         /**
+         * Holds a Queue of node operations to be done after motion is done. 
+         */
+        private Queue<MotionQueuedNodeOperation> queued_operations = new Queue<MotionQueuedNodeOperation>();
+
+        /**
          * Instantiate a new NodeView
          */
         public NodeView (){
@@ -238,10 +269,17 @@ namespace GtkFlow {
                     nodewidget = node.get_next_sibling();
                 }
             }
-
             this.queue_allocate();
-        }
 
+            var item = queued_operations.pop_head();
+            if (item != null) {
+                item.do_on_nodeview(this);
+
+                while ((item = queued_operations.pop_head ()) != null) {
+                    item.do_on_nodeview(this);
+                }
+            }
+        }
 
         private void start_marking(int n_clicks, double x, double y) {
             if (this.pick(x,y, Gtk.PickFlags.DEFAULT) == this)
@@ -370,16 +408,8 @@ namespace GtkFlow {
          * Remove a node from this nodeview
          */
         public void remove(NodeRenderer n) {
-            n.n.unlink_all();
-            var child = this.get_first_child ();
-            while (child != null) {
-                if (child == n) {
-                    child.unparent ();
-                    return;
-                }
-                child = child.get_next_sibling();
-            }
-            warning("Tried to remove a node that is not a child of nodeview");
+            var remove_node =  new RemoveNodeOperation(n);
+            queued_operations.push_tail(remove_node);
         }
 
         /**

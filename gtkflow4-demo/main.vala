@@ -35,6 +35,26 @@ class TestNode : GFlow.SimpleNode {
     }
 }
 
+private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
+    var custom_header = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
+
+    var title_label = new Gtk.Label("");
+    title_label.set_markup ("<b>%s</b>".printf(node.n.name));
+    title_label.hexpand = true;
+    title_label.halign = Gtk.Align.START;
+    node.n.notify["name"].connect(()=>{
+        title_label.set_markup("<b>%s</b>".printf(node.n.name));
+    });
+    custom_header.append(title_label);
+
+    var delete_button = new Gtk.Button();
+    delete_button.set_label ("Delete");
+    delete_button.clicked.connect(node.remove);
+    custom_header.append(delete_button);
+
+    return custom_header;
+}
+
 int main (string[] args) {
   var app = new Gtk.Application(
     "de.grindhold.GtkFlow4Example",
@@ -43,6 +63,7 @@ int main (string[] args) {
 
   app.activate.connect(() => {
     var win = new Gtk.ApplicationWindow(app);
+    win.set_default_size (400, 300);
 
     var btn = new Gtk.Button.with_label("Spawn Node");
     var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -57,7 +78,7 @@ int main (string[] args) {
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
-        var nn = new GtkFlow.Node(node);
+        var nn = new GtkFlow.Node.with_title_factory (node, custom_title_factory);
         var d = nn.retrieve_dock(node.source1);
         d.set_docklabel(new Gtk.Scale(Gtk.Orientation.HORIZONTAL, new Gtk.Adjustment(0.0,0.0,1.0,0.01,0.1,0.1)));
         d = nn.retrieve_dock(node.source2);
