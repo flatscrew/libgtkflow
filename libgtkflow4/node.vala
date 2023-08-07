@@ -178,6 +178,10 @@ namespace GtkFlow {
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
             this.ctr_click.end.connect(() => { this.release_button(); });
 
+            var motion_controller = new Gtk.EventControllerMotion();
+            motion_controller.motion.connect(this.hover_over);
+            this.add_controller(motion_controller);
+
             this.title_label = new Gtk.Label("");
             this.title_label.set_markup ("<b>%s</b>".printf(n.name));
             this.title_label.hexpand = true;
@@ -302,6 +306,15 @@ namespace GtkFlow {
             }
             this.click_offset_x = x;
             this.click_offset_y = y;
+        }
+
+        private void hover_over(double x, double y) {
+            Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
+            if (resize_area.contains_point((int)x,(int)y)) {
+                this.set_cursor_from_name("nwse-resize");
+            } else {
+                this.set_cursor_from_name("default");
+            }
         }
 
         private void release_button() {
