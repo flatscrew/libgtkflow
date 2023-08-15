@@ -86,7 +86,22 @@ namespace GtkFlow {
      * To wrap your {@link GFlow.Node}s in order to add them to a {@link NodeView}
      */
     public class Node : Gtk.Widget, NodeRenderer  {
-        private static string CSS = ".gtkflow_node { background: rgba(0.6,0.6,0.6,0.2); border-radius: 5px; }";
+        private static string CSS = "
+        .gtkflow_node { 
+            background: rgba(0.6, 0.6, 0.6, 0.2); 
+            border-radius: 5px; 
+            border: 1px solid rgba(128, 128, 128, 0.8); 
+            box-shadow: 2px 2px 3px 3px rgba(153, 153, 153, 0.5);
+        }
+
+        .gtkflow_node_marked  { 
+            background: rgba(0, 51, 128, 0.8); 
+            border-radius: 5px; 
+            border: 1px solid rgba(0, 51, 128, 0.8); 
+            box-shadow: 2px 2px 3px 3px rgba(0, 51, 153, 0.5);
+        }
+        ";
+        
         private static Gtk.CssProvider css = new Gtk.CssProvider();
         private static bool initialized = false;
         private static void init() {
@@ -97,9 +112,11 @@ namespace GtkFlow {
 
         construct {
             set_css_name("gtkflow_node");
+
+            this.notify["marked"].connect(this.marked_changed);
         }
 
-        public const int MARGIN = 10;
+        private const int MARGIN_DEFAULT = 10;
 
         private Gtk.Grid grid;
         private Gtk.GestureClick ctr_click;
@@ -109,12 +126,6 @@ namespace GtkFlow {
          * {@inheritDoc}
          */
         public bool marked {get; internal set;}
-        /**
-         * User-controlled node resizability
-         *
-         * Set to true if this should be resizable
-         */
-        public bool resizable {get; set; default=true;}
 
         public Gdk.RGBA? highlight_color {get; set; default=null;}
 
@@ -135,7 +146,9 @@ namespace GtkFlow {
          */
         public double resize_start_height {get; protected set; default=0;}
 
+        public bool render_resize_handle;
         private int n_docks = 0;
+        private int margin = 0;
 
         /**
          * Instantiate a new node
@@ -143,14 +156,17 @@ namespace GtkFlow {
          * You are required to pass a {@link GFlow.Node} to this constructor.
          */
         public Node(GFlow.Node n) {
-            this.with_title_factory(n, Node.default_title_widget);
+            this.with_margin(n, MARGIN_DEFAULT);
+
+            set_title(Node.default_title_widget(this));
         }
 
-        public Node.with_title_factory(GFlow.Node n, NodeTitleFactory title_factory) {
+        public Node.with_margin(GFlow.Node n, int margin) {
             Node.init();
             this.n = n;
+            this.margin = margin;
             
-            this.get_style_context().add_class("gtkflow_node");
+            this.add_css_class("gtkflow_node");
             this.get_style_context().add_provider(Node.css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
             this.grid = new Gtk.Grid();
@@ -163,10 +179,10 @@ namespace GtkFlow {
             this.grid.halign = Gtk.Align.FILL;
             this.grid.valign = Gtk.Align.FILL;
 
-            this.grid.margin_top = Node.MARGIN;
-            this.grid.margin_bottom = Node.MARGIN;
-            this.grid.margin_start = Node.MARGIN;
-            this.grid.margin_end = Node.MARGIN;
+            this.grid.margin_top = this.margin;
+            this.grid.margin_bottom = this.margin;
+            this.grid.margin_start = this.margin;
+            this.grid.margin_end = this.margin;
             this.grid.set_parent(this);
 
             this.set_layout_manager(new Gtk.BinLayout());
@@ -179,9 +195,6 @@ namespace GtkFlow {
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
             this.add_controller(motion_controller);
-
-            var factored_title_widget = title_factory(this);
-            this.grid.attach (factored_title_widget, 0, 0, 3, 1);
 
             foreach (GFlow.Source s in n.get_sources()) {
                 this.source_added(s);
@@ -241,7 +254,7 @@ namespace GtkFlow {
          * {@inheritDoc}
          */
         public int get_margin() {
-            return Node.MARGIN;
+            return this.margin;
         }
 
         public void remove() {
@@ -254,6 +267,10 @@ namespace GtkFlow {
          */
         public void add_child(Gtk.Widget child) {
             this.grid.attach(child, 0, 2 + n_docks, 3, 1);
+        }
+
+        public void set_title(Gtk.Widget title) {
+            this.grid.attach(title, 0, 0, 3, 1);
         }
 
         /**
@@ -301,7 +318,7 @@ namespace GtkFlow {
 
             Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
             var nv = this.get_parent() as NodeView;
-            if (resize_area.contains_point((int)x,(int)y)) {
+            if (this.n.resizable && resize_area.contains_point((int)x,(int)y)) {
                 nv.resize_node = this;
                 this.resize_start_width = this.get_width();
                 this.resize_start_height = this.get_height();
@@ -313,6 +330,9 @@ namespace GtkFlow {
         }
 
         private void hover_over(double x, double y) {
+            if (!this.n.resizable) {
+                return;
+            }
             Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
             if (resize_area.contains_point((int)x,(int)y)) {
                 this.set_cursor_from_name("nwse-resize");
@@ -339,37 +359,12 @@ namespace GtkFlow {
             base.set_parent(w);
         }
 
-        protected override void snapshot (Gtk.Snapshot sn) {
-            var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
-            var rrect = Gsk.RoundedRect().init_from_rect(rect, 5f);
-            Gdk.RGBA color;
-            Gdk.RGBA grey_color;
+        private void marked_changed() {
             if (this.marked) {
-                color = {0.0f,0.2f,0.5f,0.8f};
-                grey_color = {0.0f,0.2f,0.6f,0.5f};
-                sn.append_color(grey_color ,rect );
+                this.add_css_class("gtkflow_node_marked");
             } else {
-                color = {0.5f,0.5f,0.5f,0.8f};
-                grey_color = {0.6f,0.6f,0.6f,0.5f};
+                this.remove_css_class("gtkflow_node_marked");
             }
-            Gdk.RGBA[] border_color = {color,color,color,color};
-            float[] thicc = {1f,1f,1f,1f};
-            if (this.highlight_color != null) {
-                sn.append_color(this.highlight_color ,rect );
-            }
-            sn.append_border(rrect, thicc, border_color);
-            sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
-            if (this.resizable) {
-                var cr = sn.append_cairo(rect);
-                cr.save();
-                cr.set_source_rgba(0.6,0.6,0.6,0.9);
-                cr.set_line_width(8.0);
-                cr.move_to(this.get_width()+2,this.get_height()-6);
-                cr.line_to(this.get_width()-6,this.get_height()+2);
-                cr.stroke();
-                cr.restore();
-            }
-            base.snapshot(sn);
         }
     }
 }

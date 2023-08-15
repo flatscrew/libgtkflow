@@ -62,7 +62,8 @@ namespace GFlow {
          * initial value's type will determine this SimpleSource's type.
          */
         public SimpleSource(GLib.Value value) {
-          _type = value.get_gtype();
+            _type = value.type ();
+            last_value = value;
         }
 
         /**
@@ -99,7 +100,6 @@ namespace GFlow {
                 );
             }
             this._sinks.append (s);
-            this.changed();
         }
 
         /**
@@ -175,7 +175,7 @@ namespace GFlow {
                         v.type().name(), this.value_type.name())
                 );
             this.last_value = v;
-            changed(v, flow_id);
+            this.changed(v, flow_id);
         }
 
         /**

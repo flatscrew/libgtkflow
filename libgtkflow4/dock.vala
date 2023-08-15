@@ -101,6 +101,7 @@ namespace GtkFlow {
                 return;
             }
             if (value != null) {
+                this.last_value = GLib.Value(value.type());
                 value.copy(ref this.last_value);
             } else {
                 this.last_value = null;

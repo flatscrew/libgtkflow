@@ -519,25 +519,26 @@ namespace GtkFlow {
                 var nr = (NodeRenderer)c;
                 int tgt_x, tgt_y, src_x, src_y, w, h;
                 foreach (GFlow.Sink snk in nr.n.get_sinks()) {
-                    var target_widget = this.retrieve_dock(snk);
+                    var target_dock = this.retrieve_dock(snk);
                     Gtk.Allocation tgt_alloc, tgt_node_alloc;
-                    target_widget.get_allocation(out tgt_alloc);
+                    target_dock.get_allocation(out tgt_alloc);
                     nr.get_allocation(out tgt_node_alloc);
                     foreach (GFlow.Source src in snk.sources) {
                         if (this.temp_connected_dock != null && src == this.temp_connected_dock.d
                          && this.clicked_dock != null && snk == this.clicked_dock.d) {
                             continue;
                         }
-                        var source_widget = this.retrieve_dock(src);
-                        var source_node = this.retrieve_node(src.node);
-                        Gtk.Allocation src_alloc, src_node_alloc;
-                        source_widget.get_allocation(out src_alloc);
-                        source_node.get_allocation(out src_node_alloc);
 
-                        src_x = src_alloc.x+src_node_alloc.x+8+nr.get_margin();
-                        src_y = src_alloc.y+src_node_alloc.y+8+nr.get_margin();
-                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8+nr.get_margin();
-                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8+nr.get_margin();
+                        var source_dock = this.retrieve_dock(src);
+                        var source_node = this.retrieve_node(src.node);
+                        Gtk.Allocation src_dock_alloc, src_node_alloc;
+                        source_dock.get_allocation(out src_dock_alloc);
+                        source_node.get_allocation(out src_node_alloc);
+                        src_x = src_dock_alloc.x+src_node_alloc.x+source_node.get_margin() + 8;
+                        src_y = src_dock_alloc.y+src_node_alloc.y+source_node.get_margin() + 8;
+                        
+                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+nr.get_margin() + 8;
+                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+nr.get_margin() + 8;
                         w = tgt_x - src_x;
                         h = tgt_y - src_y;
 

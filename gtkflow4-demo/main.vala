@@ -8,16 +8,16 @@ class TestNode : GFlow.SimpleNode {
         this.name = name;
 
         try {
-            this.source1 = new GFlow.SimpleSource(typeof(int));
-            this.source1.name = "%s quelle 1".printf(name);
+            this.source1 = new GFlow.SimpleSource (123);
+            this.source1.name = "%s source 1".printf(name);
             this.add_source(source1);
 
-            this.source2 = new GFlow.SimpleSource(typeof(int));
-            this.source2.name = "%s quelle 2".printf(name);
+            this.source2 = new GFlow.SimpleSource.with_type(typeof(int));
+            this.source2.name = "%s source 2".printf(name);
             this.add_source(source2);
 
-            this.sink1 = new GFlow.SimpleSink(1);
-            this.sink1.name = "%s abfluss 2".printf(name);
+            this.sink1 = new GFlow.SimpleSink.with_type (typeof(int));
+            this.sink1.name = "%s sink 1".printf(name);
             this.add_sink(sink1);
             this.sink1.max_sources = 10;
         } catch (GFlow.NodeError e) {
@@ -35,6 +35,7 @@ class TestNode : GFlow.SimpleNode {
     }
 }
 
+
 private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
     var custom_header = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
 
@@ -47,10 +48,18 @@ private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
     });
     custom_header.append(title_label);
 
+
+    var buttons_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+
     var delete_button = new Gtk.Button();
     delete_button.set_label ("Delete");
     delete_button.clicked.connect(node.remove);
-    custom_header.append(delete_button);
+    buttons_box.append(delete_button);
+
+    var consumer_select = new Gtk.DropDown.from_strings ({"abc"});
+    buttons_box.append (consumer_select);
+
+    custom_header.append(buttons_box);
 
     return custom_header;
 }
@@ -78,7 +87,9 @@ int main (string[] args) {
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
-        var nn = new GtkFlow.Node.with_title_factory (node, custom_title_factory);
+        var nn = new GtkFlow.Node.with_margin (node, 50);
+        nn.set_title (custom_title_factory(nn));
+
         var d = nn.retrieve_dock(node.source1);
         d.set_docklabel(new Gtk.Scale(Gtk.Orientation.HORIZONTAL, new Gtk.Adjustment(0.0,0.0,1.0,0.01,0.1,0.1)));
         d = nn.retrieve_dock(node.source2);
@@ -93,7 +104,7 @@ int main (string[] args) {
     var n1 = new TestNode("foo");
     var n2 = new TestNode("bar");
     var gn1 = new GtkFlow.Node(n1);
-    gn1.add_child(new Gtk.Button.with_label("EEEEEE!"));
+    gn1.add_child(new Gtk.Button.with_label("Button!"));
     gn1.highlight_color = {0.6f,1.0f,0.0f,0.3f};
     nv.add(gn1);
     n1.register_colors(nv);
@@ -103,7 +114,7 @@ int main (string[] args) {
     try {
         n1.source1.link(n2.sink1);
     } catch (Error e) {
-        warning("could not link nodees:"+ e.message);
+        warning("Could not link nodes: %s", e.message);
     }
 
     win.child = box;
