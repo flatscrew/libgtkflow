@@ -106,7 +106,7 @@ namespace GtkFlow {
         private static bool initialized = false;
         private static void init() {
             if (Node.initialized) return;
-            Node.css.load_from_data(Node.CSS.data);
+            Node.css.load_from_data(Node.CSS, Node.CSS.length);
             Node.initialized = true;
         }
 

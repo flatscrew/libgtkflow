@@ -96,7 +96,7 @@ int main (string[] args) {
         d.set_docklabel(new Gtk.SpinButton.with_range(0.0,1.0,0.01));
         var CSS = ".gtkflow_node { background: linear-gradient(0deg, rgba(150,111,136,1) 0%, rgba(175,175,222,1) 35%, rgba(0,212,255,1) 100%); }";
         Gtk.CssProvider custom_css = new Gtk.CssProvider();
-        custom_css.load_from_data(CSS.data);
+        custom_css.load_from_data(CSS, CSS.length);
         nn.get_style_context().add_provider(custom_css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
         nv.add(nn);
     });

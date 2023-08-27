@@ -213,7 +213,7 @@ namespace GtkFlow {
         }
 
         private void process_motion(double x, double y) {
-            if (this.move_node != null) {
+            if (this.move_node != null && this.layout_manager != null) {
                 var lc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(this.move_node);
                 int old_x = lc.x;
                 int old_y = lc.y;

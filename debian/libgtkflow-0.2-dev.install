@@ -1,5 +1,0 @@
-usr/include/gtkflow*/*
-usr/lib/*/libgtkflow*.so
-usr/lib/*/pkgconfig/gtkflow*
-usr/share/vala/vapi/gtkflow-*
-usr/share/gir-*/GtkFlow*

@@ -55,8 +55,8 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/dock",
         () => {
             try {
-                var si = new GFlow.SimpleSink (typeof(int));
-                var so = new GFlow.SimpleSource (typeof(int));
+                var si = new GFlow.SimpleSink.with_type (typeof(int));
+                var so = new GFlow.SimpleSource.with_type (typeof(int));
                 try {
                     so.set_value(1);
                 } catch {
@@ -81,8 +81,8 @@ public class GFlowTest.NodeTest {
         Test.add_func ("/gflow/node/get_dock",
         () => {
             try {
-                var si = new GFlow.SimpleSink (typeof(int));
-                var so = new GFlow.SimpleSource (typeof(int));
+                var si = new GFlow.SimpleSink.with_type (typeof(int));
+                var so = new GFlow.SimpleSource.with_type (typeof(int));
                 si.name = "foo";
                 so.name = "bar";
                 try {
