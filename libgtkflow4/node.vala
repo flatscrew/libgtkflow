@@ -78,7 +78,31 @@ namespace GtkFlow {
         public abstract double resize_start_height {get; protected set; default=0;}
     }
 
-    
+
+    public class NodeDockLabelWidgetFactory : Object {
+
+        public GFlow.Node node {
+            get;
+            private set;
+        }
+
+        public NodeDockLabelWidgetFactory(GFlow.Node node) {
+            this.node = node;
+        }
+
+        public virtual Gtk.Widget create_dock_label(GFlow.Dock dock) {
+            var label = new Gtk.Label(dock.name);
+            label.justify = Gtk.Justification.LEFT;
+            label.hexpand = true;
+            if (dock is GFlow.Source) {
+                label.halign = Gtk.Align.END;
+            } else {
+                label.halign = Gtk.Align.START;
+            }
+            return label;
+        }
+    }
+
     /**
      * A Simple node representation
      *
@@ -121,6 +145,7 @@ namespace GtkFlow {
         private Gtk.Grid grid;
         private Gtk.GestureClick ctr_click;
         public GFlow.Node n {get; protected set;}
+        private NodeDockLabelWidgetFactory dock_label_factory;
 
         /**
          * {@inheritDoc}
@@ -150,20 +175,40 @@ namespace GtkFlow {
         private int n_docks = 0;
         private int margin = 0;
 
+        ~Node() {
+            this.grid.unparent();
+        }
+
         /**
          * Instantiate a new node
          *
          * You are required to pass a {@link GFlow.Node} to this constructor.
          */
         public Node(GFlow.Node n) {
-            this.with_margin(n, MARGIN_DEFAULT);
+            this.with_margin(n, MARGIN_DEFAULT, new NodeDockLabelWidgetFactory(n));
 
-            set_title(Node.default_title_widget(this));
+            var title_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
+
+            var title_label = new Gtk.Label("");
+            title_label.set_markup ("<b>%s</b>".printf(n.name));
+            title_label.hexpand = true;
+            title_label.halign = Gtk.Align.START;
+            title_box.append(title_label);
+
+            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
+            var delete_button = new Gtk.Button();
+            delete_button.child = delete_icon;
+            delete_button.has_frame = false;
+            delete_button.clicked.connect(this.remove);
+            title_box.append(delete_button);
+
+            set_title(title_box);
         }
 
-        public Node.with_margin(GFlow.Node n, int margin) {
+        public Node.with_margin(GFlow.Node n, int margin, NodeDockLabelWidgetFactory dock_label_factory) {
             Node.init();
             this.n = n;
+            this.dock_label_factory = dock_label_factory;
             this.margin = margin;
             
             this.add_css_class("gtkflow_node");
@@ -189,8 +234,8 @@ namespace GtkFlow {
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
-            this.ctr_click.end.connect(() => { this.release_button(); });
+            this.ctr_click.pressed.connect(this.press_button);
+            this.ctr_click.end.connect(this.release_button);
 
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
@@ -202,31 +247,6 @@ namespace GtkFlow {
             foreach (GFlow.Sink s in n.get_sinks()) {
                 this.sink_added(s);
             }
-        }
-
-        /*
-         * Provides a default factory method for node title.
-         */
-        private static Gtk.Widget default_title_widget(Node n) {
-            var title_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
-
-            var title_label = new Gtk.Label("");
-            title_label.set_markup ("<b>%s</b>".printf(n.n.name));
-            title_label.hexpand = true;
-            title_label.halign = Gtk.Align.START;
-            n.n.notify["name"].connect(()=>{
-                title_label.set_markup("<b>%s</b>".printf(n.n.name));
-            });
-            title_box.append(title_label);
-
-            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
-            var delete_button = new Gtk.Button();
-            delete_button.child = delete_icon;
-            delete_button.has_frame = false;
-            delete_button.clicked.connect(n.remove);
-            title_box.append(delete_button);
-
-            return title_box;
         }
 
         /**
@@ -280,32 +300,28 @@ namespace GtkFlow {
             child.unparent();
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public override void dispose() {
+        protected override void dispose() {
             this.grid.unparent();
             base.dispose();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         private void sink_added(GFlow.Sink s) {
-            var dock = new Dock(s, Gtk.Align.START);
-            dock.notify["label"].connect(()=> {
-                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
-                this.grid.attach(dock.label, 1, lc.row, 1, 1);
-            });
+            var dock = new Dock(s);
+            var dock_label = dock_label_factory.create_dock_label(dock.d);
+            
             this.grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
         }
 
         private void source_added(GFlow.Source s) {
-            var dock = new Dock(s, Gtk.Align.END);
-            dock.notify["label"].connect(()=> {
-                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
-                this.grid.attach(dock.label, 1, lc.row, 1, 1);
-            });
+            var dock = new Dock(s);
+            var dock_label = dock_label_factory.create_dock_label(dock.d);
+
             this.grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
         }
 
         private void press_button(int n_click, double x, double y) {

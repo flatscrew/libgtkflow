@@ -42,6 +42,8 @@ namespace GtkFlow {
             while (child != null) {
                 if (child == n) {
                     child.unparent ();
+                    child = null;
+                    this.n = null;
                     return;
                 }
                 child = child.get_next_sibling();
@@ -408,8 +410,7 @@ namespace GtkFlow {
          * Remove a node from this nodeview
          */
         public void remove(NodeRenderer n) {
-            var remove_node =  new RemoveNodeOperation(n);
-            queued_operations.push_tail(remove_node);
+            queued_operations.push_tail(new RemoveNodeOperation(n));
         }
 
         /**

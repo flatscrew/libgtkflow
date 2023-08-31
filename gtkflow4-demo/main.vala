@@ -1,8 +1,71 @@
+class CustomDockLabelFactory : GtkFlow.NodeDockLabelWidgetFactory {
+
+    private Gtk.SpinButton button;
+    private GFlow.Node? node;
+
+    public CustomDockLabelFactory(GFlow.Node node) {
+        base(node);
+    }
+
+    public override Gtk.Widget create_dock_label(GFlow.Dock dock) {
+        this.node = dock.node;
+        var test_node = dock.node as TestNode;
+        if (dock == test_node.source1) {
+            this.button = new Gtk.SpinButton.with_range(0.0,1.0,0.01);
+            button.halign = Gtk.Align.END;
+            button.changed.connect (this.changed);
+            return button;
+        }
+        return base.create_dock_label (dock);
+    }
+
+    private void changed() {
+        print("----> %s\n", button.sensitive ? "yes" : "no");
+        print("aaa %s\n", node.name);
+    }
+}
+class CustomNode : GtkFlow.Node {
+
+    public CustomNode(TestNode node) {
+        base.with_margin (node, 50, new CustomDockLabelFactory(node));
+        set_title (custom_title_factory(this));
+
+        var CSS = ".gtkflow_node { background: linear-gradient(0deg, rgba(150,111,136,1) 0%, rgba(175,175,222,1) 35%, rgba(0,212,255,1) 100%); }";
+        Gtk.CssProvider custom_css = new Gtk.CssProvider();
+        custom_css.load_from_data(CSS, CSS.length);
+        get_style_context().add_provider(custom_css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+    }
+
+    private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
+        var custom_header = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
+    
+        var title_label = new Gtk.Label("");
+        title_label.set_markup ("<b>%s</b>".printf(node.n.name));
+        title_label.hexpand = true;
+        title_label.halign = Gtk.Align.START;
+        custom_header.append(title_label);
+    
+        var buttons_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+    
+        var delete_button = new Gtk.Button();
+        delete_button.set_label ("Delete");
+        delete_button.clicked.connect(node.remove);
+        buttons_box.append(delete_button);
+    
+        var consumer_select = new Gtk.DropDown.from_strings ({"abc"});
+        buttons_box.append (consumer_select);
+    
+        custom_header.append(buttons_box);
+    
+        return custom_header;
+    }
+
+}
+
 class TestNode : GFlow.SimpleNode {
     public GFlow.SimpleSource source1;
     public GFlow.SimpleSource source2;
     public GFlow.SimpleSink sink1;
-
 
     public TestNode(string name) {
         this.name = name;
@@ -36,34 +99,6 @@ class TestNode : GFlow.SimpleNode {
 }
 
 
-private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
-    var custom_header = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
-
-    var title_label = new Gtk.Label("");
-    title_label.set_markup ("<b>%s</b>".printf(node.n.name));
-    title_label.hexpand = true;
-    title_label.halign = Gtk.Align.START;
-    node.n.notify["name"].connect(()=>{
-        title_label.set_markup("<b>%s</b>".printf(node.n.name));
-    });
-    custom_header.append(title_label);
-
-
-    var buttons_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-
-    var delete_button = new Gtk.Button();
-    delete_button.set_label ("Delete");
-    delete_button.clicked.connect(node.remove);
-    buttons_box.append(delete_button);
-
-    var consumer_select = new Gtk.DropDown.from_strings ({"abc"});
-    buttons_box.append (consumer_select);
-
-    custom_header.append(buttons_box);
-
-    return custom_header;
-}
-
 int main (string[] args) {
   var app = new Gtk.Application(
     "de.grindhold.GtkFlow4Example",
@@ -87,23 +122,14 @@ int main (string[] args) {
 
     btn.clicked.connect(()=>{
         var node = new TestNode("TestNode");
-        var nn = new GtkFlow.Node.with_margin (node, 50);
-        nn.set_title (custom_title_factory(nn));
-
-        var d = nn.retrieve_dock(node.source1);
-        d.set_docklabel(new Gtk.Scale(Gtk.Orientation.HORIZONTAL, new Gtk.Adjustment(0.0,0.0,1.0,0.01,0.1,0.1)));
-        d = nn.retrieve_dock(node.source2);
-        d.set_docklabel(new Gtk.SpinButton.with_range(0.0,1.0,0.01));
-        var CSS = ".gtkflow_node { background: linear-gradient(0deg, rgba(150,111,136,1) 0%, rgba(175,175,222,1) 35%, rgba(0,212,255,1) 100%); }";
-        Gtk.CssProvider custom_css = new Gtk.CssProvider();
-        custom_css.load_from_data(CSS, CSS.length);
-        nn.get_style_context().add_provider(custom_css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+        var nn = new CustomNode (node);
         nv.add(nn);
     });
 
     var n1 = new TestNode("foo");
-    var n2 = new TestNode("bar");
     var gn1 = new GtkFlow.Node(n1);
+    var n2 = new TestNode("bar");
+
     gn1.add_child(new Gtk.Button.with_label("Button!"));
     gn1.highlight_color = {0.6f,1.0f,0.0f,0.3f};
     nv.add(gn1);
