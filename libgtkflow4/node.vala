@@ -23,6 +23,10 @@ namespace GtkFlow {
 
     public delegate Gtk.Widget NodeTitleFactory(Node node);
 
+    public errordomain NodeError {
+        TITLE_ALREADY_INITIALIZED;
+    }
+
     /**
      * Defines an object that can be added to a Nodeview
      *
@@ -134,6 +138,8 @@ namespace GtkFlow {
             Node.initialized = true;
         }
 
+        private bool title_initialized = false;
+
         construct {
             set_css_name("gtkflow_node");
 
@@ -202,7 +208,11 @@ namespace GtkFlow {
             delete_button.clicked.connect(this.remove);
             title_box.append(delete_button);
 
-            set_title(title_box);
+            try {
+                set_title(title_box);
+            } catch (NodeError e) {
+                message("Could not set title in node");
+            }
         }
 
         public Node.with_margin(GFlow.Node n, int margin, NodeDockLabelWidgetFactory dock_label_factory) {
@@ -289,8 +299,13 @@ namespace GtkFlow {
             this.grid.attach(child, 0, 2 + n_docks, 3, 1);
         }
 
-        public void set_title(Gtk.Widget title) {
-            this.grid.attach(title, 0, 0, 3, 1);
+        public void set_title(Gtk.Widget title) throws NodeError {
+            if (!this.title_initialized) {
+                this.grid.attach(title, 0, 0, 3, 1);
+                this.title_initialized = true;
+            } else {
+                throw new NodeError.TITLE_ALREADY_INITIALIZED("Title may only be initialized once");
+            }
         }
 
         /**
