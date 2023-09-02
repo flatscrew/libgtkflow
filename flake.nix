@@ -141,6 +141,8 @@
           gtk3
           gtk4
           glib
+          python3
+          python3Packages.pygobject3
           self.packages.${system}.libgflow
         ];
     };
