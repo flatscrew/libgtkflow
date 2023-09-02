@@ -20,6 +20,9 @@
 *********************************************************************/
 
 namespace GtkFlow {
+
+    public delegate Gtk.Widget NodeTitleFactory(Node node);
+
     /**
      * Defines an object that can be added to a Nodeview
      *
@@ -75,7 +78,31 @@ namespace GtkFlow {
         public abstract double resize_start_height {get; protected set; default=0;}
     }
 
-    
+
+    public class NodeDockLabelWidgetFactory : Object {
+
+        public GFlow.Node node {
+            get;
+            private set;
+        }
+
+        public NodeDockLabelWidgetFactory(GFlow.Node node) {
+            this.node = node;
+        }
+
+        public virtual Gtk.Widget create_dock_label(GFlow.Dock dock) {
+            var label = new Gtk.Label(dock.name);
+            label.justify = Gtk.Justification.LEFT;
+            label.hexpand = true;
+            if (dock is GFlow.Source) {
+                label.halign = Gtk.Align.END;
+            } else {
+                label.halign = Gtk.Align.START;
+            }
+            return label;
+        }
+    }
+
     /**
      * A Simple node representation
      *
@@ -83,7 +110,22 @@ namespace GtkFlow {
      * To wrap your {@link GFlow.Node}s in order to add them to a {@link NodeView}
      */
     public class Node : Gtk.Widget, NodeRenderer  {
-        private static string CSS = ".gtkflow_node { background: rgba(0.6,0.6,0.6,0.2); border-radius: 5px; }";
+        private static string CSS = "
+        .gtkflow_node { 
+            background: rgba(0.6, 0.6, 0.6, 0.2); 
+            border-radius: 5px; 
+            border: 1px solid rgba(128, 128, 128, 0.8); 
+            box-shadow: 2px 2px 3px 3px rgba(153, 153, 153, 0.5);
+        }
+
+        .gtkflow_node_marked  { 
+            background: rgba(0, 51, 128, 0.8); 
+            border-radius: 5px; 
+            border: 1px solid rgba(0, 51, 128, 0.8); 
+            box-shadow: 2px 2px 3px 3px rgba(0, 51, 153, 0.5);
+        }
+        ";
+        
         private static Gtk.CssProvider css = new Gtk.CssProvider();
         private static bool initialized = false;
         private static void init() {
@@ -94,35 +136,23 @@ namespace GtkFlow {
 
         construct {
             set_css_name("gtkflow_node");
+
+            this.notify["marked"].connect(this.marked_changed);
         }
 
-        public const int MARGIN = 10;
+        private const int MARGIN_DEFAULT = 10;
 
         private Gtk.Grid grid;
         private Gtk.GestureClick ctr_click;
         public GFlow.Node n {get; protected set;}
+        private NodeDockLabelWidgetFactory dock_label_factory;
 
         /**
          * {@inheritDoc}
          */
         public bool marked {get; internal set;}
-        /**
-         * User-controlled node resizability
-         *
-         * Set to true if this should be resizable
-         */
-        public bool resizable {get; set; default=true;}
 
         public Gdk.RGBA? highlight_color {get; set; default=null;}
-
-        /**
-         * A widget to use for the node title instead of the name-label
-         *
-         * TODO: implement
-         */
-        public Gtk.Widget title_widget {get; set;}
-        private Gtk.Label title_label;
-        private Gtk.Button delete_button;
 
         /**
          * {@inheritDoc}
@@ -141,7 +171,13 @@ namespace GtkFlow {
          */
         public double resize_start_height {get; protected set; default=0;}
 
+        public bool render_resize_handle;
         private int n_docks = 0;
+        private int margin = 0;
+
+        ~Node() {
+            this.grid.unparent();
+        }
 
         /**
          * Instantiate a new node
@@ -149,10 +185,33 @@ namespace GtkFlow {
          * You are required to pass a {@link GFlow.Node} to this constructor.
          */
         public Node(GFlow.Node n) {
+            this.with_margin(n, MARGIN_DEFAULT, new NodeDockLabelWidgetFactory(n));
+
+            var title_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 3);
+
+            var title_label = new Gtk.Label("");
+            title_label.set_markup ("<b>%s</b>".printf(n.name));
+            title_label.hexpand = true;
+            title_label.halign = Gtk.Align.START;
+            title_box.append(title_label);
+
+            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
+            var delete_button = new Gtk.Button();
+            delete_button.child = delete_icon;
+            delete_button.has_frame = false;
+            delete_button.clicked.connect(this.remove);
+            title_box.append(delete_button);
+
+            set_title(title_box);
+        }
+
+        public Node.with_margin(GFlow.Node n, int margin, NodeDockLabelWidgetFactory dock_label_factory) {
             Node.init();
             this.n = n;
+            this.dock_label_factory = dock_label_factory;
+            this.margin = margin;
             
-            this.get_style_context().add_class("gtkflow_node");
+            this.add_css_class("gtkflow_node");
             this.get_style_context().add_provider(Node.css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
             this.grid = new Gtk.Grid();
@@ -165,38 +224,22 @@ namespace GtkFlow {
             this.grid.halign = Gtk.Align.FILL;
             this.grid.valign = Gtk.Align.FILL;
 
-            this.grid.margin_top = Node.MARGIN;
-            this.grid.margin_bottom = Node.MARGIN;
-            this.grid.margin_start = Node.MARGIN;
-            this.grid.margin_end = Node.MARGIN;
+            this.grid.margin_top = this.margin;
+            this.grid.margin_bottom = this.margin;
+            this.grid.margin_start = this.margin;
+            this.grid.margin_end = this.margin;
             this.grid.set_parent(this);
 
             this.set_layout_manager(new Gtk.BinLayout());
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
-            this.ctr_click.end.connect(() => { this.release_button(); });
+            this.ctr_click.pressed.connect(this.press_button);
+            this.ctr_click.end.connect(this.release_button);
 
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
             this.add_controller(motion_controller);
-
-            this.title_label = new Gtk.Label("");
-            this.title_label.set_markup ("<b>%s</b>".printf(n.name));
-            this.title_label.hexpand = true;
-            this.title_label.halign = Gtk.Align.START;
-            this.grid.attach(this.title_label, 0, 0, 2, 1);
-            this.n.notify["name"].connect(()=>{
-                this.title_label.set_markup("<b>%s</b>".printf(n.name));
-            });
-
-            var delete_icon = new Gtk.Image.from_icon_name("edit-delete");
-            this.delete_button = new Gtk.Button();
-            this.delete_button.child = delete_icon;
-            this.delete_button.has_frame = false;
-            this.delete_button.clicked.connect(this.cb_delete);
-            this.grid.attach(this.delete_button, 2, 0, 1, 1);
 
             foreach (GFlow.Source s in n.get_sources()) {
                 this.source_added(s);
@@ -231,10 +274,10 @@ namespace GtkFlow {
          * {@inheritDoc}
          */
         public int get_margin() {
-            return Node.MARGIN;
+            return this.margin;
         }
 
-        private void cb_delete() {
+        public void remove() {
             var nv = this.get_parent() as NodeView;
             nv.remove(this);
         }
@@ -246,6 +289,10 @@ namespace GtkFlow {
             this.grid.attach(child, 0, 2 + n_docks, 3, 1);
         }
 
+        public void set_title(Gtk.Widget title) {
+            this.grid.attach(title, 0, 0, 3, 1);
+        }
+
         /**
          * Removes a child widget from this node
          */
@@ -253,51 +300,41 @@ namespace GtkFlow {
             child.unparent();
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public override void dispose() {
+        protected override void dispose() {
             this.grid.unparent();
             base.dispose();
         }
 
-
+        /**
+         * {@inheritDoc}
+         */
         private void sink_added(GFlow.Sink s) {
-            var dock = new Dock(s, Gtk.Align.START);
-            dock.notify["label"].connect(()=> {
-                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
-                this.grid.attach(dock.label, 1, lc.row, 1, 1);
-            });
+            var dock = new Dock(s);
+            var dock_label = dock_label_factory.create_dock_label(dock.d);
+            
             this.grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
         }
 
         private void source_added(GFlow.Source s) {
-            var dock = new Dock(s, Gtk.Align.END);
-            dock.notify["label"].connect(()=> {
-                var lc = (Gtk.GridLayoutChild)this.grid.get_layout_manager().get_layout_child(dock);
-                this.grid.attach(dock.label, 1, lc.row, 1, 1);
-            });
+            var dock = new Dock(s);
+            var dock_label = dock_label_factory.create_dock_label(dock.d);
+
             this.grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock.label, 1, 1 + n_docks, 1, 1);
+            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
         }
 
         private void press_button(int n_click, double x, double y) {
             var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
-
-            bool do_processing = false;
-            if (picked_widget == this || picked_widget == this.grid) {
-                do_processing = true;
-            } else if (picked_widget.get_parent() == this.grid) {
-                if (picked_widget is Gtk.Label || picked_widget is Gtk.Image) {
-                    do_processing = true;
-                }
+            bool do_processing = true;
+            if (picked_widget is GtkFlow.Dock ) {
+                do_processing = false;
             }
             if (!do_processing) return;
 
             Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
             var nv = this.get_parent() as NodeView;
-            if (resize_area.contains_point((int)x,(int)y)) {
+            if (this.n.resizable && resize_area.contains_point((int)x,(int)y)) {
                 nv.resize_node = this;
                 this.resize_start_width = this.get_width();
                 this.resize_start_height = this.get_height();
@@ -309,6 +346,10 @@ namespace GtkFlow {
         }
 
         private void hover_over(double x, double y) {
+            if (!this.n.resizable) {
+                return;
+            }
+
             Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
             if (resize_area.contains_point((int)x,(int)y)) {
                 this.set_cursor_from_name("nwse-resize");
@@ -335,37 +376,12 @@ namespace GtkFlow {
             base.set_parent(w);
         }
 
-        protected override void snapshot (Gtk.Snapshot sn) {
-            var rect = Graphene.Rect().init(0,0,this.get_width(), this.get_height());
-            var rrect = Gsk.RoundedRect().init_from_rect(rect, 5f);
-            Gdk.RGBA color;
-            Gdk.RGBA grey_color;
+        private void marked_changed() {
             if (this.marked) {
-                color = {0.0f,0.2f,0.5f,0.8f};
-                grey_color = {0.0f,0.2f,0.6f,0.5f};
-                sn.append_color(grey_color ,rect );
+                this.add_css_class("gtkflow_node_marked");
             } else {
-                color = {0.5f,0.5f,0.5f,0.8f};
-                grey_color = {0.6f,0.6f,0.6f,0.5f};
+                this.remove_css_class("gtkflow_node_marked");
             }
-            Gdk.RGBA[] border_color = {color,color,color,color};
-            float[] thicc = {1f,1f,1f,1f};
-            if (this.highlight_color != null) {
-                sn.append_color(this.highlight_color ,rect );
-            }
-            sn.append_border(rrect, thicc, border_color);
-            sn.append_outset_shadow(rrect, grey_color, 2f, 2f, 3f, 3f);
-            if (this.resizable) {
-                var cr = sn.append_cairo(rect);
-                cr.save();
-                cr.set_source_rgba(0.6,0.6,0.6,0.9);
-                cr.set_line_width(8.0);
-                cr.move_to(this.get_width()+2,this.get_height()-6);
-                cr.line_to(this.get_width()-6,this.get_height()+2);
-                cr.stroke();
-                cr.restore();
-            }
-            base.snapshot(sn);
         }
     }
 }

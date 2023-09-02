@@ -24,6 +24,7 @@ namespace GFlow {
      * A simple implementation of {@link GFlow.Sink}.
      */
     public class SimpleSink : Object, Dock, Sink {
+
         // Dock interface
         protected GLib.Type _type = GLib.Type.NONE;
 
@@ -147,7 +148,6 @@ namespace GFlow {
                 this.do_source_changed();
                 dock.unlinked(this, this.sources.length() == 0);
                 dock.changed.disconnect(this.do_source_changed);
-                changed();
             }
         }
 
@@ -165,8 +165,11 @@ namespace GFlow {
                 this.unlink(this.sources.nth_data(this.sources.length()-1));
             }
             if (dock is Source) {
-                add_source((Source) dock);
-                changed();
+                var source = dock as Source;
+                add_source(source);
+
+                do_source_changed(source.get_last_value ());
+
                 dock.link (this);
                 linked (dock);
             }

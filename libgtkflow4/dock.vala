@@ -33,7 +33,6 @@ namespace GtkFlow {
         }
 
         public GFlow.Dock d { get; protected set; }
-        public Gtk.Widget label { get; private set; }
         private Gtk.GestureClick ctr_click;
 
         internal Value? last_value = null;
@@ -48,11 +47,6 @@ namespace GtkFlow {
             this.d = d;
             this.d.unlinked.connect(()=>{this.queue_draw();});
             this.d.linked.connect(()=>{this.queue_draw();});
-            var l = new Gtk.Label(d.name);
-            l.justify = Gtk.Justification.LEFT;
-            this.label = l;
-            this.label.hexpand = true;
-            this.label.halign = label_alignment;
 
             this.valign = Gtk.Align.CENTER;
             this.halign = Gtk.Align.CENTER;
@@ -65,20 +59,6 @@ namespace GtkFlow {
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
             this.d.changed.connect(this.cb_changed);
-        }
-
-        /**
-         * Change the widget that is used as this dock's label
-         *
-         * The given widget will be rendered instead of the usual label containing
-         * the dock's name. You can use this e.g. to express weights applied to the
-         * inputs or to provide default values if no connection is present.
-         */
-        public void set_docklabel(Gtk.Widget w) {
-            this.label.unparent();
-            this.label = w;
-            this.label.hexpand = true;
-            this.label.halign = Gtk.Align.FILL;
         }
 
         private GtkFlow.NodeView? get_nodeview() {
@@ -101,6 +81,7 @@ namespace GtkFlow {
                 return;
             }
             if (value != null) {
+                this.last_value = GLib.Value(value.type());
                 value.copy(ref this.last_value);
             } else {
                 this.last_value = null;

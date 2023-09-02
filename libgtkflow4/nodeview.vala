@@ -24,6 +24,34 @@ namespace GtkFlow {
         DOCKS_NOT_SUITABLE
     }
 
+    private interface MotionQueuedNodeOperation : Object {
+        public abstract void do_on_nodeview(NodeView nv);
+    }
+
+    private class RemoveNodeOperation : MotionQueuedNodeOperation, Object {
+
+        private NodeRenderer n;
+
+        public RemoveNodeOperation(NodeRenderer n) {
+            this.n = n;
+        }
+
+        public void do_on_nodeview(NodeView nv) {
+            n.n.unlink_all();
+            var child = nv.get_first_child ();
+            while (child != null) {
+                if (child == n) {
+                    child.unparent ();
+                    child = null;
+                    this.n = null;
+                    return;
+                }
+                child = child.get_next_sibling();
+            }
+            warning("Tried to remove a node that is not a child of nodeview");
+        }
+    }
+
     private class NodeViewLayoutManager : Gtk.LayoutManager {
         protected override Gtk.SizeRequestMode get_request_mode (Gtk.Widget widget) {
             return Gtk.SizeRequestMode.CONSTANT_SIZE;
@@ -139,6 +167,11 @@ namespace GtkFlow {
         private Gdk.Rectangle? mark_rubberband = null;
 
         /**
+         * Holds a Queue of node operations to be done after motion is done. 
+         */
+        private Queue<MotionQueuedNodeOperation> queued_operations = new Queue<MotionQueuedNodeOperation>();
+
+        /**
          * Instantiate a new NodeView
          */
         public NodeView (){
@@ -182,7 +215,7 @@ namespace GtkFlow {
         }
 
         private void process_motion(double x, double y) {
-            if (this.move_node != null) {
+            if (this.move_node != null && this.layout_manager != null) {
                 var lc = (NodeViewLayoutChild) this.layout_manager.get_layout_child(this.move_node);
                 int old_x = lc.x;
                 int old_y = lc.y;
@@ -238,10 +271,17 @@ namespace GtkFlow {
                     nodewidget = node.get_next_sibling();
                 }
             }
-
             this.queue_allocate();
-        }
 
+            var item = queued_operations.pop_head();
+            if (item != null) {
+                item.do_on_nodeview(this);
+
+                while ((item = queued_operations.pop_head ()) != null) {
+                    item.do_on_nodeview(this);
+                }
+            }
+        }
 
         private void start_marking(int n_clicks, double x, double y) {
             if (this.pick(x,y, Gtk.PickFlags.DEFAULT) == this)
@@ -370,16 +410,7 @@ namespace GtkFlow {
          * Remove a node from this nodeview
          */
         public void remove(NodeRenderer n) {
-            n.n.unlink_all();
-            var child = this.get_first_child ();
-            while (child != null) {
-                if (child == n) {
-                    child.unparent ();
-                    return;
-                }
-                child = child.get_next_sibling();
-            }
-            warning("Tried to remove a node that is not a child of nodeview");
+            queued_operations.push_tail(new RemoveNodeOperation(n));
         }
 
         /**
@@ -489,25 +520,26 @@ namespace GtkFlow {
                 var nr = (NodeRenderer)c;
                 int tgt_x, tgt_y, src_x, src_y, w, h;
                 foreach (GFlow.Sink snk in nr.n.get_sinks()) {
-                    var target_widget = this.retrieve_dock(snk);
+                    var target_dock = this.retrieve_dock(snk);
                     Gtk.Allocation tgt_alloc, tgt_node_alloc;
-                    target_widget.get_allocation(out tgt_alloc);
+                    target_dock.get_allocation(out tgt_alloc);
                     nr.get_allocation(out tgt_node_alloc);
                     foreach (GFlow.Source src in snk.sources) {
                         if (this.temp_connected_dock != null && src == this.temp_connected_dock.d
                          && this.clicked_dock != null && snk == this.clicked_dock.d) {
                             continue;
                         }
-                        var source_widget = this.retrieve_dock(src);
-                        var source_node = this.retrieve_node(src.node);
-                        Gtk.Allocation src_alloc, src_node_alloc;
-                        source_widget.get_allocation(out src_alloc);
-                        source_node.get_allocation(out src_node_alloc);
 
-                        src_x = src_alloc.x+src_node_alloc.x+8+nr.get_margin();
-                        src_y = src_alloc.y+src_node_alloc.y+8+nr.get_margin();
-                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+8+nr.get_margin();
-                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+8+nr.get_margin();
+                        var source_dock = this.retrieve_dock(src);
+                        var source_node = this.retrieve_node(src.node);
+                        Gtk.Allocation src_dock_alloc, src_node_alloc;
+                        source_dock.get_allocation(out src_dock_alloc);
+                        source_node.get_allocation(out src_node_alloc);
+                        src_x = src_dock_alloc.x+src_node_alloc.x+source_node.get_margin() + 8;
+                        src_y = src_dock_alloc.y+src_node_alloc.y+source_node.get_margin() + 8;
+                        
+                        tgt_x = tgt_alloc.x+tgt_node_alloc.x+nr.get_margin() + 8;
+                        tgt_y = tgt_alloc.y+tgt_node_alloc.y+nr.get_margin() + 8;
                         w = tgt_x - src_x;
                         h = tgt_y - src_y;
 

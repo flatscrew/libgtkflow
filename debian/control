@@ -20,99 +20,146 @@ Standards-Version: 3.9.6
 Section: libs
 Homepage: https://github.com/grindhold/libgtkflow
 
-Package: libgtkflow-0.2-doc
+Package: libgtkflow3-1.0-doc
 Section: doc
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends}
 Suggests: devhelp
-Description: Documentation for libgtkflow-0.2
+Description: Documentation for libgtkflow3-1.0
  This package contains a devhelp-book that holds API
  documentation for libgtkflow. The devhelp-book can
  be read via the software devhelp.
 
-Package: libgtkflow-0.2-dev
+Package: libgtkflow3-1.0-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libgtkflow-0.2-1 (= ${binary:Version}), ${misc:Depends},
+Depends: libgtkflow3-1.0 (= ${binary:Version}), ${misc:Depends},
          libglib2.0-dev,
          libgtk-3-dev,
          libc6-dev,
-         libgflow-0.2-dev,
+         libgflow-1.0-dev,
          libcairo2-dev,
-         gir1.2-gtkflow-0.2
+         gir1.2-gtkflow3-1.0
 Description: Flow graph library for Gtk+-3.0 headerfiles
  This package contains development headerfiles for the 
  flow-graph-library libgtkflow. It contains c-headers 
  and vapi-files.
 
-Package: libgtkflow-0.2-dbg
+Package: libgtkflow3-1.0-dbg
 Section: debug
 Priority: extra
 Architecture: any
 Multi-Arch: same
-Depends: libgtkflow-0.2-1 (= ${binary:Version}), ${misc:Depends}
-Description: Debugging information for libgtkflow-0.2
+Depends: libgtkflow3-1.0 (= ${binary:Version}), ${misc:Depends}
+Description: Debugging information for libgtkflow3-1.0
  This package provides debugging symbols for the flow graph
- library libgtkflow-0.2
+ library libgtkflow3-1.0
 
-Package: gir1.2-gtkflow-0.2
+Package: gir1.2-gtkflow3-1.0
 Section: introspection
 Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends}, ${shlibs:Depends}, ${gir:Depends}
-Description: Typelib (gobject-introspection)-files for libgtkflow
- This package contains gobject-introspection files for libgtkflow
+Description: Typelib (gobject-introspection)-files for libgtkflow3
+ This package contains gobject-introspection files for libgtkflow3
  With these files, programmers can use libgflow through the
  gobject-introspection of various scripting-languages like e.g.
  Python, Perl, Lua, PHP, JS and more
 
-Package: libgflow-0.2-doc
-Section: doc
-Architecture: all
-Multi-Arch: foreign
-Depends: ${misc:Depends}
-Suggests: devhelp
-Description: Documentation for libgflow-0.2
- This package contains a devhelp-book that holds API
- documentation for libgflow. The devhelp-book can
- be read via the software devhelp.
-
-Package: libgtkflow-0.2-1
+Package: libgtkflow3-1.0
 Architecture: any
 Multi-Arch: same
-Depends: libgflow-0.2-1, ${shlibs:Depends}, ${misc:Depends}
+Depends: libgflow-1.0, ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: Flow graph library for Gtk+-3.0
  This library provides an additional Gtk3-Widget that
  allows the drawing and manipulation of the data-flow-
  models provided by libgflow.
 
-Package: libgflow-0.2-dev
+Package: libgtkflow4-0.2-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libgflow-0.2-1 (= ${binary:Version}), ${misc:Depends},
+Depends: libgtkflow4-0.2 (= ${binary:Version}), ${misc:Depends},
+         libglib2.0-dev,
+         libgtk-4-dev,
+         libc6-dev,
+         libgflow-1.0-dev,
+         libcairo2-dev,
+         gir1.2-gtkflow4-0.2
+Description: Flow graph library for Gtk+-4.0 headerfiles
+ This package contains development headerfiles for the 
+ flow-graph-library libgtkflow. It contains c-headers 
+ and vapi-files.
+
+Package: libgtkflow4-0.2-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Multi-Arch: same
+Depends: libgtkflow4-0.2 (= ${binary:Version}), ${misc:Depends}
+Description: Debugging information for libgtkflow3-0.2
+ This package provides debugging symbols for the flow graph
+ library libgtkflow4-0.2
+
+Package: gir1.2-gtkflow4-0.2
+Section: introspection
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}, ${shlibs:Depends}, ${gir:Depends}
+Description: Typelib (gobject-introspection)-files for libgtkflow4
+ This package contains gobject-introspection files for libgtkflow4
+ With these files, programmers can use libgflow through the
+ gobject-introspection of various scripting-languages like e.g.
+ Python, Perl, Lua, PHP, JS and more
+
+Package: libgtkflow4-0.2
+Architecture: any
+Multi-Arch: same
+Depends: libgflow-1.0, ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Description: Flow graph library for Gtk+-4.0
+ This library provides an additional Gtk4-Widget that
+ allows the drawing and manipulation of the data-flow-
+ models provided by libgflow.
+
+Package: libgflow-1.0-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Suggests: devhelp
+Description: Documentation for libgflow3-1.0
+ This package contains a devhelp-book that holds API
+ documentation for libgflow. The devhelp-book can
+ be read via the software devhelp.
+
+Package: libgflow-1.0-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libgflow-1.0 (= ${binary:Version}), ${misc:Depends},
          libglib2.0-dev,
          libc6-dev,
-         gir1.2-gflow-0.2
+         gir1.2-gflow-1.0
 Description: Data flow modeling library headerfiles
  This library provides development headers for libgflow
  It contains typelib-files for gobject-introspection,
  c-headers and vapi-files.
 
-Package: libgflow-0.2-dbg
+Package: libgflow-1.0-dbg
 Section: debug
 Priority: extra
 Architecture: any
 Multi-Arch: same
-Depends: libgflow-0.2-1 (= ${binary:Version}), ${misc:Depends}
-Description: Debugging information for libgflow-0.2
+Depends: libgflow-1.0 (= ${binary:Version}), ${misc:Depends}
+Description: Debugging information for libgflow-1.0
  This package provides debugging symbols for the data flow
- modeling library libgflow-0.2
+ modeling library libgflow-1.0
 
-Package: gir1.2-gflow-0.2
+Package: gir1.2-gflow-1.0
 Section: introspection
 Architecture: any
 Multi-Arch: same
@@ -123,7 +170,7 @@ Description: Typelib (gobject-introspection)-files for libgflow
  gobject-introspection of various scripting-languages like e.g.
  Python, Perl, Lua, PHP, JS and more
 
-Package: libgflow-0.2-1
+Package: libgflow-1.0
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}
