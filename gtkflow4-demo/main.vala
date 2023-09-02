@@ -20,8 +20,6 @@ class CustomDockLabelFactory : GtkFlow.NodeDockLabelWidgetFactory {
     }
 
     private void changed() {
-        print("----> %s\n", button.sensitive ? "yes" : "no");
-        print("aaa %s\n", node.name);
     }
 }
 class CustomNode : GtkFlow.Node {
