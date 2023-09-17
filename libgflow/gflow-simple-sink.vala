@@ -143,6 +143,7 @@ namespace GFlow {
          */
         public new void unlink (Dock dock) throws GLib.Error {
             if (!this.is_linked_to (dock)) return;
+            if (!this.before_unlinking(this, dock)) return;
             if (dock is Source) {
                 this.remove_source((Source) dock);
                 this.do_source_changed();

@@ -148,7 +148,8 @@ namespace GtkFlow {
 
         private const int MARGIN_DEFAULT = 10;
 
-        private Gtk.Grid grid;
+        private Gtk.Grid pads_grid;
+        private Gtk.Box node_box;
         private Gtk.GestureClick ctr_click;
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
@@ -177,12 +178,12 @@ namespace GtkFlow {
          */
         public double resize_start_height {get; protected set; default=0;}
 
-        public bool render_resize_handle;
         private int n_docks = 0;
         private int margin = 0;
 
         ~Node() {
-            this.grid.unparent();
+            this.pads_grid.unparent();
+            this.node_box.unparent();
         }
 
         /**
@@ -221,26 +222,23 @@ namespace GtkFlow {
             this.dock_label_factory = dock_label_factory;
             this.margin = margin;
             
+            this.set_layout_manager(new Gtk.BinLayout());
             this.add_css_class("gtkflow_node");
             this.get_style_context().add_provider(Node.css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
-            this.grid = new Gtk.Grid();
-            this.grid.column_homogeneous = false;
-            this.grid.column_spacing = 5;
-            this.grid.row_homogeneous = false;
-            this.grid.row_spacing = 5;
-            this.grid.hexpand = true;
-            this.grid.vexpand = true;
-            this.grid.halign = Gtk.Align.FILL;
-            this.grid.valign = Gtk.Align.FILL;
+            this.node_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            this.node_box.set_parent(this);
+            this.node_box.hexpand = true;
+            this.node_box.vexpand = true;
+            this.node_box.halign = Gtk.Align.FILL;
+            this.node_box.valign = Gtk.Align.FILL;
 
-            this.grid.margin_top = this.margin;
-            this.grid.margin_bottom = this.margin;
-            this.grid.margin_start = this.margin;
-            this.grid.margin_end = this.margin;
-            this.grid.set_parent(this);
+            this.node_box.margin_top = this.margin;
+            this.node_box.margin_bottom = this.margin;
+            this.node_box.margin_start = this.margin;
+            this.node_box.margin_end = this.margin;
 
-            this.set_layout_manager(new Gtk.BinLayout());
+            create_pads_grid();
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
@@ -250,6 +248,16 @@ namespace GtkFlow {
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
             this.add_controller(motion_controller);
+        }
+
+        private void create_pads_grid() {
+            this.pads_grid = new Gtk.Grid();
+            this.pads_grid.column_homogeneous = false;
+            this.pads_grid.column_spacing = 5;
+            this.pads_grid.row_homogeneous = false;
+            this.pads_grid.row_spacing = 5;
+
+            node_box.append(this.pads_grid);
 
             foreach (GFlow.Source s in n.get_sources()) {
                 this.source_added(s);
@@ -257,6 +265,11 @@ namespace GtkFlow {
             foreach (GFlow.Sink s in n.get_sinks()) {
                 this.sink_added(s);
             }
+
+            this.n.source_added.connect(this.source_added);
+            this.n.source_removed.connect(this.source_removed);
+            this.n.sink_added.connect(this.sink_added);
+            this.n.sink_removed.connect(this.sink_removed);
         }
 
         /**
@@ -267,7 +280,7 @@ namespace GtkFlow {
          * with any of the Dock-Widgets in this node.
          */
         public Dock? retrieve_dock (GFlow.Dock d) {
-            var c = this.grid.get_first_child();
+            var c = this.pads_grid.get_first_child();
             while (c != null) {
                 if (!(c is Dock)) {
                     c = c.get_next_sibling();
@@ -296,12 +309,12 @@ namespace GtkFlow {
          * Adds a child widget to this node
          */
         public void add_child(Gtk.Widget child) {
-            this.grid.attach(child, 0, 2 + n_docks, 3, 1);
+            this.node_box.append(child);
         }
 
         public void set_title(Gtk.Widget title) throws NodeError {
             if (!this.title_initialized) {
-                this.grid.attach(title, 0, 0, 3, 1);
+                this.pads_grid.attach(title, 0, 0, 3, 1);
                 this.title_initialized = true;
             } else {
                 throw new NodeError.TITLE_ALREADY_INITIALIZED("Title may only be initialized once");
@@ -316,7 +329,7 @@ namespace GtkFlow {
         }
 
         protected override void dispose() {
-            this.grid.unparent();
+            this.pads_grid.unparent();
             base.dispose();
         }
 
@@ -327,16 +340,42 @@ namespace GtkFlow {
             var dock = new Dock(s);
             var dock_label = dock_label_factory.create_dock_label(dock.d);
             
-            this.grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
+            this.pads_grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
+            this.pads_grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
+        }
+
+        private void sink_removed(GFlow.Sink s) {
+            var dock_widget = retrieve_dock(s);
+
+            int column = -1;
+            int row = -1;
+            int width, height = 0;
+            pads_grid.query_child(dock_widget, out column, out row, out width, out height);
+
+            if (row != -1) {
+                pads_grid.remove_row(row);
+            }
         }
 
         private void source_added(GFlow.Source s) {
             var dock = new Dock(s);
             var dock_label = dock_label_factory.create_dock_label(dock.d);
 
-            this.grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
-            this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
+            this.pads_grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
+            this.pads_grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
+        }
+
+        private void source_removed(GFlow.Source s) {
+            var dock_widget = retrieve_dock(s);
+
+            int column = -1;
+            int row = -1;
+            int width, height = 0;
+            pads_grid.query_child(dock_widget, out column, out row, out width, out height);
+
+            if (row != -1) {
+                pads_grid.remove_row(row);
+            }
         }
 
         private void press_button(int n_click, double x, double y) {
@@ -347,7 +386,7 @@ namespace GtkFlow {
             }
             if (!do_processing) return;
 
-            Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
+            Gdk.Rectangle resize_area = resize_area();
             var nv = this.get_parent() as NodeView;
             if (this.n.resizable && resize_area.contains_point((int)x,(int)y)) {
                 nv.resize_node = this;
@@ -364,8 +403,7 @@ namespace GtkFlow {
             if (!this.n.resizable) {
                 return;
             }
-
-            Gdk.Rectangle resize_area = {this.get_width()-8, this.get_height()-8,8,8};
+            Gdk.Rectangle resize_area = resize_area();
             if (resize_area.contains_point((int)x,(int)y)) {
                 this.set_cursor_from_name("nwse-resize");
             } else {
@@ -397,6 +435,15 @@ namespace GtkFlow {
             } else {
                 this.remove_css_class("gtkflow_node_marked");
             }
+        }
+
+        private Gdk.Rectangle resize_area() {
+            return {
+                this.get_width() - 16, 
+                this.get_height() - 16,
+                16,
+                16
+            };
         }
     }
 }
