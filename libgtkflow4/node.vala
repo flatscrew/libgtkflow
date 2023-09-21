@@ -445,5 +445,13 @@ namespace GtkFlow {
                 16
             };
         }
+
+        public void set_rect(int x, int y, int width, int height) {
+            var layout_child = get_parent().get_layout_manager().get_layout_child(this) as NodeViewLayoutChild;
+            layout_child.x = x;
+            layout_child.y = y;
+
+            set_size_request(width, height);
+        }
     }
 }
