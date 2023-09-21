@@ -468,11 +468,5 @@ namespace GtkFlow {
                 16
             };
         }
-
-        public void set_position(int x, int y) {
-            var layout_child = get_parent().get_layout_manager().get_layout_child(this) as NodeViewLayoutChild;
-            layout_child.x = x;
-            layout_child.y = y;
-        }
     }
 }
