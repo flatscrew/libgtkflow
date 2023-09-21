@@ -201,7 +201,7 @@ namespace GtkFlow {
             base.dispose();
         }
 
-        private List<unowned NodeRenderer> get_marked_nodes() {
+        internal List<unowned NodeRenderer> get_marked_nodes() {
             var result = new List<unowned NodeRenderer>();
             var nodewidget = this.get_first_child();
             while (nodewidget != null) {

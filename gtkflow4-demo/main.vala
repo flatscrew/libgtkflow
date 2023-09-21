@@ -132,8 +132,11 @@ int main (string[] args) {
     gn1.highlight_color = {0.6f,1.0f,0.0f,0.3f};
     nv.add(gn1);
     n1.register_colors(nv);
-    nv.add(new GtkFlow.Node(n2));
+    var node2 = new GtkFlow.Node(n2);
+    nv.add(node2);
     n2.register_colors(nv);
+
+    node2.set_position(100,0);
 
     try {
         n1.source1.link(n2.sink1);

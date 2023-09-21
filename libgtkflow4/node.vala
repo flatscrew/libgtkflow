@@ -339,6 +339,29 @@ namespace GtkFlow {
             this.grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
         }
 
+        /**
+         * Programmatically set a node's position
+         */
+        public void set_position(int x, int y) {
+            var parent = this.get_parent();
+            if (!(parent is NodeView)) {
+                warning("Node is not a child of a NodeView");
+                return;
+            }
+            var nodeview = ((NodeView)parent);
+            var lc = (NodeViewLayoutChild)nodeview.layout_manager.get_layout_child(this);
+            lc.x = x;
+            lc.y = y;
+            if (this.marked) {
+                foreach (NodeRenderer n in nodeview.get_marked_nodes()) {
+                    if (n != this) continue;
+                    var mlc = (NodeViewLayoutChild) nodeview.layout_manager.get_layout_child(n);
+                    mlc.x -= x;
+                    mlc.y -= y;
+                }
+            }
+        }
+
         private void press_button(int n_click, double x, double y) {
             var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
             bool do_processing = true;
