@@ -82,6 +82,19 @@ namespace GFlow {
         }
 
         /**
+         * This signal is being triggered, before a connection is released
+         * between two docks. If the implementor returns false, the
+         * connection is not being released.
+         * IMPORTANT: Connect to this signal with connect_after
+         * otherwise this default handler will be called after the
+         * signal you implemented, thus always returning true,
+         * rendering your code ineffective.
+         */
+         public virtual signal bool before_unlinking (Dock self, Dock other){
+            return true;
+        }
+
+        /**
          * This signal is being triggered, when there is a connection being removed
          * from or to this Dock. If this the last connection of the dock, the
          * boolean parameter last will be set to true.
