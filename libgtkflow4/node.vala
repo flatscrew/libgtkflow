@@ -114,6 +114,8 @@ namespace GtkFlow {
      * To wrap your {@link GFlow.Node}s in order to add them to a {@link NodeView}
      */
     public class Node : Gtk.Widget, NodeRenderer  {
+        private const double DRAG_THRESHOLD = 5.0;
+
         private static string CSS = "
         .gtkflow_node { 
             background: rgba(0.6, 0.6, 0.6, 0.2); 
@@ -150,7 +152,11 @@ namespace GtkFlow {
 
         private Gtk.Grid pads_grid;
         private Gtk.Box node_box;
-        private Gtk.GestureClick ctr_click;
+        private Gtk.GestureDrag drag_gesture;
+        private double drag_start_x;
+        private double drag_start_y;
+        private bool drag_active;
+
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
 
@@ -240,10 +246,11 @@ namespace GtkFlow {
 
             create_pads_grid();
 
-            this.ctr_click = new Gtk.GestureClick();
-            this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect(this.press_button);
-            this.ctr_click.end.connect(this.release_button);
+            this.drag_gesture = new Gtk.GestureDrag();
+            this.add_controller(this.drag_gesture);
+            this.drag_gesture.drag_begin.connect(this.on_drag_begin);
+            this.drag_gesture.drag_update.connect(this.on_drag_update);
+            this.drag_gesture.drag_end.connect(this.on_drag_end);
 
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
@@ -401,44 +408,17 @@ namespace GtkFlow {
             }
         }
 
-        private void press_button(int n_click, double x, double y) {
-            var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
-            bool do_processing = true;
-            if (picked_widget is GtkFlow.Dock ) {
-                do_processing = false;
-            }
-            if (!do_processing) return;
-
-            Gdk.Rectangle resize_area = resize_area();
-            var nv = this.get_parent() as NodeView;
-            if (this.n.resizable && resize_area.contains_point((int)x,(int)y)) {
-                nv.resize_node = this;
-                this.resize_start_width = this.get_width();
-                this.resize_start_height = this.get_height();
-            } else {
-                nv.move_node = this;
-            }
-            this.click_offset_x = x;
-            this.click_offset_y = y;
-        }
-
         private void hover_over(double x, double y) {
-            if (!this.n.resizable) {
+            if (!this.n.resizable || this.drag_active) {
                 return;
             }
+
             Gdk.Rectangle resize_area = resize_area();
             if (resize_area.contains_point((int)x,(int)y)) {
                 this.set_cursor_from_name("nwse-resize");
             } else {
                 this.set_cursor_from_name("default");
             }
-        }
-
-        private void release_button() {
-            var nv = this.get_parent() as NodeView;
-            nv.move_node = null;
-            nv.resize_node = null;
-            nv.queue_allocate();
         }
 
         /**
@@ -467,6 +447,85 @@ namespace GtkFlow {
                 16,
                 16
             };
+        }
+
+        private void on_drag_begin(double start_x, double start_y) {
+            this.drag_start_x = start_x;
+            this.drag_start_y = start_y;
+            this.drag_active = false;
+
+            var cursor = new Gdk.Cursor.from_name("grabbing", null);
+            var native = this.get_native();
+            if (native != null) {
+                var surface = native.get_surface();
+                if (surface != null)
+                    surface.set_cursor(cursor);
+            }
+        }
+
+        private void on_drag_update(double offset_x, double offset_y) {
+            var nv = this.get_parent() as NodeView;
+            if (nv == null)
+                return;
+
+            double cursor_x = this.drag_start_x + offset_x;
+            double cursor_y = this.drag_start_y + offset_y;
+            Gdk.Rectangle resize_area = resize_area();
+
+            if (!this.drag_active) {
+                bool in_resize_zone = this.n.resizable && resize_area.contains_point((int)this.drag_start_x, (int)this.drag_start_y);
+                if (!in_resize_zone && below_drag_treshold(offset_x, offset_y)) {
+                    return;
+                }
+
+                this.drag_active = true;
+                this.click_offset_x = this.drag_start_x; 
+                this.click_offset_y = this.drag_start_y;
+
+                if (this.n.resizable && resize_area.contains_point(
+                        (int)(this.click_offset_x + offset_x),
+                        (int)(this.click_offset_y + offset_y))) {
+                    nv.resize_node = this;
+                    this.resize_start_width = this.get_width();
+                    this.resize_start_height = this.get_height();
+                } else {
+                    nv.move_node = this;
+                }
+            }
+
+            if (nv.move_node == this) {
+                var lc = (NodeViewLayoutChild)nv.layout_manager.get_layout_child(this);
+                lc.x += (int)offset_x;
+                lc.y += (int)offset_y;
+                nv.queue_allocate();
+            }
+
+            if (nv.resize_node == this) {
+                int new_width = (int)(this.resize_start_width + offset_x);
+                int new_height = (int)(this.resize_start_height + offset_y);
+                this.set_size_request(new_width, new_height);
+            }
+        }
+
+        private bool below_drag_treshold(double offset_x, double offset_y) {
+            if (Math.fabs(offset_x) < DRAG_THRESHOLD && Math.fabs(offset_y) < DRAG_THRESHOLD) {
+                return true;
+            }
+            return false;
+        }
+        
+        private void on_drag_end(double offset_x, double offset_y) {
+            var nv = this.get_parent() as NodeView;
+            if (nv == null)
+                return;
+        
+            nv.move_node = null;
+            nv.resize_node = null;
+            this.drag_active = false;
+            
+            this.set_cursor_from_name("default");
+
+            nv.queue_allocate();
         }
     }
 }
