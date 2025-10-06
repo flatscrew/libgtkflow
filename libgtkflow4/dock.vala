@@ -158,7 +158,7 @@ namespace GtkFlow {
             nv.queue_allocate();
         }
 
-        protected override  void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
+        protected override void measure(Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
             min = 16;
             pref = 16;
             min_base = -1;
