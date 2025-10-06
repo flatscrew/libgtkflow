@@ -456,12 +456,7 @@ namespace GtkFlow {
                 this.allow_drag = false;
                 this.drag_active = false;
 
-                var native = this.get_native();
-                if (native != null) {
-                    var surface = native.get_surface();
-                    if (surface != null)
-                        surface.set_cursor(null);
-                }
+                reset_cursor();
                 return;
             }
 
@@ -470,13 +465,7 @@ namespace GtkFlow {
             this.drag_start_y = start_y;
             this.drag_active = false;
 
-            var cursor = new Gdk.Cursor.from_name("grabbing", null);
-            var native = this.get_native();
-            if (native != null) {
-                var surface = native.get_surface();
-                if (surface != null)
-                    surface.set_cursor(cursor);
-            }
+            set_cursor("move");
         }
 
         private bool can_drag(Gtk.Widget? picked) {
@@ -545,6 +534,8 @@ namespace GtkFlow {
         }
         
         private void on_drag_end(double offset_x, double offset_y) {
+            reset_cursor();
+
             var nv = this.get_parent() as NodeView;
             if (nv == null) return;
             if (!allow_drag) return;
@@ -552,10 +543,28 @@ namespace GtkFlow {
             nv.move_node = null;
             nv.resize_node = null;
             this.drag_active = false;
-            
-            this.set_cursor_from_name("default");
 
             nv.queue_allocate();
+        }
+
+        private void set_cursor(string? cursor_name) {
+            var native = this.get_native();
+            if (native != null) {
+                var surface = native.get_surface();
+
+                if (cursor_name == null) {
+                    surface.set_cursor(null);
+                    return;
+                }
+    
+                var cursor = new Gdk.Cursor.from_name("move", null);
+                if (surface != null)
+                    surface.set_cursor(cursor);
+            }
+        }
+
+        private void reset_cursor() {
+            set_cursor(null);
         }
     }
 }
