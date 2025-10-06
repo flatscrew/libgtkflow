@@ -454,7 +454,7 @@ namespace GtkFlow {
             this.drag_start_y = start_y;
             this.drag_active = false;
 
-            var cursor = new Gdk.Cursor.from_name("grabbing");
+            var cursor = new Gdk.Cursor.from_name("grabbing", null);
             var native = this.get_native();
             if (native != null) {
                 var surface = native.get_surface();
