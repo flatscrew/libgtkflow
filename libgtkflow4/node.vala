@@ -156,6 +156,7 @@ namespace GtkFlow {
         private double drag_start_x;
         private double drag_start_y;
         private bool drag_active;
+        private bool allow_drag;
 
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
@@ -218,7 +219,7 @@ namespace GtkFlow {
             try {
                 set_title(title_box);
             } catch (NodeError e) {
-                message("Could not set title in node");
+                error("Could not set title in node: %s", e.message);
             }
         }
 
@@ -450,6 +451,21 @@ namespace GtkFlow {
         }
 
         private void on_drag_begin(double start_x, double start_y) {
+            var picked = this.pick(start_x, start_y, Gtk.PickFlags.DEFAULT);
+            if (!can_drag(picked)) {
+                this.allow_drag = false;
+                this.drag_active = false;
+
+                var native = this.get_native();
+                if (native != null) {
+                    var surface = native.get_surface();
+                    if (surface != null)
+                        surface.set_cursor(null);
+                }
+                return;
+            }
+
+            this.allow_drag = true;
             this.drag_start_x = start_x;
             this.drag_start_y = start_y;
             this.drag_active = false;
@@ -463,15 +479,29 @@ namespace GtkFlow {
             }
         }
 
+        private bool can_drag(Gtk.Widget? picked) {
+            if (picked == null)
+                return false;
+        
+            Gtk.Widget? current = picked;
+            while (current != null) {
+                if (current is Gtk.Actionable || current is Gtk.Editable || current is Dock)
+                    return false;
+        
+                current = current.get_parent();
+            }
+        
+            return true;
+        }
+
         private void on_drag_update(double offset_x, double offset_y) {
             var nv = this.get_parent() as NodeView;
             if (nv == null)
                 return;
 
-            double cursor_x = this.drag_start_x + offset_x;
-            double cursor_y = this.drag_start_y + offset_y;
-            Gdk.Rectangle resize_area = resize_area();
+            if (!allow_drag) return;
 
+            Gdk.Rectangle resize_area = resize_area();
             if (!this.drag_active) {
                 bool in_resize_zone = this.n.resizable && resize_area.contains_point((int)this.drag_start_x, (int)this.drag_start_y);
                 if (!in_resize_zone && below_drag_treshold(offset_x, offset_y)) {
@@ -516,8 +546,8 @@ namespace GtkFlow {
         
         private void on_drag_end(double offset_x, double offset_y) {
             var nv = this.get_parent() as NodeView;
-            if (nv == null)
-                return;
+            if (nv == null) return;
+            if (!allow_drag) return;
         
             nv.move_node = null;
             nv.resize_node = null;
