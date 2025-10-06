@@ -150,7 +150,7 @@ namespace GtkFlow {
 
         private Gtk.Grid pads_grid;
         private Gtk.Box node_box;
-        private Gtk.GestureClick ctr_click;
+        private Gtk.GestureDrag drag_gesture;
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
 
@@ -240,10 +240,11 @@ namespace GtkFlow {
 
             create_pads_grid();
 
-            this.ctr_click = new Gtk.GestureClick();
-            this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect(this.press_button);
-            this.ctr_click.end.connect(this.release_button);
+            this.drag_gesture = new Gtk.GestureDrag();
+            this.add_controller(this.drag_gesture);
+            this.drag_gesture.drag_begin.connect(this.on_drag_begin);
+            this.drag_gesture.drag_update.connect(this.on_drag_update);
+            this.drag_gesture.drag_end.connect(this.on_drag_end);
 
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
@@ -401,27 +402,6 @@ namespace GtkFlow {
             }
         }
 
-        private void press_button(int n_click, double x, double y) {
-            var picked_widget = this.pick(x,y, Gtk.PickFlags.NON_TARGETABLE);
-            bool do_processing = true;
-            if (picked_widget is GtkFlow.Dock ) {
-                do_processing = false;
-            }
-            if (!do_processing) return;
-
-            Gdk.Rectangle resize_area = resize_area();
-            var nv = this.get_parent() as NodeView;
-            if (this.n.resizable && resize_area.contains_point((int)x,(int)y)) {
-                nv.resize_node = this;
-                this.resize_start_width = this.get_width();
-                this.resize_start_height = this.get_height();
-            } else {
-                nv.move_node = this;
-            }
-            this.click_offset_x = x;
-            this.click_offset_y = y;
-        }
-
         private void hover_over(double x, double y) {
             if (!this.n.resizable) {
                 return;
@@ -432,13 +412,6 @@ namespace GtkFlow {
             } else {
                 this.set_cursor_from_name("default");
             }
-        }
-
-        private void release_button() {
-            var nv = this.get_parent() as NodeView;
-            nv.move_node = null;
-            nv.resize_node = null;
-            nv.queue_allocate();
         }
 
         /**
@@ -467,6 +440,58 @@ namespace GtkFlow {
                 16,
                 16
             };
+        }
+
+        private void on_drag_begin(double start_x, double start_y) {
+            var picked_widget = this.pick(start_x, start_y, Gtk.PickFlags.NON_TARGETABLE);
+            if (picked_widget is GtkFlow.Dock)
+                return;
+        
+            var nv = this.get_parent() as NodeView;
+            if (nv == null)
+                return;
+        
+            Gdk.Rectangle resize_area = resize_area();
+        
+            if (this.n.resizable && resize_area.contains_point((int)start_x, (int)start_y)) {
+                nv.resize_node = this;
+                this.resize_start_width = this.get_width();
+                this.resize_start_height = this.get_height();
+            } else {
+                nv.move_node = this;
+            }
+        
+            this.click_offset_x = start_x;
+            this.click_offset_y = start_y;
+        }
+
+        private void on_drag_update(double offset_x, double offset_y) {
+            var nv = this.get_parent() as NodeView;
+            if (nv == null)
+                return;
+        
+            if (nv.move_node == this) {
+                var lc = (NodeViewLayoutChild)nv.layout_manager.get_layout_child(this);
+                lc.x += (int)offset_x;
+                lc.y += (int)offset_y;
+                nv.queue_allocate();
+            }
+        
+            if (nv.resize_node == this) {
+                int new_width = (int)(this.resize_start_width + offset_x);
+                int new_height = (int)(this.resize_start_height + offset_y);
+                this.set_size_request(new_width, new_height);
+            }
+        }
+        
+        private void on_drag_end(double offset_x, double offset_y) {
+            var nv = this.get_parent() as NodeView;
+            if (nv == null)
+                return;
+        
+            nv.move_node = null;
+            nv.resize_node = null;
+            nv.queue_allocate();
         }
     }
 }
