@@ -36,7 +36,7 @@ namespace GFlow {
          */
         public virtual void unlink_all () throws GLib.Error
         {
-            foreach (Source s in this.sources)
+            foreach (Source s in this.sources.copy())
                 if (s != null)
                     this.unlink (s);
         }
