@@ -158,6 +158,9 @@ namespace GtkFlow {
         private bool drag_active;
         private bool allow_drag;
 
+        private int previous_x;
+        private int previous_y;
+
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
 
@@ -184,6 +187,8 @@ namespace GtkFlow {
          * {@inheritDoc}
          */
         public double resize_start_height {get; protected set; default=0;}
+
+        public signal void position_changed(int old_x, int old_y, int new_x, int new_y);
 
         private int n_docks = 0;
         private int margin = 0;
@@ -395,14 +400,15 @@ namespace GtkFlow {
                 warning("Node is not a child of a NodeView");
                 return;
             }
-            var nodeview = ((NodeView)parent);
-            var lc = (NodeViewLayoutChild)nodeview.layout_manager.get_layout_child(this);
-            lc.x = x;
-            lc.y = y;
+            var nodeview = parent as NodeView;
+            var layout_child = nodeview.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
+            layout_child.x = x;
+            layout_child.y = y;
+
             if (this.marked) {
                 foreach (NodeRenderer n in nodeview.get_marked_nodes()) {
                     if (n != this) continue;
-                    var mlc = (NodeViewLayoutChild) nodeview.layout_manager.get_layout_child(n);
+                    var mlc = nodeview.layout_manager.get_layout_child(n) as NodeViewLayoutChild;
                     mlc.x -= x;
                     mlc.y -= y;
                 }
@@ -465,6 +471,13 @@ namespace GtkFlow {
             this.drag_start_y = start_y;
             this.drag_active = false;
 
+            var node_view = this.get_parent() as NodeView;
+            if (node_view == null) return;
+        
+            var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
+            this.previous_x = layout_child.x;
+            this.previous_y = layout_child.y;
+
             set_cursor("move");
         }
 
@@ -484,8 +497,8 @@ namespace GtkFlow {
         }
 
         private void on_drag_update(double offset_x, double offset_y) {
-            var nv = this.get_parent() as NodeView;
-            if (nv == null)
+            var node_view = this.get_parent() as NodeView;
+            if (node_view == null)
                 return;
 
             if (!allow_drag) return;
@@ -504,22 +517,22 @@ namespace GtkFlow {
                 if (this.n.resizable && resize_area.contains_point(
                         (int)(this.click_offset_x + offset_x),
                         (int)(this.click_offset_y + offset_y))) {
-                    nv.resize_node = this;
+                    node_view.resize_node = this;
                     this.resize_start_width = this.get_width();
                     this.resize_start_height = this.get_height();
                 } else {
-                    nv.move_node = this;
+                    node_view.move_node = this;
                 }
             }
 
-            if (nv.move_node == this) {
-                var lc = (NodeViewLayoutChild)nv.layout_manager.get_layout_child(this);
-                lc.x += (int)offset_x;
-                lc.y += (int)offset_y;
-                nv.queue_allocate();
+            if (node_view.move_node == this) {
+                var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
+                layout_child.x += (int)offset_x;
+                layout_child.y += (int)offset_y;
+                node_view.queue_allocate();
             }
 
-            if (nv.resize_node == this) {
+            if (node_view.resize_node == this) {
                 int new_width = (int)(this.resize_start_width + offset_x);
                 int new_height = (int)(this.resize_start_height + offset_y);
                 this.set_size_request(new_width, new_height);
@@ -536,18 +549,22 @@ namespace GtkFlow {
         private void on_drag_end(double offset_x, double offset_y) {
             reset_cursor();
 
-            var nv = this.get_parent() as NodeView;
-            if (nv == null) return;
             if (!allow_drag) return;
+            
+            var node_view = this.get_parent() as NodeView;
+            if (node_view == null) return;
         
-            nv.move_node = null;
-            nv.resize_node = null;
+            node_view.move_node = null;
+            node_view.resize_node = null;
             this.drag_active = false;
 
-            nv.queue_allocate();
+            node_view.queue_allocate();
+
+            var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
+            position_changed(previous_x, previous_y, layout_child.x, layout_child.y);
         }
 
-        private void set_cursor(string? cursor_name) {
+        private new void set_cursor(string? cursor_name) {
             var native = this.get_native();
             if (native != null) {
                 var surface = native.get_surface();

@@ -32,6 +32,13 @@ class CustomNode : GtkFlow.Node {
         Gtk.CssProvider custom_css = new Gtk.CssProvider();
         custom_css.load_from_data(CSS.data);
         get_style_context().add_provider(custom_css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
+
+        this.position_changed.connect(this.debug_position_changed);
+    }
+
+    private void debug_position_changed(int old_x, int old_y, int new_x, int new_y) {
+        message("Position changed, old x = %d, old y = %d, new x = %d, new y %d\n", old_x, old_y, new_x, new_y);
     }
 
     private Gtk.Widget custom_title_factory (GtkFlow.Node node) {
