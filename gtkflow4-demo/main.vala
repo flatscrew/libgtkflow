@@ -35,10 +35,15 @@ class CustomNode : GtkFlow.Node {
 
 
         this.position_changed.connect(this.debug_position_changed);
+        this.size_changed.connect(this.debug_size_changed);
     }
 
     private void debug_position_changed(int old_x, int old_y, int new_x, int new_y) {
         message("Position changed, old x = %d, old y = %d, new x = %d, new y %d\n", old_x, old_y, new_x, new_y);
+    }
+
+    private void debug_size_changed(int old_width, int old_height, int new_width, int new_height) {
+        message("Size changed, old width = %d, old height = %d, new width = %d, new height %d\n", old_width, old_height, new_width, new_height);
     }
 
     private Gtk.Widget custom_title_factory (GtkFlow.Node node) {

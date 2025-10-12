@@ -160,6 +160,8 @@ namespace GtkFlow {
 
         private int previous_x;
         private int previous_y;
+        private int previous_width;
+        private int previous_height;
 
         public GFlow.Node n {get; protected set;}
         private NodeDockLabelWidgetFactory dock_label_factory;
@@ -189,6 +191,7 @@ namespace GtkFlow {
         public double resize_start_height {get; protected set; default=0;}
 
         public signal void position_changed(int old_x, int old_y, int new_x, int new_y);
+        public signal void size_changed(int old_width, int old_height, int new_width, int new_height);
 
         private int n_docks = 0;
         private int margin = 0;
@@ -477,6 +480,8 @@ namespace GtkFlow {
             var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
             this.previous_x = layout_child.x;
             this.previous_y = layout_child.y;
+            this.previous_width = get_width();
+            this.previous_height = get_height();
 
             set_cursor("move");
         }
@@ -561,7 +566,18 @@ namespace GtkFlow {
             node_view.queue_allocate();
 
             var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
-            position_changed(previous_x, previous_y, layout_child.x, layout_child.y);
+            notify_position_changed(previous_x, previous_y, layout_child.x, layout_child.y);
+            notify_size_changed(previous_width, previous_height, get_width(), get_height());
+        }
+
+        private void notify_position_changed(int old_x, int old_y, int new_x, int new_y) {
+            if (old_x == new_x && old_y == new_y) return;
+            position_changed(old_x, old_y, new_x, new_y);
+        }
+
+        private void notify_size_changed(int old_width, int old_height, int new_width, int new_height) {
+            if (old_width == new_width && old_height == new_height) return;
+            size_changed(old_width, old_height, new_width, new_height);
         }
 
         private new void set_cursor(string? cursor_name) {
