@@ -180,12 +180,12 @@ namespace GtkFlow {
 
             this.ctr_motion = new Gtk.EventControllerMotion();
             this.add_controller(this.ctr_motion);
-            this.ctr_motion.motion.connect((x,y)=> { this.process_motion(x,y); });
+            this.ctr_motion.motion.connect(this.process_motion);
 
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
-            this.ctr_click.pressed.connect((n,x,y) => { this.start_marking(n,x,y); });
-            this.ctr_click.released.connect((n,x,y) => { this.end_temp_connector(n,x,y); });
+            this.ctr_click.pressed.connect(this.start_marking);
+            this.ctr_click.released.connect(this.end_temp_connector);
         }
 
         /**
@@ -205,7 +205,7 @@ namespace GtkFlow {
             var result = new List<unowned NodeRenderer>();
             var nodewidget = this.get_first_child();
             while (nodewidget != null) {
-                var node = (NodeRenderer)nodewidget;
+                var node = nodewidget as NodeRenderer;
                 if (node.marked) {
                     result.append(node);
                 }

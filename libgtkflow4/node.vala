@@ -569,13 +569,6 @@ namespace GtkFlow {
                 }
             }
 
-            if (node_view.move_node == this) {
-                var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
-                layout_child.x += (int)offset_x;
-                layout_child.y += (int)offset_y;
-                node_view.queue_allocate();
-            }
-
             if (node_view.resize_node == this) {
                 int new_width = (int)(this.resize_start_width + offset_x);
                 int new_height = (int)(this.resize_start_height + offset_y);
