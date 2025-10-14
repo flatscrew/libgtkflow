@@ -415,6 +415,23 @@ namespace GtkFlow {
             }
         }
 
+        public void get_position(out int x, out int y) {
+            var parent = this.get_parent();
+            if (!(parent is NodeView)) {
+                x = 0;
+                y = 0;
+                warning("Node is not a child of a NodeView");
+                return;
+            }
+
+
+            var nodeview = parent as NodeView;
+            var layout_child = nodeview.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
+
+            x = layout_child.x;
+            y = layout_child.y;
+        }
+
         private void hover_over(double x, double y) {
             if (!this.n.resizable || this.drag_active) {
                 return;
