@@ -251,13 +251,35 @@ namespace GtkFlow {
             this.node_box.margin_end = this.margin;
 
             create_pads_grid();
+            create_drag_drop_controller();
+            create_motion_controller();
+            create_event_override_controller();
+        }
 
+        private void create_event_override_controller() {
+            var controller = new Gtk.EventControllerLegacy();
+            controller.set_propagation_phase(Gtk.PropagationPhase.CAPTURE);
+            controller.event.connect((ev) => {
+                if (drag_active &&
+                    (ev.get_event_type() == Gdk.EventType.BUTTON_PRESS ||
+                    ev.get_event_type() == Gdk.EventType.BUTTON_RELEASE ||
+                    ev.get_event_type() == Gdk.EventType.DRAG_ENTER)) {
+                    return Gdk.EVENT_STOP;
+                }
+                return Gdk.EVENT_PROPAGATE;
+            });
+            this.add_controller(controller);
+        }
+
+        private void create_drag_drop_controller() {
             this.drag_gesture = new Gtk.GestureDrag();
             this.add_controller(this.drag_gesture);
             this.drag_gesture.drag_begin.connect(this.on_drag_begin);
             this.drag_gesture.drag_update.connect(this.on_drag_update);
             this.drag_gesture.drag_end.connect(this.on_drag_end);
+        }
 
+        private void create_motion_controller() {
             var motion_controller = new Gtk.EventControllerMotion();
             motion_controller.motion.connect(this.hover_over);
             this.add_controller(motion_controller);
@@ -504,7 +526,7 @@ namespace GtkFlow {
         
             Gtk.Widget? current = picked;
             while (current != null) {
-                if (current is Gtk.Actionable || current is Gtk.Editable || current is Dock)
+                if (current is Dock)
                     return false;
         
                 current = current.get_parent();
