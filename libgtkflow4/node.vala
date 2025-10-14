@@ -500,7 +500,7 @@ namespace GtkFlow {
 
         private void on_drag_begin(double start_x, double start_y) {
             var picked = this.pick(start_x, start_y, Gtk.PickFlags.DEFAULT);
-            if (!can_drag(picked)) {
+            if (is_drag_forbidden(picked)) {
                 this.allow_drag = false;
                 this.drag_active = false;
 
@@ -521,23 +521,20 @@ namespace GtkFlow {
             this.previous_y = layout_child.y;
             this.previous_width = get_width();
             this.previous_height = get_height();
-
-            set_cursor("move");
         }
 
-        private bool can_drag(Gtk.Widget? picked) {
-            if (picked == null)
+        private bool is_drag_forbidden(Gtk.Widget? widget) {
+            if (widget == null)
                 return false;
         
-            Gtk.Widget? current = picked;
+            Gtk.Widget? current = widget;
             while (current != null) {
-                if (current is Dock)
-                    return false;
-        
+                if ( widget is Dock) {
+                    return true;
+                }
                 current = current.get_parent();
             }
-        
-            return true;
+            return false;
         }
 
         private void on_drag_update(double offset_x, double offset_y) {
@@ -566,6 +563,7 @@ namespace GtkFlow {
                     this.resize_start_height = this.get_height();
                 } else {
                     node_view.move_node = this;
+                    set_cursor("move");
                 }
             }
 
