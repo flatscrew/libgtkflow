@@ -399,6 +399,13 @@ namespace GtkFlow {
             }
         }
 
+        public void bring_node_to_front(NodeRenderer node) {
+            var last = this.get_last_child();
+            if (last == node) return;
+
+            node.insert_after(this, last);
+        }
+
         /**
          * Add a node to this nodeview
          */
@@ -429,7 +436,6 @@ namespace GtkFlow {
             }
             return null;
         }
-
 
         /**
          * Retrieve a Dock-Widget from this nodeview.

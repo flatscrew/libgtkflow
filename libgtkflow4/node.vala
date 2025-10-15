@@ -515,6 +515,8 @@ namespace GtkFlow {
 
             var node_view = this.get_parent() as NodeView;
             if (node_view == null) return;
+
+            node_view.bring_node_to_front(this);
         
             var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;
             this.previous_x = layout_child.x;
