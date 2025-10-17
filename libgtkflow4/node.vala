@@ -595,6 +595,7 @@ namespace GtkFlow {
             node_view.resize_node = null;
             this.drag_active = false;
 
+            node_view.queue_resize();
             node_view.queue_allocate();
 
             var layout_child = node_view.layout_manager.get_layout_child(this) as NodeViewLayoutChild;

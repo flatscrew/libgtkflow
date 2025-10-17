@@ -36,6 +36,7 @@ class CustomNode : GtkFlow.Node {
 
         this.position_changed.connect(this.debug_position_changed);
         this.size_changed.connect(this.debug_size_changed);
+     
     }
 
     private void debug_position_changed(int old_x, int old_y, int new_x, int new_y) {
@@ -107,7 +108,6 @@ class TestNode : GFlow.SimpleNode {
         snk_widget1.resolve_color.connect_after((d,v)=>{ return {0.0f,0.0f,1.0f,1.0f};});
     }
 }
-
 
 int main (string[] args) {
   var app = new Gtk.Application(

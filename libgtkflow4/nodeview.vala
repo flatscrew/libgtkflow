@@ -139,6 +139,7 @@ namespace GtkFlow {
          */
         private Gtk.EventControllerMotion ctr_motion;
         private Gtk.GestureClick ctr_click;
+
         /**
          * The current extents of the temporary connector
          * if null, there is no temporary connector drawn at the moment

@@ -39,6 +39,7 @@ namespace GtkFlow {
         private int rubber_width = 0;
         private int rubber_height = 0;
         private bool move_rubber = false;
+        
         /**
          * The nodeview that this Minimap should depict
          *
@@ -58,31 +59,45 @@ namespace GtkFlow {
                     GLib.SignalHandler.disconnect(this._nodeview, this.hadjustment_signal);
                     GLib.SignalHandler.disconnect(this._nodeview, this.vadjustment_signal);
                 }
-                if (value == null) {
-                    this._nodeview = null;
-                    this._scrolledwindow = null;
-                } else {
-                    this._nodeview = value;
-                    this._scrolledwindow = null;
-                    if (value.get_parent() is Gtk.ScrolledWindow) {
-                        this._scrolledwindow = value.get_parent() as Gtk.ScrolledWindow;
+            
+                this._nodeview = value;
+                this._scrolledwindow = null;
+            
+                if (value != null) {
+                    this._scrolledwindow = find_scrolled_window(value);
+            
+                    if (this._scrolledwindow != null) {
+                        this.hadjustment_signal = this._scrolledwindow.hadjustment.notify["value"].connect(() => {
+                            this.queue_draw();
+                        });
+                        this.vadjustment_signal = this._scrolledwindow.vadjustment.notify["value"].connect(() => {
+                            this.queue_draw();
+                        });
                     } else {
-                        if (value.get_parent() is Gtk.Viewport) {
-                            if (value.get_parent().get_parent() is Gtk.ScrolledWindow) {
-                                this._scrolledwindow = value.get_parent().get_parent() as Gtk.ScrolledWindow;
-                                this.hadjustment_signal = this._scrolledwindow.hadjustment.notify["value"].connect(
-                                    ()=>{this.queue_draw();}
-                                );
-                                this.vadjustment_signal = this._scrolledwindow.vadjustment.notify["value"].connect(
-                                    ()=>{this.queue_draw();}
-                                );
-                            }
-                        }
+                        warning("MiniMap: could not find parent ScrolledWindow for NodeView!");
                     }
-                    this.draw_signal = this._nodeview.draw_minimap.connect(()=>{this.queue_draw(); });
+            
+                    this.draw_signal = this._nodeview.draw_minimap.connect(() => {
+                        this.queue_draw();
+                    });
                 }
+            
                 this.queue_draw();
             }
+        }
+        
+        /**
+         * Performs a recursive ScrolledWindow search up to the root.
+         */
+        private Gtk.ScrolledWindow? find_scrolled_window(Gtk.Widget widget) {
+            Gtk.Widget? parent = widget.get_parent();
+            while (parent != null) {
+                if (parent is Gtk.ScrolledWindow) {
+                    return parent as Gtk.ScrolledWindow;
+                }
+                parent = parent.get_parent();
+            }
+            return null;
         }
 
         private Gtk.EventControllerMotion ctr_motion;
