@@ -372,7 +372,7 @@ namespace GtkFlow {
         private void sink_added(GFlow.Sink s) {
             var dock = new Dock(s);
             var dock_label = dock_label_factory.create_dock_label(dock.d);
-            dock_label.halign = Gtk.Align.END;
+            dock_label.halign = Gtk.Align.START;
             
             this.pads_grid.attach(dock, 0, 1 + ++n_docks, 1, 1);
             this.pads_grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
@@ -394,7 +394,7 @@ namespace GtkFlow {
         private void source_added(GFlow.Source s) {
             var dock = new Dock(s);
             var dock_label = dock_label_factory.create_dock_label(dock.d);
-            dock_label.halign = Gtk.Align.START;
+            dock_label.halign = Gtk.Align.END;
             
             this.pads_grid.attach(dock, 2, 1 + ++n_docks, 1, 1);
             this.pads_grid.attach(dock_label, 1, 1 + n_docks, 1, 1);
