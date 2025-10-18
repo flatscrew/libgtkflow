@@ -168,11 +168,6 @@ namespace GtkFlow {
         private Gdk.Rectangle? mark_rubberband = null;
 
         /**
-         * Holds a Queue of node operations to be done after motion is done. 
-         */
-        private Queue<MotionQueuedNodeOperation> queued_operations = new Queue<MotionQueuedNodeOperation>();
-
-        /**
          * Instantiate a new NodeView
          */
         public NodeView (){
@@ -273,15 +268,6 @@ namespace GtkFlow {
                 }
             }
             this.queue_allocate();
-
-            var item = queued_operations.pop_head();
-            if (item != null) {
-                item.do_on_nodeview(this);
-
-                while ((item = queued_operations.pop_head ()) != null) {
-                    item.do_on_nodeview(this);
-                }
-            }
         }
 
         private void start_marking(int n_clicks, double x, double y) {
@@ -418,7 +404,16 @@ namespace GtkFlow {
          * Remove a node from this nodeview
          */
         public void remove(NodeRenderer n) {
-            queued_operations.push_tail(new RemoveNodeOperation(n));
+            n.n.unlink_all();
+            var child = get_first_child ();
+            while (child != null) {
+                if (child == n) {
+                    child.unparent ();
+                    child = null;
+                    return;
+                }
+                child = child.get_next_sibling();
+            }
         }
 
         /**
