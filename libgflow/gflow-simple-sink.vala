@@ -103,9 +103,10 @@ namespace GFlow {
         {
             if (this._sources.index(s) != -1)
                 this._sources.remove(s);
+                
             if (s.is_linked_to(this)) {
                 s.unlink (this);
-                this.unlinked(s, this._sources.length () == 0);
+                //  this.unlinked(s, this._sources.length () == 0);
             }
         }
         

@@ -83,14 +83,18 @@ class TestNode : GFlow.SimpleNode {
 
         try {
             this.source1 = new GFlow.SimpleSource (123);
+            source1.unlinked.connect(() => message("Unlinked source1"));
             this.source1.name = "%s source 1".printf(name);
             this.add_source(source1);
 
             this.source2 = new GFlow.SimpleSource.with_type(typeof(int));
+            source2.unlinked.connect(() => message("Unlinked source2"));
             this.source2.name = "%s source 2".printf(name);
             this.add_source(source2);
 
             this.sink1 = new GFlow.SimpleSink.with_type (typeof(int));
+            sink1.unlinked.connect(() => message("Unlinked sink1"));
+            
             this.sink1.name = "%s sink 1".printf(name);
             this.add_sink(sink1);
             this.sink1.max_sources = 10;

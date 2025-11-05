@@ -124,6 +124,8 @@ namespace GtkFlow {
         construct {
             set_css_name("gtkflow_nodeview");
         }
+        
+        public signal void dock_connection_missed(Dock dock, double x, double y);
 
         /**
          * If this property is set to true, the nodeview will not perform
@@ -294,10 +296,11 @@ namespace GtkFlow {
         }
 
         internal void end_temp_connector(int n_clicks, double x, double y) {
+            var picked_widget = this.pick(x, y, Gtk.PickFlags.DEFAULT);
+            
             if (this.temp_connector != null) {
-                var w = this.pick(x,y,Gtk.PickFlags.DEFAULT);
-                if (w is Dock) {
-                    var pd = (Dock)w;
+                if (picked_widget is Dock) {
+                    var pd = (Dock) picked_widget;
                     if (pd.d is GFlow.Source && this.temp_connected_dock.d is GFlow.Sink
                      || pd.d is GFlow.Sink && this.temp_connected_dock.d is GFlow.Source) {
                         try {
@@ -331,8 +334,11 @@ namespace GtkFlow {
                         try {
                             this.clicked_dock.d.unlink(this.temp_connected_dock.d);
                         } catch (Error e) {
-                            warning("Could not unlink: "+e.message);
+                            warning("Could not unlink: %s", e.message);
                         }
+                     } else {
+                        this.temp_connected_dock.notify_connection_miss(x, y);
+                        missed_temp_connector(x, y);
                      }
                 }
 
@@ -344,13 +350,16 @@ namespace GtkFlow {
                 this.clicked_dock = null;
                 this.temp_connected_dock = null;
                 this.temp_connector = null;
-
-            }
+            } 
 
             this.update_extents();
             this.queue_resize();
             this.mark_rubberband = null;
             this.queue_allocate();
+        }
+        
+        private void missed_temp_connector(double x, double y) {
+            this.dock_connection_missed(this.temp_connected_dock, x, y);
         }
 
         private void update_extents() {
@@ -512,6 +521,7 @@ namespace GtkFlow {
 
         protected override void snapshot (Gtk.Snapshot sn) {
             base.snapshot(sn);
+            
             var rect = Graphene.Rect().init(0,0,(float)this.get_width(), (float)this.get_height());
             var cr = sn.append_cairo(rect);
 
@@ -521,11 +531,13 @@ namespace GtkFlow {
             while (c != null) {
                 var nr = (NodeRenderer)c;
                 int tgt_x, tgt_y, src_x, src_y, w, h;
+                
                 foreach (GFlow.Sink snk in nr.n.get_sinks()) {
                     var target_dock = this.retrieve_dock(snk);
                     Gtk.Allocation tgt_alloc, tgt_node_alloc;
                     target_dock.get_allocation(out tgt_alloc);
                     nr.get_allocation(out tgt_node_alloc);
+                    
                     foreach (GFlow.Source src in snk.sources) {
                         if (this.temp_connected_dock != null && src == this.temp_connected_dock.d
                          && this.clicked_dock != null && snk == this.clicked_dock.d) {
@@ -534,6 +546,7 @@ namespace GtkFlow {
 
                         var source_dock = this.retrieve_dock(src);
                         var source_node = this.retrieve_node(src.node);
+                        
                         Gtk.Allocation src_dock_alloc, src_node_alloc;
                         source_dock.get_allocation(out src_dock_alloc);
                         source_node.get_allocation(out src_node_alloc);
@@ -553,18 +566,22 @@ namespace GtkFlow {
                         cr.save();
                         cr.set_source_rgba(color.red, color.green, color.blue, color.alpha);
                         cr.move_to(src_x, src_y);
+                        
                         if (w > 0) {
                             cr.rel_curve_to(w/3,0,2*w/3,h,w,h);
                         } else {
                             cr.rel_curve_to(-w/3,0,1.3*w,h,w,h);
                         }
+                        
                         cr.stroke();
                         cr.restore();
                     }
                 }
                 c = c.get_next_sibling();
             }
+            
             this.draw_minimap();
+            
             if (this.temp_connector != null) {
                 color = this.temp_connected_dock.resolve_color(
                     this.temp_connected_dock, this.temp_connected_dock.last_value
@@ -584,6 +601,7 @@ namespace GtkFlow {
                 cr.stroke();
                 cr.restore();
             }
+            
             if (this.mark_rubberband != null) {
                 cr.save();
                 cr.set_source_rgba(0.0, 0.2, 0.9, 0.4);

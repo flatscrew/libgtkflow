@@ -109,9 +109,10 @@ namespace GFlow {
         {
             if (this._sinks.index(s) != -1)
                 this._sinks.remove(s);
+            
             if (s.is_linked_to(this)) {
                 s.unlink (this);
-                this.unlinked(s, this._sinks.length () == 0);
+                //  this.unlinked(s, this._sinks.length () == 0);
             }
         }
 
@@ -137,7 +138,8 @@ namespace GFlow {
         {
             if (!this.is_linked_to (dock)) return;
             if (dock is Sink) {
-                remove_sink ((Sink) dock);
+                this.remove_sink ((Sink) dock);
+                dock.unlinked(this, this.sinks.length() == 0);
             }
         }
 

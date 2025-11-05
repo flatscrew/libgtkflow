@@ -497,6 +497,7 @@ namespace GtkFlow {
 
         private void on_drag_begin(double start_x, double start_y) {
             var picked = this.pick(start_x, start_y, Gtk.PickFlags.DEFAULT);
+            
             if (is_drag_forbidden(picked)) {
                 this.allow_drag = false;
                 this.drag_active = false;
@@ -528,7 +529,7 @@ namespace GtkFlow {
         
             Gtk.Widget? current = widget;
             while (current != null) {
-                if ( widget is Dock) {
+                if (widget is Dock) {
                     return true;
                 }
                 current = current.get_parent();

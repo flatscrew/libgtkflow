@@ -32,6 +32,8 @@ namespace GtkFlow {
             set_css_name("gtkflow_dock");
         }
 
+        public signal void connection_missed(double x, double y);
+        
         public GFlow.Dock d { get; protected set; }
         private Gtk.GestureClick ctr_click;
 
@@ -149,6 +151,11 @@ namespace GtkFlow {
         }
 
         private void press_button(int n_clicked, double x, double y) {
+            var picked = this.pick(x, y, Gtk.PickFlags.DEFAULT);
+            if (picked == null) {
+                return;
+            }
+            
             var nv = this.get_nodeview();
             if (nv == null) {
                 warning("Dock could not process button press: no nodeview");
@@ -163,6 +170,10 @@ namespace GtkFlow {
             pref = 16;
             min_base = -1;
             pref_base = -1;
+        }
+        
+        public void notify_connection_miss(double x, double y) {
+            this.connection_missed(x, y);
         }
     }
 }
