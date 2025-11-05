@@ -111,35 +111,9 @@ namespace GtkFlow {
     public class Node : Gtk.Widget, NodeRenderer  {
         private const double DRAG_THRESHOLD = 5.0;
 
-        private static string CSS = "
-        .gtkflow_node { 
-            background: rgba(0.6, 0.6, 0.6, 0.2); 
-            border-radius: 5px; 
-            border: 1px solid rgba(128, 128, 128, 0.8); 
-            box-shadow: 2px 2px 3px 3px rgba(153, 153, 153, 0.5);
-        }
-
-        .gtkflow_node_marked  { 
-            background: rgba(0, 51, 128, 0.8); 
-            border-radius: 5px; 
-            border: 1px solid rgba(0, 51, 128, 0.8); 
-            box-shadow: 2px 2px 3px 3px rgba(0, 51, 153, 0.5);
-        }
-        ";
-        
-        private static Gtk.CssProvider css = new Gtk.CssProvider();
-        private static bool initialized = false;
-        private static void init() {
-            if (Node.initialized) return;
-            Node.css.load_from_data(Node.CSS.data);
-            Node.initialized = true;
-        }
-
         private bool title_initialized = false;
 
         construct {
-            set_css_name("gtkflow_node");
-
             this.notify["marked"].connect(this.marked_changed);
         }
 
@@ -191,11 +165,12 @@ namespace GtkFlow {
         private int n_docks = 0;
         private int margin = 0;
 
+        
         ~Node() {
             this.pads_grid.unparent();
             this.node_box.unparent();
         }
-
+        
         /**
          * Instantiate a new node
          *
@@ -227,14 +202,12 @@ namespace GtkFlow {
         }
 
         public Node.with_margin(GFlow.Node n, int margin, NodeDockLabelWidgetFactory dock_label_factory) {
-            Node.init();
             this.n = n;
             this.dock_label_factory = dock_label_factory;
             this.margin = margin;
             
             this.set_layout_manager(new Gtk.BinLayout());
-            this.add_css_class("gtkflow_node");
-            this.get_style_context().add_provider(Node.css,Gtk.STYLE_PROVIDER_PRIORITY_USER);
+            //  this.get_style_context().add_provider(Node.css, Gtk.STYLE_PROVIDER_PRIORITY_USER);
 
             this.node_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
             this.node_box.set_parent(this);
@@ -252,6 +225,8 @@ namespace GtkFlow {
             create_drag_drop_controller();
             create_motion_controller();
             create_event_override_controller();
+            
+            this.add_css_class("gtkflow_node");
         }
 
         private void create_event_override_controller() {

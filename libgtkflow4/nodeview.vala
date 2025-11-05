@@ -24,40 +24,12 @@ namespace GtkFlow {
         DOCKS_NOT_SUITABLE
     }
 
-    private interface MotionQueuedNodeOperation : Object {
-        public abstract void do_on_nodeview(NodeView nv);
-    }
-
-    private class RemoveNodeOperation : MotionQueuedNodeOperation, Object {
-
-        private NodeRenderer n;
-
-        public RemoveNodeOperation(NodeRenderer n) {
-            this.n = n;
-        }
-
-        public void do_on_nodeview(NodeView nv) {
-            n.n.unlink_all();
-            var child = nv.get_first_child ();
-            while (child != null) {
-                if (child == n) {
-                    child.unparent ();
-                    child = null;
-                    this.n = null;
-                    return;
-                }
-                child = child.get_next_sibling();
-            }
-            warning("Tried to remove a node that is not a child of nodeview");
-        }
-    }
-
     private class NodeViewLayoutManager : Gtk.LayoutManager {
         protected override Gtk.SizeRequestMode get_request_mode (Gtk.Widget widget) {
             return Gtk.SizeRequestMode.CONSTANT_SIZE;
         }
 
-        protected override  void measure(Gtk.Widget w, Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
+        protected override void measure(Gtk.Widget w, Gtk.Orientation o, int for_size, out int min, out int pref, out int min_base, out int pref_base) {
             int lower_bound = 0;
             int upper_bound = 0;
             var c = w.get_first_child();

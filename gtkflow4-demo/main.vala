@@ -120,8 +120,11 @@ int main (string[] args) {
   );
 
   app.activate.connect(() => {
+    GtkFlow.init();
+    
     var win = new Gtk.ApplicationWindow(app);
     win.set_default_size (400, 300);
+    
 
     var btn = new Gtk.Button.with_label("Spawn Node");
     var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
@@ -152,7 +155,7 @@ int main (string[] args) {
     nv.add(node2);
     n2.register_colors(nv);
 
-    node2.set_position(100,0);
+    node2.set_position(200, 200);
 
     try {
         n1.source1.link(n2.sink1);

@@ -24,6 +24,7 @@ src = files([
     'minimap.vala',
     'node.vala',
     'nodeview.vala',
+    'init.vala'
 ])
 
 gtkflow4_api = '0.2'

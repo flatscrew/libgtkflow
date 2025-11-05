@@ -28,10 +28,6 @@ namespace GtkFlow {
      * of {@link GtkFlow.Node}
      */
     public class Dock : Gtk.Widget {
-        construct {
-            set_css_name("gtkflow_dock");
-        }
-
         public signal void connection_missed(double x, double y);
         
         public GFlow.Dock d { get; protected set; }
@@ -49,6 +45,7 @@ namespace GtkFlow {
             this.d = d;
             this.d.unlinked.connect(()=>{this.queue_draw();});
             this.d.linked.connect(()=>{this.queue_draw();});
+            this.d.changed.connect(this.cb_changed);
 
             this.valign = Gtk.Align.CENTER;
             this.halign = Gtk.Align.CENTER;
@@ -60,7 +57,8 @@ namespace GtkFlow {
             this.ctr_click = new Gtk.GestureClick();
             this.add_controller(this.ctr_click);
             this.ctr_click.pressed.connect((n, x, y) => { this.press_button(n,x,y); });
-            this.d.changed.connect(this.cb_changed);
+            
+            this.add_css_class("gtkflow_dock");
         }
 
         private GtkFlow.NodeView? get_nodeview() {
@@ -107,47 +105,44 @@ namespace GtkFlow {
         }
 
         protected override void snapshot (Gtk.Snapshot sn) {
-            var nv = this.get_nodeview();
-            if (nv == null) {
-                warning("Dock could not snapshot: no nodeview");
+            int width = this.get_allocated_width();
+            int height = this.get_allocated_height();
+            
+            if (width == 0 || height == 0) {
+                warning("Dock snapshot skipped (0 size)");
                 return;
             }
-            var rect = Graphene.Rect().init(0,0,16, 16);
-            var rrect = Gsk.RoundedRect().init_from_rect(rect, 8f);
-            Gdk.RGBA color = {0.5f,0.5f,0.5f,1.0f};
-            Gdk.RGBA[] border_color = {color,color,color,color};
-            float[] thicc = {1f,1f,1f,1f};
-            sn.append_border(rrect, thicc, border_color);
-            base.snapshot(sn);
+            
+            var rect = Graphene.Rect().init(0, 0, width, height);
+            var ctx = this.get_style_context();
             var cr = sn.append_cairo(rect);
-            cr.save();
-            cr.set_source_rgba(0.0,0.0,0.0,0.0);
-            cr.set_operator(Cairo.Operator.SOURCE);
-            cr.paint();
-            cr.restore();
-            if (this.d.is_linked()) {
-                Gdk.RGBA dot_color = {0.0f,0.0f,0.0f,1.0f};
-                if (this.d is GFlow.Source) {
-                    dot_color = this.resolve_color(this, this.last_value);
-                } else if (this.d is GFlow.Sink && this.d.is_linked()) {
-                    var sink = (GFlow.Sink) this.d;
+        
+            ctx.render_background(cr, 0, 0, width, height);
+            ctx.render_frame(cr, 0, 0, width, height);
+        
+            if (!this.d.is_linked())
+                return;
+        
+                
+            Gdk.RGBA dot_color = {0.0f, 0.0f, 0.0f, 1.0f};
+        
+            if (this.d is GFlow.Source) {
+                dot_color = this.resolve_color(this, this.last_value);
+            } else if (this.d is GFlow.Sink && this.d.is_linked()) {
+                var nv = this.get_nodeview();
+                if (nv != null) {
+                    var sink = (GFlow.Sink)this.d;
                     var sourcedock = nv.retrieve_dock(sink.sources.nth_data(0));
-                    if (sourcedock != null) {
+                    if (sourcedock != null)
                         dot_color = sourcedock.resolve_color(this, this.last_value);
-                    }
                 }
-                thicc = {8f, 8f, 8f, 8f};
-                cr.save();
-                cr.set_source_rgba(
-                    dot_color.red,
-                    dot_color.green,
-                    dot_color.blue,
-                    dot_color.alpha
-                );
-                cr.arc(8d,8d,4d,0.0,2*Math.PI);
-                cr.fill();
-                cr.restore();
             }
+        
+            cr.save();
+            cr.set_source_rgba(dot_color.red, dot_color.green, dot_color.blue, dot_color.alpha);
+            cr.arc(width / 2.0, height / 2.0, 4.0, 0.0, 2 * Math.PI);
+            cr.fill();
+            cr.restore();
         }
 
         private void press_button(int n_clicked, double x, double y) {
